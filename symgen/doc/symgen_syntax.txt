@@ -1,0 +1,27 @@
+// blank lines and white space are ignored
+// lines starting # are comments and ignored
+
+input = component *
+
+component = "COMP" NAME REF 
+            unit *
+            "END"
+
+unit = "UNIT" [PWR] 
+       pin_def * 
+       
+
+pin_def = NUMBER NAME [type [position]]
+
+type =  "I"           // input 
+        | "CI"        // clock, input        
+        | "O"         // output
+        | "P"         // power, input
+        
+position = "L" | "R" | "T" | "B"        // position with respect to unit: left, right, top, bottom         
+
+NAME = valid pin name. If name starts with "~", the pin shape is set to inverted style if applicable 
+
+NUMBER = valid pin number, [0-9]*
+
+  

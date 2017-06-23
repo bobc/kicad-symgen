@@ -1,0 +1,2980 @@
+COMP 74469 U
+UNIT 
+3 D0 I L
+4 D1 I L
+5 D2 I L
+6 D3 I L
+7 D4 I L
+8 D5 I L
+9 D6 I L
+10 D7 I L
+1 CLK I L
+2 LD I L
+11 UD I L
+23 CBI I L
+22 Q0 T R
+21 Q1 T R
+20 Q2 T R
+19 Q3 T R
+18 Q4 T R
+17 Q5 T R
+16 Q6 T R
+15 Q7 T R
+13 OE I R
+14 CBO O R
+UNIT PWR
+12 GND P U
+24 VCC P D
+END
+COMP 74HC595 U
+DESC 8 bits serial in // out Shift Register 3 State Out
+KEYW HCMOS SR 3State
+DOC 74xx/74HC595.pdf
+ALIAS 74LS596
+DESC 8 bits serial in // out Shift Register Open Collect.
+KEYW HCMOS SR OpenCol
+ALIAS 74LS595
+DESC 8 bits serial in // out Shift Register 3 State Out
+KEYW TTL SR 3State
+UNIT 
+14 SER I L
+11 SRCLK CI L
+10 SRCLR ~I L
+12 RCLK CI L
+13 G ~I L
+15 QA T R
+1 QB T R
+2 QC T R
+3 QD T R
+4 QE T R
+5 QF T R
+6 QG T R
+7 QH T R
+9 ~QH O R
+UNIT PWR
+8 GND P U
+16 VCC P D
+END
+COMP 74HCT04 U
+DESC Hex Inverseur
+KEYW HCTMOS not inv
+ALIAS 74HC14
+ALIAS 74HC04
+DESC Hex Inverseur
+KEYW HCMOS not inv
+ALIAS 74LS14
+DESC Hex inverseur schmitt trigger
+KEYW TTL not inv
+UNIT NOT
+1 ~ I L
+2 ~ ~O R
+UNIT NOT
+3 ~ I L
+4 ~ ~O R
+UNIT NOT
+5 ~ I L
+6 ~ ~O R
+UNIT NOT
+9 ~ I L
+8 ~ ~O R
+UNIT NOT
+11 ~ I L
+10 ~ ~O R
+UNIT NOT
+13 ~ I L
+12 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS00 U
+FPLIST
+14DIP300*
+SO14*
+DESC Quad nand2
+KEYW TTL nand2
+ALIAS 74LS37
+DESC Quad Buffer nand2
+KEYW TTL nand2 buffer
+ALIAS 7400
+DESC Quad nand2
+KEYW TTL nand2
+ALIAS 74HCT00
+DESC Quad nand2
+KEYW HCTMOS nand2
+ALIAS 74HC00
+DESC Quad nand2
+KEYW HCMOS nand2
+UNIT NAND
+1 ~ I L
+2 ~ I L
+3 ~ ~O R
+UNIT NAND
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+8 ~ ~O R
+UNIT NAND
+12 ~ I L
+13 ~ I L
+11 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS01 U
+DESC Quad nand2 open collect.
+KEYW TTL nand2 opencol
+UNIT NAND
+2 ~ I L
+3 ~ I L
+1 ~ ~C R
+UNIT NAND
+5 ~ I L
+6 ~ I L
+4 ~ ~C R
+UNIT NAND
+8 ~ I L
+9 ~ I L
+10 ~ ~C R
+UNIT NAND
+11 ~ I L
+12 ~ I L
+13 ~ ~C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS02 U
+FPLIST
+SO14*
+14DIP*
+DESC Quad Nor2
+KEYW TTL Nor2
+ALIAS 74HC02
+DESC Quad Nor2
+KEYW HCMOS Nor2
+ALIAS 74HCT02
+DESC Quad Nor2
+KEYW HCTMOS Nor2
+ALIAS 7402
+DESC Quad Nor2
+KEYW TTL Nor2
+ALIAS 74LS28
+DESC Quad Buffer Nor2
+KEYW TTL Nor2 Buffer
+UNIT NOR
+2 ~ I L
+3 ~ I L
+1 ~ ~O R
+UNIT NOR
+5 ~ I L
+6 ~ I L
+4 ~ ~O R
+UNIT NOR
+8 ~ I L
+9 ~ I L
+10 ~ ~O R
+UNIT NOR
+11 ~ I L
+12 ~ I L
+13 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS03 U
+DESC Quad Nand2 open collect
+KEYW TTL Nand2 OpenCol
+UNIT NAND
+1 ~ I L
+2 ~ I L
+3 ~ ~C R
+UNIT NAND
+4 ~ I L
+5 ~ I L
+6 ~ ~C R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+8 ~ ~C R
+UNIT NAND
+12 ~ I L
+13 ~ I L
+11 ~ ~C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS04 U
+DESC Hex Inverseur
+KEYW TTL not inv
+UNIT NOT
+1 ~ I L
+2 ~ ~O R
+UNIT NOT
+3 ~ I L
+4 ~ ~O R
+UNIT NOT
+5 ~ I L
+6 ~ ~O R
+UNIT NOT
+9 ~ I L
+8 ~ ~O R
+UNIT NOT
+11 ~ I L
+10 ~ ~O R
+UNIT NOT
+13 ~ I L
+12 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS05 U
+DESC Inverseur Open Collect
+KEYW TTL not inv OpenCol
+ALIAS 74LS06
+ALIAS 74LS06N
+UNIT NOT
+1 ~ I L
+2 ~ ~C R
+UNIT NOT
+3 ~ I L
+4 ~ ~C R
+UNIT NOT
+5 ~ I L
+6 ~ ~C R
+UNIT NOT
+9 ~ I L
+8 ~ ~C R
+UNIT NOT
+11 ~ I L
+10 ~ ~C R
+UNIT NOT
+13 ~ I L
+12 ~ ~C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS08 U
+DESC Quad And2
+KEYW TTL and2
+ALIAS 74LS09
+DESC Quad And2 Open Collect
+KEYW TTL and2 OpenCol
+UNIT AND
+1 ~ I L
+2 ~ I L
+3 ~ O R
+UNIT AND
+4 ~ I L
+5 ~ I L
+6 ~ O R
+UNIT AND
+9 ~ I L
+10 ~ I L
+8 ~ O R
+UNIT AND
+12 ~ I L
+13 ~ I L
+11 ~ O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS10 U
+DESC Triple Nand3
+KEYW TTL Nand3
+UNIT NAND
+1 ~ I L
+2 ~ I L
+13 ~ I L
+12 ~ ~O R
+UNIT NAND
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+11 ~ I L
+8 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS107 U
+DESC Double JK FlipFlop, reset
+KEYW TTL JK
+UNIT 
+1 J I L
+12 Cp ICI L
+4 K I L
+3 Q O R
+2 ~Q ~O R
+UNIT 
+8 J I L
+9 Cp ICI L
+11 K I L
+5 Q O R
+6 ~Q ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS109 U
+DESC Double JK FlipFlop, Set & Reset
+KEYW TTL JK
+UNIT 
+2 J I L
+4 Cp CI L
+3 K ~I L
+6 Q O R
+7 ~Q ~O R
+UNIT 
+14 J I L
+12 Cp CI L
+13 K ~I L
+10 Q I R
+9 ~Q ~I R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS11 U
+DESC Triple And3
+KEYW TTL And3
+UNIT AND
+1 ~ I L
+2 ~ I L
+13 ~ I L
+12 ~ O R
+UNIT AND
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ O R
+UNIT AND
+9 ~ I L
+10 ~ I L
+11 ~ I L
+8 ~ O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS112 U
+DESC Double JK FlipFlop, Set & Reset
+KEYW TTL JK
+UNIT 
+3 J I L
+1 Cp ICI L
+2 K I L
+5 Q O R
+6 ~Q ~O R
+UNIT 
+11 J I L
+13 Cp ICI L
+12 K I L
+9 Q O R
+7 ~Q ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS113 U
+DESC Double JK, Set
+KEYW TTL JK
+UNIT 
+3 J I L
+1 Cp ~I L
+2 K I L
+5 Q O R
+6 ~Q ~O R
+UNIT 
+11 J I L
+13 Cp ~I L
+12 K I L
+9 Q I R
+8 ~Q ~I R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS114 U
+DESC Double JK, common Clock & Reset, Set
+KEYW TTL JK
+UNIT 
+3 J I L
+1 Cp ~I L
+2 K I L
+5 Q O R
+6 ~Q ~O R
+UNIT 
+11 J I L
+13 Cp ~I L
+12 K I L
+9 Q I R
+8 ~Q ~I R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS12 U
+DESC Triple Nand3 Open Collect
+KEYW TTL Nand3 OpenCol
+UNIT NAND
+1 ~ I L
+2 ~ I L
+13 ~ I L
+12 ~ ~C R
+UNIT NAND
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ ~C R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+11 ~ I L
+8 ~ ~C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS121 U
+UNIT 
+3 A1 I L
+4 A2 I L
+5 B I L
+6 Q O R
+1 ~Q O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS122 U
+DESC Retriggerable Monostable
+KEYW TTL monostable
+UNIT 
+1 A1 ~I L
+2 A2 ~I L
+3 B1 I L
+4 B2 I L
+8 Q O R
+6 ~Q ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS123 U
+DESC Dual retriggerable Monostable
+KEYW TTL monostable
+UNIT 
+1 A ~I L
+2 B I L
+13 Q O R
+4 ~Q ~O R
+UNIT 
+9 A ~I L
+10 B I L
+5 Q O R
+12 ~Q ~O R
+UNIT PWR
+8 GND P U
+16 VCC P D
+END
+COMP 74LS125 U
+DESC Quad buffer 3 State out
+KEYW TTL buffer 3State
+ALIAS 74LVC125
+DESC Quad buffer 3 State out
+KEYW TTL buffer 3State
+UNIT 
+2 D I L
+3 O T R
+UNIT 
+5 D I L
+6 O T R
+UNIT 
+9 D I L
+8 O T R
+UNIT 
+12 D I L
+11 O T R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS126 U
+DESC Quad buffer 3 State out
+KEYW TTL Buffer 3State
+UNIT 
+2 ~ I L
+3 ~ T R
+UNIT 
+5 D I L
+6 O T R
+UNIT 
+9 D I L
+8 ~ T R
+UNIT 
+12 ~ I L
+11 ~ T R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS13 U
+DESC Double Nand4 schmitt trigger
+KEYW TTL Nand4
+UNIT NAND
+1 ~ I L
+2 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+12 ~ I L
+13 ~ I L
+8 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS132 U
+DESC Quad Nand2 schmitt trigger
+KEYW TTL Nand2
+UNIT NAND
+1 ~ I L
+2 ~ I L
+3 ~ ~O R
+UNIT NAND
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+8 ~ ~O R
+UNIT NAND
+12 ~ I L
+13 ~ I L
+11 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS133 U
+DESC Nand 13 inputs
+KEYW TTL Nand13
+UNIT NAND
+1 ~ I L
+2 ~ I L
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ I L
+7 ~ I L
+10 ~ I L
+11 ~ I L
+12 ~ I L
+13 ~ I L
+14 ~ I L
+15 ~ I L
+9 ~ ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS136 U
+DESC Quad Exclusive Or 2-inputs, Open Collect.
+KEYW TTL XOR2 OpenCol
+DOC http://www.ti.com/lit/ds/symlink/sn54ls136.pdf
+UNIT XOR
+1 ~ I L
+2 ~ I L
+3 ~ C R
+UNIT XOR
+4 ~ I L
+5 ~ I L
+6 ~ C R
+UNIT XOR
+9 ~ I L
+10 ~ I L
+8 ~ C R
+UNIT XOR
+12 ~ I L
+13 ~ I L
+11 ~ I R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS137 U
+DESC Decoder 3 to 8, addr latches.
+KEYW TTL DECOD8 DECOD
+UNIT 
+1 A0 I L
+2 A1 I L
+3 A2 I L
+4 ~Gl ~I L
+5 ~G2 ~I L
+6 G1 I L
+7 Y7 ~O R
+9 Y6 ~O R
+10 Y5 ~O R
+11 Y4 ~O R
+12 Y3 ~O R
+13 Y2 ~O R
+14 Y1 ~O R
+15 Y0 ~O R
+UNIT PWR
+16 VCC P U
+8 GND P U
+END
+COMP 74LS138 U
+DESC Decoder 3 to 8 (active low outputs)
+KEYW TTL DECOD DECOD8
+UNIT 
+1 A0 I L
+2 A1 I L
+3 A2 I L
+6 E3 I L
+5 E2 LI L
+4 E1 LI L
+15 O0 VO R
+14 O1 VO R
+13 O2 VO R
+12 O3 VO R
+11 O4 VO R
+10 O5 VO R
+9 O6 VO R
+7 O7 VO R
+UNIT PWR
+8 GND P U
+16 VCC P D
+END
+COMP 74LS139 U
+DESC Dual Decoder 1 of 4, Active low outputs
+KEYW TTL DECOD4
+UNIT 
+3 A1 I L
+2 A0 I L
+1 E ~I L
+4 O0 ~O R
+5 O1 ~O R
+6 O2 ~O R
+7 O3 ~O R
+UNIT 
+13 A1 I L
+14 A0 I L
+15 E ~I L
+12 O0 ~O R
+11 O1 ~O R
+10 O2 ~O R
+9 O3 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS145 U
+DESC Decoder 1 to 10, Open Collect.
+KEYW TTL DECOD10 OpenColl
+UNIT 
+15 P0 I L
+14 P1 I L
+13 P2 I L
+12 P3 I L
+1 Q0 ~C R
+2 Q1 ~C R
+3 Q2 ~C R
+4 Q3 ~C R
+5 Q4 ~C R
+6 Q5 ~C R
+7 Q6 ~C R
+9 Q7 ~C R
+10 Q8 ~C R
+11 Q9 ~C R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS147 U
+DESC Priority Encodeur, 10 to 4
+KEYW TTL ENCOD
+UNIT 
+11 E1 ~I L
+12 E2 ~I L
+13 E3 ~I L
+1 E4 ~I L
+2 E5 ~I L
+3 E6 ~I L
+4 E7 ~I L
+5 E8 ~I L
+10 E9 ~I L
+9 S0 ~O R
+7 S1 ~O R
+6 S2 ~O R
+14 S3 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS148 U
+DESC Priority Encoder 3 to 8 cascadable
+KEYW TTL ENCOD
+UNIT 
+10 IO ~I L
+11 I1 ~I L
+12 I2 ~I L
+13 I3 ~I L
+1 I4 ~I L
+2 I5 ~I L
+3 I6 ~I L
+4 I7 ~I L
+5 EI ~I L
+9 S0 ~O R
+7 S1 ~O R
+6 S2 ~O R
+14 GS ~O R
+15 EO ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS15 U
+DESC Triple And 3 inputs
+KEYW TTL And3
+UNIT AND
+1 ~ I L
+2 ~ I L
+13 ~ I L
+12 ~ C R
+UNIT AND
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ C R
+UNIT AND
+9 ~ I L
+10 ~ I L
+11 ~ I L
+8 ~ C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS151 U
+DESC Multiplexer 8 to 1
+KEYW TTL MUX8
+UNIT 
+4 I0 I L
+3 I1 I L
+2 I2 I L
+1 I3 I L
+15 I4 I L
+14 I5 I L
+13 I6 I L
+12 I7 I L
+11 S0 I L
+10 S1 I L
+9 S2 I L
+7 ~E ~I L
+5 Z O R
+6 ~Z ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS153 U
+DESC Dual Multiplexer 4 to 1
+KEYW TTL Mux4
+UNIT 
+6 I0a I L
+5 I1a I L
+4 I2a I L
+3 I3a I L
+1 Ea ~I L
+10 I0b I L
+11 I1b I L
+12 I2b I L
+13 I3b I L
+15 Eb ~I L
+14 S0 I L
+2 S1 I L
+7 Za O R
+9 Zb O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS154 U
+DESC Decoder 4 to 16
+KEYW TTL DECOD16 DECOD
+UNIT 
+23 A0 I L
+22 A1 I L
+21 A2 I L
+20 A3 I L
+18 E0 I L
+19 E1 I L
+1 S0 O R
+2 S1 O R
+3 S2 O R
+4 S3 O R
+5 S4 O R
+6 S5 O R
+7 S6 O R
+8 S7 O R
+9 S8 O R
+10 S9 O R
+11 S10 O R
+13 S11 O R
+14 S12 O R
+15 S13 I R
+16 S14 O R
+17 S15 O R
+UNIT PWR
+12 GND P U
+24 VCC P D
+END
+COMP 74LS155 U
+DESC Dual 2 to 4 lines Decoder/Demultiplexer
+KEYW TTL DECOD8 DECOD4 DEMUX4 DEMUX8 DEMUX DECOD
+ALIAS 74LS156
+DESC Dual 2 to 4 lines Decoder/Demultiplexer, Open Collect.
+KEYW TTL DECOD8 DECOD4 DEMUX4 DEMUX8 OpenCol
+UNIT 
+1 Ea1 I L
+2 Ea2 ~I L
+13 A0 I L
+3 A1 I L
+14 Eb1 ~I L
+15 Eb2 ~I L
+7 Q0a ~O R
+6 Q1a ~O R
+5 Q2a ~O R
+4 Q3a ~O R
+9 Q0b ~O R
+10 Q1b ~O R
+11 Q2b ~O R
+12 Q3b ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS157 U
+DESC Quad 2 to 1 line Multiplexer
+KEYW TTL MUX MUX2
+UNIT 
+2 I0a I L
+3 I1a I L
+5 I0b I L
+6 I1b I L
+14 I0c I L
+13 I1c I L
+11 I0d I L
+10 I1d I L
+1 S I L
+15 E ~I L
+4 Za O R
+7 Zb O R
+12 Zc O R
+9 Zd O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS158 U
+DESC Quad 2 to 1 multiplexer
+KEYW TTL Mux MUX2
+UNIT 
+2 I0a I L
+3 I1a I L
+5 I0b I L
+6 I1b I L
+14 I0c I L
+13 I1c I L
+11 I0d I L
+10 I1d I L
+1 S I L
+15 E ~I L
+4 Za ~O R
+7 Zb ~O R
+12 Zc ~O R
+9 Zd ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS161 U
+DESC Sychronous 4 bits programmable binary Counter
+KEYW TTL CNT CNT4
+ALIAS 74LS160
+DESC Sychronous 4 bits programmable decimal Counter
+KEYW TTL CNT CNT4
+ALIAS 74LS162
+DESC Sychronous 4 bits programmable decimal Counter
+KEYW TTL CNT CNT4
+ALIAS 74LS163
+DESC Sychronous 4 bits programmable binary Counter
+KEYW TTL CNT CNT4
+UNIT 
+6 P3 I L
+5 P2 I L
+4 P1 I L
+3 P0 I L
+9 ~Pe ~I L
+7 Cep I L
+10 Cet I L
+2 Cp I L
+1 ~MR ~I L
+14 Q0 O R
+13 Q1 O R
+12 Q2 O R
+11 Q3 O R
+15 Tc O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS165 U
+DESC Shift Register 8 bits, parallel load
+KEYW TTL SR SR8
+UNIT 
+10 Ds I L
+11 P0 I L
+12 P1 I L
+13 P2 I L
+14 P3 I L
+3 P4 I L
+4 P5 I L
+5 P6 I L
+6 P7 I L
+1 Pl ~I L
+2 CP I L
+15 CE ~I L
+9 Q7 O R
+7 ~Q7 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS166 U
+DESC Shift Register 8 bits, parallel load
+KEYW TTL SR SR8
+UNIT 
+1 Ds I L
+2 A I L
+3 B I L
+4 C I L
+5 D I L
+10 E I L
+11 F I L
+12 G I L
+14 H I L
+15 PE ~I L
+7 Clk I L
+6 CE ~I L
+9 Clr ~I L
+13 Qh O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS168 U
+DESC Synchronous 4 bits Up/Down Decimal counter
+KEYW TTL CNT CNT4
+ALIAS 74LS169
+DESC Synchronous 4 bits Up/Down binary counter
+KEYW TTL CNT CNT4
+UNIT 
+3 P0 I L
+4 P1 I L
+5 P2 I L
+6 P3 I L
+9 Pe ~I L
+1 U/D I L
+7 Cep ~I L
+10 Cet ~I L
+2 Cp CI L
+14 Q0 O R
+13 Q1 O R
+12 Q2 O R
+11 Q3 O R
+15 ~Tc ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS170 U
+DESC 4 x 4 Register Files Open Collect.
+KEYW TTL Register OpenCol
+ALIAS 74ls670
+DESC 4 x 4 Register Files 3 State Out
+KEYW TTL Register 3State
+UNIT 
+15 D1 I L
+1 D2 I L
+2 D3 I L
+3 D4 I L
+14 Wa I L
+13 Wb I L
+12 ~Ew I L
+5 Ra I L
+4 Rb I L
+11 ~Er I L
+10 Q1 T R
+9 Q2 T R
+7 Q3 T R
+6 Q4 T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS173 U
+DESC 4 bits D-type Register, 3 state out
+KEYW TTL REG REG4 3State DFF
+UNIT 
+14 D0 I L
+13 D1 I L
+12 D2 I L
+11 D3 I L
+1 Oe1 ~I L
+2 Oe2 ~I L
+9 E1 ~I L
+10 E2 ~I L
+7 Cp CI L
+15 Mr I L
+3 Q0 T R
+4 Q1 T R
+5 Q2 T R
+6 Q3 T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS174 U
+DESC Hex D-type FlipFlop, reset
+KEYW TTL REG REG6 DFF
+UNIT 
+3 D0 I L
+4 D1 I L
+6 D2 I L
+11 D3 I L
+13 D4 I L
+14 D5 I L
+9 Cp I L
+1 ~Mr ~I L
+2 Q0 I R
+5 Q1 I R
+7 Q2 I R
+10 Q3 I R
+12 Q4 I R
+15 Q5 I R
+UNIT PWR
+8 GND P U
+16 VCC P D
+END
+COMP 74LS175 U
+DESC 4 bits D FlipFlop, reset
+KEYW TTL REG REG4 DFF
+UNIT 
+4 D0 I L
+5 D1 I L
+12 D2 I L
+13 D3 I L
+9 Cp CI L
+1 ~Mr ~I L
+2 Q0 O R
+3 ~Q0 ~O R
+7 Q1 O R
+6 ~Q1 ~O R
+10 Q2 O R
+11 ~Q2 ~O R
+15 Q3 O R
+14 ~Q3 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P D
+END
+COMP 74LS181 U
+DESC Arithmetic logic unit
+KEYW TTL ALU ARITH
+DOC 74xx/74F181.pdf
+UNIT 
+2 A0 I L
+23 A1 I L
+21 A2 I L
+19 A3 I L
+1 B0 I L
+22 B1 I L
+20 B2 I L
+18 B3 I L
+6 S0 I L
+5 S1 I L
+4 S2 I L
+3 S3 I L
+8 M I L
+7 Cn ~I L
+9 F0 O R
+10 F1 O R
+11 F2 O R
+13 F3 O R
+16 Cn+4 ~O R
+14 A=B O R
+17 Y O R
+15 X O R
+UNIT PWR
+12 GND P U
+24 VCC P D
+END
+COMP 74LS182 U
+DESC Carry generator
+KEYW TTL ALU ARITH
+UNIT 
+4 P0 ~I L
+2 P1 ~I L
+15 P2 ~I L
+6 P3 ~I L
+3 G0 ~I L
+1 G1 ~I L
+14 G2 ~I L
+5 G3 ~I L
+13 Cn I L
+12 Cn+x O R
+11 Cn+y O R
+9 Cn+z O R
+7 P ~O R
+10 G ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS190 U
+DESC 4 bits Synchronous 4 bits Up/Down BCD Counter
+KEYW TTL CNT CNT4
+ALIAS 74LS191
+DESC 4 bits Synchronous 4 bits Up/Down binary Counter
+KEYW TTL CNT CNT4
+UNIT 
+15 P0 I L
+1 P1 I L
+10 P2 I L
+9 P3 I L
+11 Pl ~I L
+5 D/U I L
+4 Ce ~I L
+14 Cp CI L
+3 Q0 I R
+2 Q1 I R
+6 Q2 I R
+7 Q3 I R
+13 ~Rc I R
+12 Tc ~I R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS192 U
+DESC Synchronous 4 bits Up/Down (2 clk) counter
+KEYW TTL CNT CNT4
+ALIAS 74LS193
+DESC Synchronous 4 bits Up/Down (2 clk) counter
+KEYW TTL CNT CNT4
+UNIT 
+15 P0 I L
+1 P1 I L
+10 P2 I L
+9 P3 I L
+11 Pl ~I L
+5 CpUp CI L
+4 CpDw CI L
+14 Mr I L
+3 Q0 I R
+2 Q1 I R
+6 Q2 I R
+7 Q3 I R
+12 TcUp ~I R
+13 TcDw ~I R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS194 U
+DESC Shift Register 4 bits Bidirectionnel
+KEYW TTL RS SR4
+UNIT 
+3 P0 I L
+4 P1 I L
+5 P2 I L
+6 P3 I L
+2 Dsr I L
+7 Dsl I L
+9 S0 I L
+10 S1 I L
+11 Cp CI L
+1 Mr ~I L
+15 Q0 O R
+14 Q1 O R
+13 Q2 O R
+12 Q3 O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS195 U
+DESC Shift Register 4 bits, parallel
+KEYW TTL SR SR4
+UNIT 
+4 P0 I L
+5 P1 I L
+6 P2 I L
+7 P3 I L
+2 J I L
+10 Cp CI L
+3 ~K ~I L
+9 Pe ~I L
+1 Mr ~I L
+15 Q0 O R
+14 Q1 O R
+13 Q2 O R
+12 Q3 O R
+11 ~Q3 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS196 U
+DESC 4 (3 + 1 ) bits presettable BCD counter
+KEYW TTL CNT CNT4
+ALIAS 74LS197
+DESC 4 (3 + 1 ) bits presettable binary counter
+KEYW TTL CNT CNT4
+UNIT 
+4 P0 I L
+10 P1 I L
+3 P2 I L
+11 P3 I L
+1 Pl ~I L
+8 Cp0 ICI L
+6 Cp1 ICI L
+13 Mr ~I L
+5 Q0 O R
+9 Q1 O R
+2 Q2 O R
+12 Q3 O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS20 U
+DESC Dual Nand 4 inputs
+KEYW TTL Nand4
+ALIAS 74LS22
+DESC Dual Nand 4 inputs Open Collect.
+KEYW TTL Nand4 OpenCol
+ALIAS 74LS40
+DESC Dual Nand 4 inputs
+KEYW TTL Nand4
+UNIT NAND
+1 ~ I L
+2 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+12 ~ I L
+13 ~ I L
+8 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS21 U
+DESC Dual And 4 inputs
+KEYW TTL And4
+UNIT AND
+1 ~ I L
+2 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ O R
+UNIT AND
+9 ~ I L
+10 ~ I L
+12 ~ I L
+13 ~ I L
+8 ~ O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS221 U
+DESC Dual Monostable
+KEYW TTL Monostable
+UNIT 
+1 A ~I L
+2 B I L
+3 Clr I L
+13 Q O R
+4 ~Q ~O R
+UNIT 
+9 A ~I L
+10 B I L
+11 Clr I L
+5 Q O R
+12 ~Q O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS240 U
+DESC 8 bits BUS Buffer (Inverter) 3 State out
+KEYW TTL Buffer BUS 3State
+UNIT 
+2 I0a I L
+4 I1a I L
+6 I2a I L
+8 I3a I L
+11 I0b I L
+13 I1b I L
+15 I2b I L
+17 I3b I L
+1 OEa ~I L
+19 OEb ~I L
+18 O0a ~T R
+16 O1a ~T R
+14 O2a ~T R
+12 O3a ~T R
+9 O0b ~T R
+7 O1b ~T R
+5 O2b ~T R
+3 O3b ~T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS241 U
+DESC 8 bits Bus Buffer 3 State out
+KEYW TTL Buffer BUS 3State
+ALIAS 74LS244
+DESC 8 bits Bus Buffer 3 State out
+KEYW TTL Buffer BUS 3State
+UNIT 
+2 I0a I L
+4 I1a I L
+6 I2a I L
+8 I3a I L
+11 I0b I L
+13 I1b I L
+15 I2b I L
+17 I3b I L
+1 OEa ~I L
+19 OEb ~I L
+18 O0a T R
+16 O1a T R
+14 O2a T R
+12 O3a T R
+9 O0b T R
+7 O1b T R
+5 O2b T R
+3 O3b T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS242 U
+UNIT 
+3 A0 I L
+4 A1 I L
+5 A2 I L
+6 A3 I L
+1 OEa ~I L
+13 OEb I L
+11 B0 ~T R
+10 B1 ~T R
+9 B2 ~T R
+8 B3 ~T R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS243 U
+DESC 4 bits Bus Tranceiver
+KEYW TTL Buffer 3State BUS BIDI
+UNIT 
+3 A0 I L
+4 A1 I L
+5 A2 I L
+6 A3 I L
+1 OEa ~I L
+13 OEb I L
+11 B0 T R
+10 B1 T R
+9 B2 T R
+8 B3 T R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS245 U
+DESC Octal BUS Transceivers, 3 State out
+KEYW TTL BUS 3State
+ALIAS 74HC245
+DESC Octal BUS Transceivers, 3 State out
+KEYW HCMOS BUS 3State
+UNIT 
+2 A0 T L
+3 A1 T L
+4 A2 T L
+5 A3 T L
+6 A4 T L
+7 A5 T L
+8 A6 T L
+9 A7 T L
+1 A->B I L
+19 CE ~I L
+18 B0 T R
+17 B1 T R
+16 B2 T R
+15 B3 T R
+14 B4 T R
+13 B5 T R
+12 B6 T R
+11 B7 T R
+UNIT PWR
+10 GND P U
+20 VCC P D
+END
+COMP 74LS247 U
+DESC BDC to 7 segments Decoder Open Collec. active Low
+KEYW TTL DECOD
+ALIAS 74LS246
+DESC BDC to 7 segments Decoder Open Collec. active Low
+KEYW TTL DECOD
+UNIT 
+7 A I L
+1 B I L
+2 C I L
+6 D I L
+3 Lt ~I L
+5 Rbi ~I L
+13 a ~C R
+12 b ~C R
+11 c ~C R
+10 d ~C R
+9 e ~C R
+14 g ~C R
+15 f ~C R
+4 Rbo ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS248 U
+DESC BCD to 7 segments Decoder, Active High
+KEYW TTL DECOD
+ALIAS 74LS249
+DESC BCD to 7 segments Decoder, Open collect, Active High
+KEYW TTL DECOD OpenCol
+UNIT 
+7 A I L
+1 B I L
+2 C I L
+6 D I L
+3 Lt ~I L
+5 Rbi ~I L
+13 a C R
+12 b C R
+11 c C R
+10 d C R
+9 e C R
+14 g C R
+15 f C R
+4 Rbo ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS251 U
+DESC Multiplexer 8 to 1, 3 state Out
+KEYW TTL MUX MUX8 3State
+UNIT 
+4 I0 I L
+3 I1 I L
+2 I2 I L
+1 I3 I L
+15 I4 I L
+14 I5 I L
+13 I6 I L
+12 I7 I L
+11 S0 I L
+10 S1 I L
+9 S2 I L
+7 ~E ~I L
+5 Z T R
+6 ~Z ~T R
+UNIT PWR
+16 VCC P U
+END
+COMP 74LS253 U
+DESC Dual Multiplexer 4 to 1, 3 State Out
+KEYW TTL MUX MUX4 3State
+UNIT 
+6 I0a I L
+5 I1a I L
+4 I2a I L
+3 I3a I L
+1 OEa ~I L
+10 I0b I L
+11 I1b I L
+12 I2b I L
+13 I3b I L
+15 OEb ~I L
+14 A0 I L
+2 A1 I L
+7 Za T R
+9 Zb T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS256 U
+UNIT 
+1 Ea1 I L
+2 Ea2 ~I L
+13 A0 I L
+3 A1 I L
+14 Eb1 ~I L
+15 Eb2 ~I L
+7 Q0a ~T R
+6 Q1a ~T R
+5 Q2a ~T R
+4 Q3a ~T R
+9 Q0b ~T R
+10 Q1b ~T R
+11 Q2b ~T R
+12 Q3b ~T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS257 U
+DESC Quad 2 to 1 Multiplexer
+KEYW TTL MUX MUX2
+UNIT 
+2 I0a I L
+3 I1a I L
+5 I0b I L
+6 I1b I L
+14 I0c I L
+13 I1c I L
+11 I0d I L
+10 I1d I L
+1 S I L
+15 OE ~I L
+4 Za T R
+7 Zb T R
+12 Zc T R
+9 Zd T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS258 U
+DESC Quad 2 to 1 Multiplexer,invert
+KEYW TTL MUX MUX2
+UNIT 
+2 I0a I L
+3 I1a I L
+5 I0b I L
+6 I1b I L
+14 I0c I L
+13 I1c I L
+11 I0d I L
+10 I1d I L
+1 S I L
+15 OE ~I L
+4 Za ~T R
+7 Zb ~T R
+12 Zc ~T R
+9 Zd ~T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS259 U
+DESC 8 bits addressable latch
+KEYW TTL REG DFF
+UNIT 
+13 D I L
+1 A0 I L
+2 A1 I L
+3 A2 I L
+14 E ~I L
+15 Clr ~I L
+4 Q0 O R
+5 Q1 O R
+6 Q2 O R
+7 Q3 O R
+9 Q4 O R
+10 Q5 O R
+11 Q6 O R
+12 Q7 O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS26 U
+DESC Quad Nand 2 inputs Open collect.
+KEYW TTL Nand2 OpenCol
+ALIAS 74LS38
+DESC Quad Buffer Nand 2 inputs Open collect.
+KEYW TTL Nand2 OpenCol Buffer
+UNIT NAND
+1 ~ I L
+2 ~ I L
+3 ~ ~C R
+UNIT NAND
+4 ~ I L
+5 ~ I L
+6 ~ ~C R
+UNIT NAND
+9 ~ I L
+10 ~ I L
+8 ~ ~C R
+UNIT NAND
+12 ~ I L
+13 ~ I L
+11 ~ ~C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS27 U
+DESC Triple Nr 3 inputs
+KEYW TTL Nor3
+UNIT NOR
+1 ~ I L
+2 ~ I L
+13 ~ I L
+12 ~ ~O R
+UNIT NOR
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT NOR
+9 ~ I L
+10 ~ I L
+11 ~ I L
+8 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS273 U
+DESC 8 bits D FlipFlop, reset
+KEYW TTL DFF DFF8
+UNIT 
+3 D0 I L
+4 D1 I L
+7 D2 I L
+8 D3 I L
+13 D4 I L
+14 D5 I L
+17 D6 I L
+18 D7 I L
+11 Cp CI L
+1 Mr ~I L
+2 Q0 O R
+5 Q1 O R
+6 Q2 O R
+9 Q3 O R
+12 Q4 O R
+15 Q5 O R
+16 Q6 O R
+19 Q7 O R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS280 U
+DESC Parity Generator/Checker
+KEYW TTL ALU Arith
+UNIT 
+8 A I L
+9 B I L
+10 C I L
+11 D I L
+12 E I L
+13 F I L
+1 G I L
+2 H I L
+4 I I L
+5 Even O R
+6 Odd O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS283 U
+DESC 4 bits full Adder
+KEYW TTL ADD Arith ALU
+UNIT 
+7 C0 I L
+5 A1 I L
+3 A2 I L
+14 A3 I L
+12 A4 I L
+6 B1 I L
+2 B2 I L
+15 B3 I L
+11 B4 I L
+4 S1 O R
+1 S2 O R
+13 S3 O R
+10 S4 O R
+9 C4 O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS290 U
+DESC 4 bits BCD counter
+KEYW TTL CNT CNT4
+ALIAS 74LS293
+DESC 4 bits binary counter
+KEYW TTL CNT CNT4
+UNIT 
+10 Cp0 ICI L
+11 Cp1 ICI L
+3 Ms2 I L
+1 Ms1 I L
+12 Mr1 I L
+13 Mr2 I L
+9 Q0 O R
+5 Q1 O R
+4 Q2 O R
+8 Q3 O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS295 U
+UNIT 
+1 Ds I L
+2 P0 I L
+3 P1 I L
+4 P2 I L
+5 P3 I L
+6 Pe I L
+9 Cp ICI L
+8 OE ~I L
+13 Q0 O R
+12 Q1 O R
+11 Q2 O R
+10 Q3 O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS298 U
+DESC Quad 2 to 1 multiplexer with storage
+KEYW TTL MUX MUX2
+UNIT 
+3 I0a I L
+2 I1a I L
+4 I0b I L
+1 I1b I L
+9 I0c I L
+5 I1c I L
+7 I0d I L
+6 I1d I L
+10 S I L
+11 Cp ICI L
+15 Qa O R
+14 Qb O R
+13 Qc O R
+12 Qd O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS299 U
+DESC 8 bits Universer shift/storage Register
+KEYW TTL REG SR SR8
+UNIT 
+11 Ds0 I L
+18 Ds7 I L
+1 S0 I L
+19 S1 I L
+2 OE1 ~I L
+3 OE2 ~I L
+12 Cp CI L
+9 Mr ~I L
+8 Q0 O R
+17 Q7 O R
+7 IO0 T R
+13 IO1 T R
+6 IO2 T R
+14 IO3 T R
+5 IO4 T R
+15 IO5 T R
+4 IO6 T R
+16 IO7 T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS30 U
+DESC Nand 8 inputs
+KEYW TTL Nand8
+UNIT NAND
+1 ~ I L
+2 ~ I L
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ I L
+11 ~ I L
+12 ~ I L
+8 ~ ~I R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS32 U
+DESC Quad Or 2 inputs
+KEYW TTL Or2
+UNIT OR
+1 ~ I L
+2 ~ I L
+3 ~ O R
+UNIT OR
+4 ~ I L
+5 ~ I L
+6 ~ O R
+UNIT OR
+9 ~ I L
+10 ~ I L
+8 ~ O R
+UNIT OR
+12 ~ I L
+13 ~ I L
+11 ~ O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS322 U
+UNIT 
+3 D0 I L
+17 D1 I L
+19 DS I L
+18 SE ~I L
+2 S/P I L
+1 G ~I L
+8 OE ~I L
+11 Clk CI L
+9 Clr ~I L
+4 A/Qa T R
+16 B/Qb T R
+5 C/Qc T R
+15 D/Qd T R
+6 E/Qe T R
+14 F/Qf T R
+7 G/Qg T R
+13 H/Qh T R
+12 Qh O R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS323 U
+DESC 8 bits Universal Shift/Storage Register
+KEYW TTL REG SR SR8
+UNIT 
+11 DS0 I L
+18 DS7 I L
+1 S0 I L
+19 S1 I L
+9 SR ~I L
+12 Cp CI L
+2 OE1 ~I L
+3 OE2 ~I L
+17 Q7 O R
+8 Q0 O R
+7 IO0 T R
+13 IO1 T R
+6 IO2 T R
+14 IO3 T R
+5 IO4 T R
+15 IO5 T R
+4 IO6 T R
+16 IO7 T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS33 U
+DESC Quad Nand 2 inputs, Open collect.
+KEYW TTL Nand8 OpenCol
+UNIT NOR
+2 ~ I L
+3 ~ I L
+1 ~ ~C R
+UNIT NOR
+5 ~ I L
+6 ~ I L
+4 ~ ~C R
+UNIT NOR
+8 ~ I L
+9 ~ I L
+10 ~ ~C R
+UNIT NOR
+11 ~ I L
+12 ~ I L
+13 ~ ~C R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS348 U
+DESC 8 to 3 lines Priority Encoder
+KEYW TTL ENCOD Arith
+UNIT 
+5 EI ~I L
+10 0 ~I L
+11 1 ~I L
+12 2 ~I L
+13 3 ~I L
+1 4 ~I L
+2 5 ~I L
+3 6 ~I L
+4 7 ~I L
+9 A0 ~T R
+7 A1 ~T R
+6 A2 ~T R
+14 GS ~O R
+15 E0 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS352 U
+DESC Dual 4 to 1 line Multiplexer
+KEYW TTL Mux MUX4
+UNIT 
+6 I0a I L
+5 I1a I L
+4 I2a I L
+3 I3a I L
+1 Ea ~I L
+10 I0b I L
+11 I1b I L
+12 I2b I L
+13 I3b I L
+15 Eb ~I L
+14 S0 I L
+2 S1 I L
+7 Za ~O R
+9 Zb ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS353 U
+DESC Dual 4 to 1 line Multiplexer, inverter
+KEYW TTL MUX MUX2
+UNIT 
+6 I0a I L
+5 I1a I L
+4 I2a I L
+3 I3a I L
+1 OEa ~I L
+10 I0b I L
+11 I1b I L
+12 I2b I L
+13 I3b I L
+15 OEb ~I L
+14 A0 I L
+2 A1 I L
+7 Za ~T R
+9 Zb ~T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS365 U
+DESC Hex Bus Driver, 3 State Out
+KEYW TTL Buffer BUS 3State
+UNIT 
+2 I1 I L
+4 I2 I L
+6 I3 I L
+10 I4 I L
+12 I5 I L
+14 I6 I L
+1 E1 ~I L
+15 E2 ~I L
+3 O1 T R
+5 O2 T R
+7 O3 T R
+9 O4 T R
+11 O5 T R
+13 O6 T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS366 U
+DESC Hex Bus Driver inverter, 3 state out
+KEYW TTL Buffer BUS 3State
+UNIT 
+2 I1 I L
+4 I2 I L
+6 I3 I L
+10 I4 I L
+12 I5 I L
+14 I6 I L
+1 E1 ~I L
+15 E2 ~I L
+3 O1 ~T R
+5 O2 ~T R
+7 O3 ~T R
+9 O4 ~T R
+11 O5 ~T R
+13 O6 ~T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS367 U
+DESC Hex Bus Driver 3 state Out
+KEYW TTL Buffer BUS 3State
+UNIT 
+2 I1 I L
+4 I2 I L
+6 I3 I L
+10 I4 I L
+12 I5 I L
+14 I6 I L
+1 OEa ~I L
+15 OEb ~I L
+3 O1a T R
+5 O2a T R
+7 O3a T R
+9 O4a T R
+11 O5b T R
+13 O6b T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS368 U
+DESC Hex Bus Driver inverter, 3 state Out
+KEYW TTL Buffer BUS 3State
+UNIT 
+2 I1 I L
+4 I2 I L
+6 I3 I L
+10 I4 I L
+12 I5 I L
+14 I6 I L
+1 OEa ~I L
+15 OEb ~I L
+3 O1a ~T R
+5 O2a ~T R
+7 O3a ~T R
+9 O4a ~T R
+11 O5b ~T R
+13 O6b ~T R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS373 U
+DESC 8 bits Latch, 3 state Out
+KEYW TTL REG DFF DFF8 LATCH
+UNIT 
+3 D0 I L
+4 D1 I L
+7 D2 I L
+8 D3 I L
+13 D4 I L
+14 D5 I L
+17 D6 I L
+18 D7 I L
+11 LE I L
+1 OE ~I L
+2 O0 T R
+5 O1 T R
+6 O2 T R
+9 O3 T R
+12 O4 T R
+15 O5 T R
+16 O6 T R
+19 O7 T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS374 U
+DESC 8 bits Register, 3 state Out
+KEYW TTL DFF DFF8 REG 3State
+UNIT 
+3 D0 I L
+4 D1 I L
+7 D2 I L
+8 D3 I L
+13 D4 I L
+14 D5 I L
+17 D6 I L
+18 D7 I L
+11 Cp CI L
+1 OE ~I L
+2 O0 T R
+5 O1 T R
+6 O2 T R
+9 O3 T R
+12 O4 T R
+15 O5 T R
+16 O6 T R
+19 O7 T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS375 U
+DESC 4 bits Latch
+KEYW TTL DFF DFF4 Latch
+UNIT 
+1 D0 I L
+7 D1 I L
+9 D2 I L
+15 D3 I L
+4 E01 I L
+12 E23 I L
+3 Q0 O R
+2 ~Q0 ~O R
+5 Q1 O R
+6 ~Q1 ~O R
+11 Q2 O R
+10 ~Q2 ~O R
+13 Q3 O R
+14 ~Q3 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS377 U
+DESC 8 bit Register
+KEYW TTL REG DFF DFF8
+UNIT 
+3 D0 I L
+4 D1 I L
+7 D2 I L
+8 D3 I L
+13 D4 I L
+14 D5 I L
+17 D6 I L
+18 D7 I L
+11 Cp CI L
+1 EO ~I L
+2 Q0 O R
+5 Q1 O R
+6 Q2 O R
+9 Q3 O R
+12 Q4 O R
+15 Q5 O R
+16 Q6 O R
+19 Q7 O R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS378 U
+DESC 6 bits Register
+KEYW TTL REG DFF DFF6
+UNIT 
+3 D0 I L
+4 D1 I L
+6 D2 I L
+11 D3 I L
+13 D4 I L
+14 D5 I L
+9 Cp I L
+1 ~E ~I L
+2 Q0 O R
+5 Q1 O R
+7 Q2 O R
+10 Q3 O R
+12 Q4 O R
+15 Q5 O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS379 U
+DESC 4 bits Register
+KEYW TTL REG DFF DFF4
+UNIT 
+4 D0 I L
+5 D1 I L
+12 D2 I L
+13 D3 I L
+9 Cp CI L
+1 CE ~I L
+2 Q0 O R
+3 ~Q0 ~O R
+7 Q1 O R
+6 ~Q1 ~O R
+10 Q2 O R
+11 ~Q2 ~O R
+15 Q3 O R
+14 ~Q3 ~O R
+UNIT PWR
+16 VCC P U
+8 GND P U
+END
+COMP 74LS385 U
+DESC Quad serial Adder
+KEYW TTL ADD Arith ALU
+UNIT 
+2 1S I L
+3 1S/A I L
+4 1B I L
+5 1A I L
+6 2A I L
+7 2B I L
+8 2S/A I L
+9 2S I L
+1 Clk CI L
+11 Clr I L
+19 4S O R
+18 4S/A O R
+17 4B O R
+16 4A O R
+15 3A O R
+14 3B O R
+13 3S/A O R
+12 3S O R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS386 U
+DESC Quad 2 input XOR
+KEYW TTL XOR2
+UNIT XOR
+1 ~ I L
+2 ~ I L
+3 ~ O R
+UNIT XOR
+5 ~ I L
+6 ~ I L
+4 ~ O R
+UNIT XOR
+8 ~ I L
+9 ~ I L
+10 ~ O R
+UNIT XOR
+12 ~ I L
+13 ~ I L
+11 ~ O R
+UNIT PWR
+7 GND P U
+14 VCC P U
+END
+COMP 74LS390 U
+DESC Dual BDC 4 bits counter
+KEYW TTL CNT CNT4
+UNIT 
+1 Cp0 ICI L
+4 Cp1 ICI L
+2 Mr I L
+3 Q0 O R
+5 Q1 O R
+6 Q2 O R
+7 Q3 O R
+UNIT 
+15 Cp0 ICI L
+12 Cp1 ICI L
+14 Mr I L
+13 Q0 O R
+11 Q1 O R
+10 Q2 O R
+9 Q3 O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS393 U
+DESC Dual BDC 4 bits counter
+KEYW TTL CNT CNT4
+DOC 74xx\74LS393.pdf
+UNIT 
+1 Cp ICI L
+2 Mr I L
+3 Q0 O R
+4 Q1 O R
+5 Q2 O R
+6 Q3 O R
+UNIT 
+13 Cp ICI L
+12 Mr I L
+11 Q0 O R
+10 Q1 O R
+9 Q2 O R
+8 Q3 O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS395 U
+DESC 4 bits universal shift register, 3 state out
+KEYW TTL SR SR4 REG 3State
+UNIT 
+2 Ds I L
+3 P0 I L
+4 P1 I L
+5 P2 I L
+6 P3 I L
+7 L/S I L
+10 Cp ICI L
+9 OE ~I L
+1 MR ~I L
+15 Q0 T R
+14 Q1 T R
+13 Q2 T R
+12 Q3 T R
+11 Q'3 O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS398 U
+DESC Quad 2 to 1 line Multiplexer, 3 state out
+KEYW TTL MUX MUX2 3State
+UNIT 
+4 I0a I L
+5 I1a I L
+7 I0b I L
+6 I1b I L
+14 I0c I L
+15 I1c I L
+17 I0d I L
+16 I1d I L
+10 S I L
+11 Cp CI L
+2 Qa O R
+3 ~QA ~O R
+9 Qb O R
+8 ~Qb ~O R
+12 Qc O R
+13 ~Qc ~O R
+19 Qd O R
+18 ~Qd ~O R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS399 U
+DESC Quad 2 to 1 line multiplexer with storage
+KEYW TTL MUX MUX2
+UNIT 
+3 I0a I L
+4 I1a I L
+6 I0b I L
+5 I1b I L
+11 I0c I L
+12 I1c I L
+14 I0d I L
+13 I1d I L
+1 Sel I L
+9 Cp CI L
+2 Qa O R
+7 Qb O R
+10 Qc O R
+15 Qd O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS42 U
+DESC 4 to 10 line DECODER
+KEYW TTL DECOD DECOD10
+UNIT 
+15 A0 I L
+14 A1 I L
+13 A2 I L
+12 A3 I L
+1 0 ~O R
+2 1 ~O R
+3 2 ~O R
+4 3 ~O R
+5 4 ~O R
+6 5 ~O R
+7 6 ~O R
+9 7 ~O R
+10 8 ~O R
+11 9 ~O R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS47 U
+DESC BCD to 7 segments Driver, Open Collect, 30V outputs
+KEYW TTL DECOD DECOD7 OpenCol
+ALIAS 74LS46
+DESC BCD to 7 segments Driver, Open Collect, 15V outputs
+KEYW TTL DECOD DECOD7 OpenCol
+UNIT 
+7 A I L
+1 B I L
+2 C I L
+6 D I L
+3 LT ~I L
+4 BI ~I L
+5 RBI ~I L
+13 a ~C R
+12 b ~C R
+11 c ~C R
+10 d ~C R
+9 e ~C R
+15 f ~C R
+14 g ~C R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS48 U
+DESC BCD to 7 segments Decoder/driver, Active High outputs
+KEYW TTL DECOD DECOD7
+UNIT 
+7 A I L
+1 B I L
+2 C I L
+6 D I L
+3 LT ~I L
+4 BI ~I L
+5 RBI ~I L
+13 a C R
+12 b C R
+11 c C R
+10 d C R
+9 e C R
+15 f C R
+14 g C R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS49 U
+DESC BDC to 7 segments decoder/driver, Open collect.
+KEYW TTL DECOD DECOD7 OpenCol
+DOC http://www.ti.com/lit/ds/symlink/sn74ls49.pdf
+UNIT 
+7 A I L
+1 B I L
+2 C I L
+6 D I L
+5 ~RBI I L
+4 ~BI ~I L
+13 a C R
+12 b C R
+11 c C R
+10 d C R
+9 e C R
+15 f C R
+14 g C R
+UNIT PWR
+8 GND P U
+16 VCC P U
+END
+COMP 74LS51 U
+FPLIST
+DIP-14*
+DESC Dual 3- and 2-input AND-NOR ( S = /(AB[C] + DE[F]) )
+KEYW TTL ANDNOR
+DOC http://www.ti.com/lit/ds/symlink/sn74ls51.pdf
+UNIT 
+1 ~ I L
+12 ~ I L
+13 ~ I L
+9 ~ I L
+10 ~ I L
+11 ~ I L
+8 ~ ~O R
+UNIT 
+2 ~ I L
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ ~O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS54 U
+DESC And-Nor (S = /(AB + CD + EF + GH) )
+KEYW TTL ANDNOR
+UNIT 
+1 ~ I L
+13 ~ I L
+2 ~ I L
+3 ~ I L
+4 ~ I L
+5 ~ I L
+9 ~ I L
+10 ~ I L
+8 ~ ~O R
+UNIT PWR
+7 GND P R
+14 VCC P R
+END
+COMP 74LS540 U
+DESC 8 bits Buffer/Line driver Inverter, 3 state Out
+KEYW BUFFER BUS TTL 3State
+UNIT 
+2 A0 I L
+3 A1 I L
+4 A2 I L
+5 A3 I L
+6 A4 I L
+7 A5 I L
+8 A6 I L
+9 A7 I L
+1 G1 ~I L
+19 G2 ~I L
+18 Y0 ~T R
+17 Y1 ~T R
+16 Y2 ~T R
+15 Y3 ~T R
+14 Y4 ~T R
+13 Y5 ~T R
+12 Y6 ~T R
+11 Y7 ~T R
+UNIT PWR
+10 GND P U
+20 VCC P U
+END
+COMP 74LS541 U
+DESC 8bits Buffer/Line Driver 3 state Out
+KEYW TTL BUFFER 3State BUS
+UNIT 
+2 A0 I L
+3 A1 I L
+4 A2 I L
+5 A3 I L
+6 A4 I L
+7 A5 I L
+8 A6 I L
+9 A7 I L
+1 G1 ~I L
+19 G2 ~I L
+18 Y0 T R
+17 Y1 T R
+16 Y2 T R
+15 Y3 T R
+14 Y4 T R
+13 Y5 T R
+12 Y6 T R
+11 Y7 T R
+UNIT PWR
+10 GND P U
+20 VCC P D
+END
+COMP 74LS55 U
+DESC AND-NOR ( S = / (ABCD + EFGH) )
+KEYW TTL ANDNOR
+UNIT 
+1 ~ I L
+2 ~ I L
+3 ~ I L
+4 ~ I L
+10 ~ I L
+11 ~ I L
+12 ~ I L
+13 ~ I L
+8 Y ~O R
+UNIT PWR
+7 GND P R
+14 VCC P R
+END
+COMP 74LS573 U
+DESC 8 bits Latch 3 state Out
+KEYW TTL DFF DFF8 LATCH 3State
+DOC 74xx/74hc573.pdf
+UNIT 
+2 D0 I L
+3 D1 I L
+4 D2 I L
+5 D3 I L
+6 D4 I L
+7 D5 I L
+8 D6 I L
+9 D7 I L
+11 Load I L
+1 OE ~I L
+19 Q0 T R
+18 Q1 T R
+17 Q2 T R
+16 Q3 T R
+15 Q4 T R
+14 Q5 T R
+13 Q6 T R
+12 Q7 T R
+UNIT PWR
+10 GND P U
+20 VCC P D
+END
+COMP 74LS574 U
+DESC 8 bits Register, 3 state Out
+KEYW TTL REG DFF DFF8 3State
+UNIT 
+2 D0 I L
+3 D1 I L
+4 D2 I L
+5 D3 I L
+6 D4 I L
+7 D5 I L
+8 D6 I L
+9 D7 I L
+11 Cp CI L
+1 OE ~I L
+19 Q0 T R
+18 Q1 T R
+17 Q2 T R
+16 Q3 T R
+15 Q4 T R
+14 Q5 T R
+13 Q6 T R
+12 Q7 T R
+UNIT PWR
+10 GND P U
+20 VCC P D
+END
+COMP 74LS688 U
+DESC 8 bits Comparator
+KEYW TTL DECOD Arith
+UNIT 
+2 P0 I L
+4 P1 I L
+6 P2 I L
+8 P3 I L
+11 P4 I L
+13 P5 I L
+15 P6 I L
+17 P7 I L
+3 R0 I L
+5 R1 I L
+7 R2 I L
+9 R3 I L
+12 R4 I L
+14 R5 I L
+16 R6 I L
+18 R7 I L
+1 G ~I L
+19 P=R ~O R
+UNIT PWR
+10 GND P R
+20 VCC P R
+END
+COMP 74LS73 U
+DESC Dual JK FlipFlop, reset
+KEYW TTL JK JKFF
+UNIT 
+7 J I L
+5 Cp ICI L
+10 K I L
+9 Q O R
+8 ~Q ~O R
+UNIT 
+14 J I L
+1 Cp ICI L
+3 K I L
+12 Q O R
+13 ~Q ~O R
+UNIT PWR
+4 VCC P R
+11 GND P R
+END
+COMP 74LS74 U
+DESC Dual D FlipFlop, Set & Reset
+KEYW TTL DFF
+DOC 74xx/74hc_hct74.pdf
+ALIAS 74HC74
+DESC Dual D FlipFlop, Set & Reset
+KEYW TTL DFF
+DOC 74xx/74hc_hct74.pdf
+UNIT 
+2 D I L
+3 Cp CI L
+5 Q O R
+6 ~Q ~O R
+UNIT 
+12 D I L
+11 Cp CI L
+9 Q O R
+8 ~Q ~O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS75 U
+DESC 4 bits Latch
+KEYW TTL DFF Latch
+UNIT 
+2 D0 I L
+3 D1 I L
+6 D2 I L
+7 D3 I L
+13 E01 I L
+4 E23 I L
+16 Q0 O R
+15 Q1 O R
+10 Q2 O R
+9 Q3 O R
+1 ~Q0 O R
+14 ~Q1 O R
+11 ~Q2 O R
+8 ~Q3 O R
+UNIT PWR
+5 VCC P D
+END
+COMP 74LS76 U
+DESC Dual JK FlipFlop, Set & Reset
+KEYW TTL JK JKFF
+UNIT 
+16 K I L
+1 Cp ICI L
+4 J I L
+15 Q O R
+14 ~Q ~O R
+UNIT 
+12 K I L
+6 Cp ~I L
+9 J I L
+11 Q O R
+10 ~Q ~O R
+UNIT PWR
+5 VCC P U
+13 GND P U
+END
+COMP 74LS77 U
+DESC 4 bits Latch
+KEYW TTL DFF Latch
+UNIT 
+1 D0 I L
+2 D1 I L
+5 D2 I L
+6 D3 I L
+12 E01 I L
+3 E23 I L
+14 Q0 O R
+13 Q1 O R
+9 Q2 O R
+8 Q3 O R
+UNIT PWR
+4 VCC P D
+11 GND P U
+END
+COMP 74LS78 U
+DESC Dual JK FlipFlop, preset , common clock & reset
+KEYW TTL JK JKFF
+UNIT 
+3 J I L
+14 K I L
+13 Q O R
+12 ~Q ~O R
+UNIT 
+10 J I L
+7 K I L
+8 Q O R
+9 ~Q ~O R
+UNIT PWR
+4 VCC P D
+11 GND P U
+END
+COMP 74LS83 U
+DESC 4 bits Full Adder
+KEYW TTL ADD ARITH ALU
+UNIT 
+13 C0 I L
+16 B4 I L
+4 B3 I L
+7 B2 I L
+11 B1 I L
+1 A4 I L
+3 A3 I L
+8 A2 I L
+10 A1 I L
+9 S1 O R
+6 S2 O R
+2 S3 O R
+15 S4 O R
+14 C4 O R
+UNIT PWR
+5 VCC P D
+12 GND P U
+END
+COMP 74LS85 U
+DESC 4 bits Comparateur
+KEYW TTL COMP ARITH
+UNIT 
+1 B3 I L
+14 B2 I L
+11 B1 I L
+9 B0 I L
+15 A3 I L
+13 A2 I L
+12 A1 I L
+10 A0 I L
+4 Ia>b I R
+2 Ia<b I R
+3 Ia=b I R
+5 Oa>b O R
+7 Oa<b O R
+6 Oa=b O R
+UNIT PWR
+8 GND P U
+16 VCC P D
+END
+COMP 74LS86 U
+DESC Quad XOR 2 inputs
+KEYW TTL XOR2
+DOC 74xx/74ls86.pdf
+ALIAS 74HC86
+UNIT XOR
+1 IN1 I L
+2 IN2 I L
+3 OUT O R
+UNIT XOR
+4 IN1 I L
+5 IN2 I L
+6 OUT O R
+UNIT XOR
+9 IN1 I L
+10 IN2 I L
+8 OUT O R
+UNIT XOR
+12 IN1 I L
+13 IN2 I L
+11 OUT O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP 74LS90 U
+DESC BCD Counter ( div 2 & div 5 )
+KEYW TTL CNT CNT4
+UNIT 
+14 CP0 ICI L
+1 CP1..3 ICI L
+2 R0(1) I L
+3 R0(2) I L
+6 R9(1) I L
+7 R9(2) I L
+12 Q0 O R
+9 Q1 O R
+8 Q2 O R
+11 Q3 O R
+UNIT PWR
+5 VCC P D
+10 GND P U
+END
+COMP 74LS91 U
+DESC 8 bits Serial Register
+KEYW TTL SR SR8
+UNIT 
+12 A I L
+11 B I L
+9 Ck ICI L
+13 Qh O R
+14 ~Qh ~O R
+UNIT PWR
+5 VCC P D
+10 GND P U
+END
+COMP 74LS92 U
+DESC Divide by 12 counter
+KEYW TTL CNT CNT4
+UNIT 
+14 CP0 ICI L
+1 CP1..3 ICI L
+6 R0(1) I L
+7 R0(2) I L
+12 Q0 O R
+11 Q1 O R
+9 Q2 O R
+8 Q3 O R
+UNIT PWR
+5 VCC P D
+10 GND P U
+END
+COMP 74LS93 U
+DESC Divide by 2 & 8 counter
+KEYW TTL CNT CNT4
+UNIT 
+14 CP0 ICI L
+1 CP1..3 ICI L
+2 R0(1) I L
+3 R0(2) I L
+12 Q0 O R
+9 Q1 O R
+8 Q2 O R
+11 Q3 O R
+UNIT PWR
+5 VCC P D
+10 GND P U
+END
+COMP 74LS95 U
+DESC Shift Register 5 bits ( // in // out )
+KEYW TTL SR SR4
+UNIT 
+1 Ds I L
+2 P0 I L
+3 P1 I L
+4 P2 I L
+5 P3 I L
+6 Mode I L
+9 Cp1.Rshift ICI L
+8 Cp2.Lshift ICI L
+13 Q0 O R
+12 Q1 O R
+11 Q2 O R
+10 Q3 O R
+UNIT PWR
+7 GND P U
+14 VCC P D
+END
+COMP SN74LVC1G332 U
+FPLIST
+SOT-23*
+SC70*
+DESC 3-input OR Gate
+KEYW 3 input OR
+DOC http://www.ti.com/lit/ds/symlink/sn74lvc1g332.pdf
+UNIT 
+1 ~ I L
+3 ~ I L
+6 ~ I L
+4 ~ O R
+UNIT PWR
+2 GND P U
+5 Vcc P D
+END
