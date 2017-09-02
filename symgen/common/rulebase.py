@@ -2,22 +2,22 @@
 
 # Static functions
 def isValidName(name):
-        name = str(name).lower()
-        for c in name:
-            # Numeric characters check
-            if c.isalnum():
-                continue
+    name = str(name).lower()
+    for c in name:
+        # Numeric characters check
+        if c.isalnum():
+            continue
                 
-            # Alpha characters (simple set only)
-            if c >= 'a' and c <= 'z':
-                continue
+        # Alpha characters (simple set only)
+        if c >= 'a' and c <= 'z':
+            continue
                 
-            if c in ['_', '-', '.']:
-                continue
+        if c in ['_', '-', '.']:
+            continue
             
-            return False
+        return False
                 
-        return True
+    return True
 
 class Verbosity:
     NONE=0

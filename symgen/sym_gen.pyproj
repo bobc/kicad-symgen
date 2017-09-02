@@ -9,10 +9,14 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>.</WorkingDirectory>
+    <WorkingDirectory>data</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <CommandLineArguments>-d --lib C:\git_kicad\kicad-library\library\74xx.lib --ref 7400_logic_ref.txt</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,7 +31,19 @@
     <Compile Include="common\print_color.py" />
     <Compile Include="common\rulebase.py" />
     <Compile Include="common\sexpr.py" />
+    <Compile Include="str_utils.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="sym_comp.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="sym_drawing.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="schlib.py" />
+    <Compile Include="sym_gates.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="sym_gen.py" />
   </ItemGroup>
   <ItemGroup>

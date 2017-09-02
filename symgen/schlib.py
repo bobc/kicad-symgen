@@ -234,7 +234,10 @@ class Component(object):
         self.pins = self.draw['pins']
 
         # get documentation
-        self.documentation = self.getDocumentation(documentation,self.name)
+        if documentation:
+            self.documentation = self.getDocumentation(documentation,self.name)
+        else:
+            self.documentation = None
         
     def resetDraw(self):
         self.draw = {
@@ -399,9 +402,10 @@ class SchLib(object):
     def addComponent(self, component):
         if not component in self.components:
             self.components.append(component)
-            self.documentation.add(component.name, component.documentation)
-            for alias in component.aliases.keys():
-                self.documentation.add(alias, component.aliases[alias])
+            if component.documentation:
+                self.documentation.add(component.name, component.documentation)
+                for alias in component.aliases.keys():
+                    self.documentation.add(alias, component.aliases[alias])
 
     def save(self, filename=None):
         if not self.validFile: return False

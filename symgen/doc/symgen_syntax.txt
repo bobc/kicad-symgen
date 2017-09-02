@@ -1,24 +1,78 @@
-// blank lines and white space are ignored
-// lines starting # are comments and ignored
+# blank lines and white space (tab, spc) are ignored
+# lines starting # are comments and ignored
 
-input = component *
+input = ( directive | component )* 
+        
+# a directive outside a component definition applies to all subsequent components
+# a directive inside a component definition applies to only that component
+        
+directive = "%lib" name           # output library name
+            | "%pinlen" number    # len in mils
+            | "%width" number     # width in mils
+            | "%fill" back        # body filL: fore, back, none
+            | "%line" number      # default pen size in mils
+            | "%iconlib" name     # name of icon library e.g template.lib   
+        
 
-component = "COMP" NAME REF 
+component = "COMP" NAME REF
+
+            directive *
+ 
+            [ "FPLIST"
+            footprint_spec
+            ]
+            
+            [ "DESC" ]
+            [ "KEYW" ]
+            [ "DOC"  ]
+            
+            [ "ALIAS" name
+              [ "DESC" ]
+              [ "KEYW" ]
+              [ "DOC"  ]
+            ]
+            
             unit *
+            
             "END"
 
-unit = "UNIT" [PWR] 
-       pin_def * 
+unit = "UNIT" [type] [ICON name+ ] [WIDTH number] [TEMP name]  
+       pin_def *
        
+       
+type =  PWR [ SEPerate | COMBined ]
+        | NONE
+        | NOT | BUF | AND | OR | NAND | NOR | XOR
 
-pin_def = NUMBER NAME [type [position]]
+pin_def = NUMBER NAME [type [position]]       # todo: [align] ?
 
-type =  "I"           // input 
-        | "CI"        // clock, input        
-        | "O"         // output
-        | "P"         // power, input
+          | "SPC" position
+          
+          | %SELECT column_name+ "FROM" filename
+
+
+# flags* type
+# flags
+#   ~ for inverted
+#   P for power
+#   C for clock
+#   F falling edge
+#   L active low input
+#   V active low output
+#   N not visible
+#   X non-logic
+
+type =  "I"           # input 
+        | "O"         # output
+        | "B"         # bidirectional
+        | "T"         # tristate
+        | "P"         # no connect
+        | "C"         # no connect
+        | "E"         # no connect
+        | "U"         # unspecified
+        | "N"         # no connect
         
-position = "L" | "R" | "T" | "B"        // position with respect to unit: left, right, top, bottom         
+position = "L" | "R" | "T" | "B"        # position with respect to unit: left, right, top, bottom         
 
 NAME = valid pin name. If name starts with "~", the pin shape is set to inverted style if applicable 
 
