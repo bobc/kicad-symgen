@@ -1,0 +1,31 @@
+EESchema-LIBRARY Version 2.3
+#encoding utf-8
+#
+# 4016
+#
+DEF 4016 U 0 40 Y Y 1 F N
+F0 "U" 0 0 50 H V C CNN
+F1 "4016" 0 -200 50 H V C CNN
+F2 "" 0 0 50 H I C CNN
+F3 "" 0 0 50 H I C CNN
+DRAW
+P 4 0 0 0 -100 0 100 100 100 -100 -100 0 f
+P 4 0 0 0 -100 100 100 0 -100 -100 -100 100 f
+P 2 1 1 6 0 50 0 100 N
+ENDDRAW
+ENDDEF
+#
+# icon_schmitt
+#
+DEF icon_schmitt U 0 40 Y Y 1 F N
+F0 "U" -400 50 50 H V C CNN
+F1 "icon_schmitt" -400 -100 50 H V C CNN
+F2 "" 25 0 50 H I C CNN
+F3 "" 25 0 50 H I C CNN
+DRAW
+P 3 0 1 0 -25 -50 -25 50 25 50 N
+P 4 0 1 0 -50 -50 25 -50 25 50 50 50 N
+ENDDRAW
+ENDDEF
+#
+#End Library

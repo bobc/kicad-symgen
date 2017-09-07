@@ -1,0 +1,41 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP 74LS181
+D Arithmetic logic unit
+K TTL ALU ARITH
+F 74xx/74F181.pdf
+$ENDCMP
+#
+$CMP 74LS51
+D Dual 3- and 2-input AND-NOR ( S = /(AB[C] + DE[F]) )
+K TTL ANDNOR
+F http://www.ti.com/lit/ds/symlink/sn74ls51.pdf
+$ENDCMP
+#
+$CMP 74LS54
+D And-Nor (S = /(AB + CD + EF + GH) )
+K TTL ANDNOR
+$ENDCMP
+#
+$CMP 74LS55
+D AND-NOR ( S = / (ABCD + EFGH) )
+K TTL ANDNOR
+$ENDCMP
+#
+$CMP icon_bidi_buffer
+D icon bidirectional buffer
+$ENDCMP
+#
+$CMP icon_buffer
+D icon for buffer
+$ENDCMP
+#
+$CMP icon_inverter
+D icon for inverter/NOT gate
+$ENDCMP
+#
+$CMP icon_schmitt
+D icon for schmitt trigger
+$ENDCMP
+#
+#End Doc Library
