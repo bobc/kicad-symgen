@@ -1,48 +1,103 @@
 """This module contains classes for drawing"""
 
+from enum import Enum
 from schlib import *
 
-class Point:
-    x = 0
-    y = 0
 
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
+NoFill = 'N'
+Foreground = 'F'
+Background = 'f'
+
+class Point:
+    #x = 0
+    #y = 0
+
+    def __init__(self, px=0, py=0):
+        self.x = px
+        self.y = py
 
     def Sub (self, p):
         return Point (self.x - p.x, self.y-p.y)
+
+    def Add (self, p):
+        return Point (self.x + p.x, self.y + p.y)
+
+class BoundingBox(object):
+
+    pmin = Point()
+    pmax = Point()
+
+    def __init__(self, min_p, max_p):
+        self.pmin = min_p
+        self.pmax = max_p
+
+    def extend (self, p):
+        self.pmin.x = min(self.pmin.x, p.x)
+        self.pmin.y = min(self.pmin.y, p.y)
+        self.pmax.x = max(self.pmax.x, p.x)
+        self.pmax.y = max(self.pmax.y, p.y)
+
+    def __add__(self, other):
+        if other == 0:
+            return BoundingBox(self.pmin, self.pmax)
+        return BoundingBox(
+                Point (min(self.pmin.x, other.pmin.x), min(self.pmin.y, other.pmin.y)),
+                Point (max(self.pmax.x, other.pmax.x), max(self.pmax.y, other.pmax.y)) )
+    __radd__ = __add__
+
+    def __repr__(self):
+        return "BoundingBox(%r, %r, %r, %r)" % (
+                self.pmin.x, self.pmax.x, self.pmin.y, self.pmax.y)
+
+    __str__ = __repr__
+
+    @property
+    def width(self):
+        return self.pmax.x - self.pmin.x
+    @property
+    def height(self):
+        return self.pmax.y - self.pmin.y
+    @property
+    def centerx(self):
+        return (self.pmax.x + self.pmin.x) / 2
+    @property
+    def centery(self):
+        return (self.pmax.y + self.pmin.y) / 2
 
 class DrawBase(object):
 
     key = ' '
     unit=0
-    demorgan=0
+    demorgan=1
     pensize=10
-    fill="N"
+    fill = NoFill
 
     def __init__(self, s=None):
         self.key = ' '
         self.unit=0
-        self.demorgan=0
+        self.demorgan=1
         self.pensize=10
-        self.fill="N"
+        self.fill=NoFill
 
-    def getvalues (self):
+    def parse (self, s):
+        pass
+
+    def get_values (self):
         values = [] 
         return values
 
     def get_element (self):
-        return [self.key, dict(zip(Component._KEYS[self.key], self.getvalues() )) ]
+        return [self.key, dict(zip(Component._KEYS[self.key], self.get_values() )) ]
 
-class Pin:
+    def get_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        return bb
 
-    orientation = "L"
-    align = " "
+class Pin (DrawBase):
 
-    def __init__(self):
+    def __init__(self, s=None):
         self.unit = 0
-        self.convert = 0
+        self.demorgan = 0
 
         self.name=""
         self.number=""
@@ -55,7 +110,12 @@ class Pin:
         self.shape = " "
         self.visible = True
 
-    def getvalues (self):
+        super(Pin, self).__init__()
+        self.key = 'X'
+        if s:
+            self.parse (s)
+
+    def get_values (self):
         values = [] 
         values.append (self.name)
         values.append (self.number)
@@ -66,10 +126,12 @@ class Pin:
         values.append (str(self.sizename))
         values.append (str(self.sizenum))
         values.append (str(self.unit))
-        values.append (str(self.convert))
+        values.append (str(self.demorgan))
         values.append (self.type)
         values.append (self.shape)
         return values
+
+    # parse, get_bounds
 
     def is_output(self):
         return self.type in ['O','B','T','C','E']
@@ -77,11 +139,7 @@ class Pin:
     def is_input(self):
         return self.type in ['I','B']
 
-class Arc:
-    unit=0
-    demorgan=0
-    pensize=10
-    fill="N"
+class Arc (DrawBase):
 
     pos=Point()
     radius=0
@@ -91,25 +149,10 @@ class Arc:
     end=Point()
 
     def __init__(self, s=None):
+        super(Arc, self).__init__()
+        self.key = 'A'
         if s:
             self.parse (s)
-
-    def getvalues (self):
-        values = []
-        values.append (str(int(self.pos.x)))
-        values.append (str(int(self.pos.y)))
-        values.append (str(int(self.radius)))
-        values.append (str(int(self.arcstart)))
-        values.append (str(int(self.arcend)))
-        values.append (str(self.unit))
-        values.append (str(self.demorgan))
-        values.append (str(int(self.pensize)))
-        values.append (self.fill)
-        values.append (str(int(self.start.x)))
-        values.append (str(int(self.start.y)))
-        values.append (str(int(self.end.x)))
-        values.append (str(int(self.end.y)))
-        return values
 
     def parse (self, s):
         tokens = s.split()
@@ -127,6 +170,23 @@ class Arc:
         self.end.x = int(tokens[12])
         self.end.y = int(tokens[13])
 
+    def get_values (self):
+        values = []
+        values.append (str(int(self.pos.x)))
+        values.append (str(int(self.pos.y)))
+        values.append (str(int(self.radius)))
+        values.append (str(int(self.arcstart)))
+        values.append (str(int(self.arcend)))
+        values.append (str(self.unit))
+        values.append (str(self.demorgan))
+        values.append (str(int(self.pensize)))
+        values.append (self.fill)
+        values.append (str(int(self.start.x)))
+        values.append (str(int(self.start.y)))
+        values.append (str(int(self.end.x)))
+        values.append (str(int(self.end.y)))
+        return values
+
     def SetParams (self, unit, variant, pensize, fill, startpos, endpos, pos, radius, startangle, endangle):
         self.unit = unit     
         self.demorgan = variant
@@ -140,23 +200,58 @@ class Arc:
         self.start = startpos
         self.end = endpos
 
-    def get_element (self):
-        return ['A', dict(zip(Component._ARC_KEYS, self.getvalues() )) ]
+    def get_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        # todo: maybe not right?
+        bb.extend (self.start)
+        bb.extend (self.end)
+        return bb
 
 
 class Circle (DrawBase):
+    center = Point()
+    radius = 0
 
     def __init__(self, s = None):
         super(Circle, self).__init__()
-        self.key = 'C'    
+        self.key = 'C'
+        if s:
+            self.parse (s)
 
-class PolyLine:
+
+    def parse (self, s):
+        tokens = s.split()
+        self.center.x = int(tokens[1])
+        self.center.y = int(tokens[2])
+        self.radius = int(tokens[3])
+        self.unit = int(tokens[4])
+        self.demorgan = int(tokens[5])
+        self.pensize = int(tokens[6])
+        self.fill = tokens[7]
+
+    def get_values(self):
+        # ['posx','posy','radius','unit','convert','thickness','fill']
+        values = []
+        values.append (str(int(self.center.x)))
+        values.append (str(int(self.center.y)))
+        values.append (str(int(self.radius)))
+        values.append (str(int(self.unit)))
+        values.append (str(int(self.demorgan)))
+        values.append (str(int(self.pensize)))
+        values.append (self.fill)
+        return values
+
+    def get_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        bb.extend (Point (self.center.x - self.radius, self.center.x - self.radius))
+        bb.extend (Point (self.center.x + self.radius, self.center.x + self.radius))
+        return bb
+
+class PolyLine (DrawBase):
 
     def __init__(self, s=None):
-        self.unit=0
-        self.demorgan=0
-        self.pensize=10
-        self.fill="N"
+        super(PolyLine, self).__init__()
+        self.key = 'P'
 
         self.point_count =0
         self.points = []
@@ -185,7 +280,7 @@ class PolyLine:
         self.point_count = len(pts)
         self.points = pts
 
-    def getvalues (self):
+    def get_values (self):
         values = []
         values.append (str(self.point_count))
         values.append (str(self.unit))
@@ -201,23 +296,44 @@ class PolyLine:
 
         return values
 
-    def get_element (self):
-        return ['P', dict(zip(Component._POLY_KEYS, self.getvalues() )) ]
+    def get_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        for p in self.points:
+            bb.extend (p)
+        return bb
 
-
-class Rect:
-    unit = 0
-    demorgan = 1
-    pensize = 10
-    fill = "N"
+class Rect (DrawBase):
 
     p1 = Point()
     p2 = Point()
 
-    def __init__(self):
-        pass
+    def __init__(self, s=None):
+        super(Rect, self).__init__()
+        self.key = 'S'
+        if s:
+            self.parse (s)
 
-    def getvalues (self):
+    def SetParams (self, unit, variant, pensize, fill, p1, p2):
+        self.unit = unit     
+        self.demorgan = variant
+        self.pensize = pensize
+        self.fill = fill
+
+        self.p1 = p1
+        self.p2 = p2
+
+    def parse (self, s):
+        tokens = s.split()
+        self.p1.x = int(tokens[1])
+        self.p1.y = int(tokens[2])
+        self.p2.x = int(tokens[3])
+        self.p2.y = int(tokens[4])
+        self.unit = int(tokens[5])
+        self.demorgan = int(tokens[6])
+        self.pensize= int(tokens[7])
+        self.fill = tokens[8]
+
+    def get_values (self):
         values = []
         values.append (str(self.p1.x))
         values.append (str(self.p1.y))
@@ -229,6 +345,73 @@ class Rect:
         values.append (self.fill)
         return values
 
+    def get_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        bb.extend (self.p1)
+        bb.extend (self.p2)
+        return bb
+
+
+class Text (DrawBase):
+
+    # ['direction','posx','posy','text_size','text_type','unit','convert','text', 'italic', 'bold', 'hjustify', 'vjustify']
+
+    value = "~"  # text
+    pos = Point()
+    angle = 0.0  # direction
+    text_size = 50
+    visible = True  # text_type
+    horiz_alignment = "C"   # L C R
+    vert_alignment = "C"    # T C B
+    italic = False
+    bold = False
+
+    def __init__(self, s = None):
+        super(Text, self).__init__()
+        self.key = 'T'
+        if s:
+            self.parse (s)
+
+    def parse (self, s):
+        tokens = s.split()
+        self.angle = float(tokens[1])/10.0
+        self.pos.x = int(tokens[2])
+        self.pos.y = int(tokens[3])
+        self.text_size = int(tokens[4])
+        self.visible = True if tokens[5]=="0" else False
+        self.unit = int(tokens[6])
+        self.demorgan = int(tokens[7])
+        self.value = tokens[8]
+        self.italic = True if tokens[9]=="Italic" else False
+        self.bold = True if tokens[10]=="1" else False
+        self.horiz_alignment = tokens[11]
+        self.vert_alignment = tokens[12]
+
+        #self.pensize= int(tokens[7])
+        #self.fill = tokens[8]
+
+    def get_values (self):
+        values = []
+        values.append (str(int(self.angle*10.0)))
+        values.append (str(int(self.pos.x)))
+        values.append (str(int(self.pos.y)))
+        values.append (str(self.text_size))
+        values.append ("0" if self.visible else "1")
+        values.append (str(self.unit))
+        values.append (str(self.demorgan))
+        values.append (self.value)      # quotes, escaping
+        values.append ("Italic" if self.italic else "Normal")
+        values.append ("1" if self.bold else "0")
+        values.append (self.horiz_alignment)
+        values.append (self.vert_alignment)
+        return values
+
+    def get_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        # todo: need to adjust for alignment, angle
+        bb.extend (self.pos)
+        bb.extend (self.pos.Add (self.text_size * len(self.value), self.text_size) )
+        return bb
 
 # "P 2 0 1 8 -300 -200 0 -200 N"
 def parse_polyline (s):

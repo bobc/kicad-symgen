@@ -3,6 +3,31 @@ from collections import OrderedDict
 
 from sym_drawing import *
 
+class StyleAttributes:
+
+    pensize = 10
+    fill = NoFill
+
+    offset = 0
+    show_pin_number = True
+    show_pin_name = True
+
+    font_size = 50
+    angle = "H"
+    visible = False    
+    horiz_alignment = "C"
+    vert_alignment = "C"
+    italic = False
+    bold = False
+
+    pin_length = 100
+    orientation = "L"   # direction
+    sizenum = 50
+    sizename = 50
+
+    def __init__(self):
+        pass
+
 class ComponentDef:
     name = "name"
     ref = "ref"
@@ -40,6 +65,7 @@ class LogicDesc:
     input_type = ""
     output_type = ""
     technologies = OrderedDict ()
+    packages = ""
 
     def __init__(self, tokens):
         self.id=tokens[0].strip()
@@ -59,5 +85,22 @@ class LogicDesc:
                 j = 5
                 while j < len(tokens):
                     if tokens[j] != "None":
-                        self.technologies [tokens[j].strip()] = tokens[j+1].strip()
-                    j += 2
+                        if len(tokens)-j >= 2:
+                            self.technologies [tokens[j].strip()] = tokens[j+1].strip()
+                            j += 2
+                        else:
+                            self.packages = tokens[j].strip()
+                            j += 1
+
+    def get_datasheet (self, family):
+        if family in self.technologies:
+            return self.technologies[family]
+        else:
+            for key in self.technologies:
+                if key.contains (family):
+                    return self.technologies[key]
+
+            if 'Standard' in self.technologies:
+                return self.technologies['Standard']
+            else:
+                return None

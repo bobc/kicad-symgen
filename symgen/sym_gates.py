@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 from  math import *
 from schlib import *
@@ -5,15 +6,14 @@ from sym_drawing import *
 
 class Gate:
 
-    # 'f' = background
-    # 'F'= foreground
-    # 'N'= no fill
-    fill = 'f'
+    fill = Background
     pensize = 10
 
     num_inputs = 0
     offsets = []
     #pin_len = 150
+
+    num_outputs = 1
 
     width = 300
     height = 300
@@ -33,6 +33,9 @@ class Gate:
     def get_output_positions (self):
         return []
 
+    def get_center (self):
+        return Point (0,0)
+
     def add_gate_graphic (self, comp, unit, variant):
         pass
 
@@ -45,13 +48,14 @@ class Gate:
                 arc.pensize = self.pensize
                 #arc.fill = self.fill
                 comp.drawOrdered.append(arc.get_element())
-            else:
+            elif drawing.startswith ("P"):
                 poly = PolyLine (drawing)
                 poly.unit = unit
                 poly.demorgan = variant
                 poly.pensize = self.pensize
                 #poly.fill = self.fill
                 comp.drawOrdered.append(poly.get_element())
+            ## todo, rect etc
 
     def r_pythagoras (self, x, h):
         return sqrt (h*h - x*x)
@@ -365,6 +369,7 @@ class OrGate (Gate):
             outputs_pos = [Point(self.size_x_by_2, 0)]
         return outputs_pos
 
+
 class XorGate (Gate):
 
     def __init__(self, num_inputs):
@@ -375,6 +380,7 @@ class XorGate (Gate):
 
         # get the basic OR shape
         or_gate = OrGate(self.num_inputs)
+        or_gate.fill = self.fill
         or_gate.add_gate_graphic (comp, unit, variant)
 
         # add an extra arc on left
@@ -422,8 +428,12 @@ class NotGate (Gate):
 
     def add_gate_graphic (self, comp, unit, variant):
 
-        drawings = ["P 4 0 0 10 -150 150 -150 -150 150 0 -150 150 f"]
-        self.add_drawings (comp, unit, variant, drawings)
+        poly = PolyLine("P 4 0 0 10 -150 150 -150 -150 150 0 -150 150 f")
+        poly.unit = unit
+        poly.demorgan = variant
+        poly.fill = self.fill
+        poly.pensize = self.pensize
+        comp.drawOrdered.append(poly.get_element())
         
     def get_input_positions (self):
         inputs_pos = [Point(-150,0), Point(0, -75)]
@@ -433,3 +443,64 @@ class NotGate (Gate):
     def get_output_positions (self):
         outputs_pos = [Point(150,0)]
         return outputs_pos
+
+    def get_center (self):
+        return Point (self.width/3-self.width/2, 0)
+#
+#
+#
+class IecGate (Gate):
+
+    type = "or"
+
+    def __init__(self, num_inputs):
+        Gate.__init__(self, num_inputs)
+
+    def get_input_positions(self):
+        inputs_pos = []
+        self.offsets = []
+        top = (self.num_inputs-1) * 100 / 2
+        #top = int(top/100) * 100
+        for j in range(0, self.num_inputs):
+            inputs_pos.append (Point (-self.size_x_by_2, top - j*100))
+            self.offsets.append (0)
+        return inputs_pos
+
+    def get_output_positions(self):
+        #outputs_pos = [Point(self.size_x_by_2,0)]
+        outputs_pos = []
+        top = (self.num_outputs-1) * 100 / 2
+        for j in range(0, self.num_outputs):
+            outputs_pos.append (Point (self.size_x_by_2, top - j*100))
+
+        return outputs_pos
+        
+    def add_gate_graphic (self,comp,unit,variant):
+
+        if self.num_inputs*100 >= self.height:
+            self.height = self.num_inputs*100 + 50
+
+        origin = Point (self.width/2, self.height/2)
+
+        rect = Rect ()
+        rect.p1 = Point (0,0).Sub (origin)
+        rect.p2 = Point (self.width, self.height).Sub (origin)
+        rect.unit = unit
+        rect.demorgan = variant
+        comp.drawOrdered.append(rect.get_element())
+
+        text = Text()
+        text.unit = unit
+        text.demorgan = variant
+        if self.type in ["or","nor"]:
+            text.value = "≥1" # ">=1" 
+        elif self.type in ["and","nand"]:
+            text.value = "&"
+        elif self.type in ["xor","xnor"]:
+            text.value = "=1"
+        elif self.type in ["not","buffer"]:
+            text.value = "1"
+
+        comp.drawOrdered.append(text.get_element())
+
+           

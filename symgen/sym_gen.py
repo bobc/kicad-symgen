@@ -13,20 +13,20 @@
 
  todo:
 
-   - de morgans 
-   (error reporting
-   field pos?
-   /doc fields, aliases - dcm 
    ieee symbols
-   /smaller logic symbols?
-   /pin length = 200?
+   field pos?
+   (error reporting
 
-   ? parametize input/output file names etc 
+   / de morgans 
+   / doc fields, aliases - dcm 
+   / smaller logic symbols?
+   / pin length = 200?
+   / parametize input/output file names etc 
 
  issues
-  ? bad symbols
-  / missing graphics
-  pin overlaps (top/bot)
+   pin overlaps (top/bot)
+   ? bad symbols
+   / missing graphics
 """
 
 import os, sys
@@ -42,6 +42,7 @@ import re
 import copy
 import time
 import hashlib
+from enum import Enum
 
 from schlib import *
 from print_color import *
@@ -51,10 +52,17 @@ from sym_drawing import *
 from sym_comp import *
 from sym_gates import *
 
+class SymbolStyle (Enum):
+    # ANSI/MIL MIL-STD-806, now also IEEE Standard 91-1984 "distinctive shapes" 
+    ANSI = 1
+    # IEC 60617-12, now also IEEE Standard 91-1984
+    IEC = 2
+    # DIN 40700
+    DIN = 3
+
 class SymGen:
 
     verbose = False
-    opt_combine_power_for_single_units = True
 
     exit_code = 0
     num_errors = 0
@@ -73,18 +81,28 @@ class SymGen:
     line = None
 
     # some global settings
-#    def_fill = "f"  # background fill
-#    def_pen = 10    # 10 mil
+    opt_combine_power_for_single_units = True
+
+    symbol_style = SymbolStyle.ANSI
+    #symbol_style = SymbolStyle.IEC
+
+    def_pin_length = 200
 
     def_box_width = 600
     def_box_pen = 10
     def_box_fill = "f" # background fill
-    def_pin_length = 200
+
+    #def_logic_fill = NoFill
+    def_logic_fill = Background
+
+    # per component settings  
+    pin_length = def_pin_length
 
     box_width = def_box_width
     box_pen = def_box_pen
     box_fill = def_box_fill
-    pin_length = def_pin_length
+
+    logic_fill = def_logic_fill
 
     comp_description = None
     comp_keywords = None
@@ -119,6 +137,22 @@ class SymGen:
         line = line.rstrip()
         return line
 
+    def create_drawing_object (self, elem):
+        key = elem[0]
+        params = elem[1]
+        s = self.convert_to_string (elem)
+        if key == 'S':
+            drawing = Rect (s)
+        elif key == 'C':
+            drawing = Circle(s)
+        elif key == 'P':
+            drawing = PolyLine(s)
+        elif key == 'A':
+            drawing = Arc(s)
+        else:
+            drawing = None
+
+        return drawing
 
     # convert pin orientation from KiCad directions to symgen directions
     def kicad_to_symgen_dir (self, direction):
@@ -190,8 +224,19 @@ class SymGen:
 
         return result
 
+    def is_positive_power (self, pin):
+        name = pin['name'].upper()
+        if len(name)>3 :
+            name = name[0:3]
+        if pin['name'].upper() in ["3.3V", "5V"] or name in ["VCC", "VDD", "V+"]:
+            return True
+
+    # other forms 5V 3.3V +5V
     def is_power_pin (self, pin):
-        if pin['name'] in ["VCC", "GND"]:
+        name = pin['name'].upper()
+        if len(name)>3 :
+            name = name[0:3]
+        if pin['name'].upper() in ["3.3V", "5V"] or name in ["VCC", "VDD", "V+", "GND", "VSS", "VEE", "V-"]:
             return True
         elif pin['electrical_type'] in "Ww":
             return True
@@ -202,31 +247,46 @@ class SymGen:
         pins = []
 
         for pin in comp.pins:
-            if pin['unit'] == str(unit):
+            if pin['unit'] =='0' or  pin['unit'] == str(unit):
                 pins.append (pin)
         return pins
 
+    # abc 74 abc nG 123
+    # abc 4nnn abc
+    # abc 14nnn abc
     def parse_74xx_name (self, s):
         s = s.upper()
-        s = after (s, "74")
 
-        if "G" in s:
-            number = after (s, "G")
-            match = re.match ('([A-Za-z]+)', before(s, "G"))
-            if match:
-                family = match.group(1)
-            else:
-                family = ""
-            std_number = "74x" + after (s, family)
+        prefix = ""
+        match = re.match ('([A-Za-z]+)', s)
+        if match:
+            prefix = match.group(1)
+            s = after (s, prefix)
         else:
-            # 74 
-            # HCT 240 _PWR
-            match = re.match ('([A-Za-z]+)', s)
-            if match:
-                family = match.group(1)
+            prefix = ""
+
+        if s.startswith("74"):
+            s = after (s, "74")
+            if "G" in s:
+                number = after (s, "G")
+                match = re.match ('([A-Za-z]+)', before(s, "G"))
+                if match:
+                    family = match.group(1)
+                else:
+                    family = ""
+                std_number = "74x" + after (s, family)
             else:
-                family = ""
-            std_number = "74" + re.sub ("[^0-9]", "", after (s, family))
+                # 74 
+                # HCT 240 _PWR
+                match = re.match ('([A-Za-z]+)', s)
+                if match:
+                    family = match.group(1)
+                else:
+                    family = ""
+                std_number = "74" + re.sub ("[^0-9]", "", after (s, family))
+        else:
+            family = "4000"
+            std_number = re.sub ("[^0-9]", "", s)
 
         return family, std_number
             
@@ -310,8 +370,25 @@ class SymGen:
         checksum = md5.hexdigest()
         return checksum
 
+    def get_bounds (self, comp, unit):
+        bbs=[]
+        for elem in comp.drawOrdered:
+            key = elem[0]
+            params = elem[1]
+
+            if key in ['P','S','C','A']:
+                if int(params['unit']) == unit and int(params['convert']) <= 1:
+                    drawing = self.create_drawing_object ([key, params])
+                    bbs.append (drawing.get_bounds())
+
+        if len(bbs)==0:    
+            return BoundingBox(Point(), Point())
+        else:
+            return sum(bbs)
 
     def dump_lib (self, lib_filename, dump_path, ref_list_filename):
+
+        print "Reading %s" % (lib_filename)
         lib = SchLib(lib_filename)
 
         keywords = {}
@@ -327,9 +404,10 @@ class SymGen:
         template_doc_filename = os.path.join (out_path, out_filename + "_template.dcm")
 
         if ref_list_filename:
+            print "Reading ref list %s" % (ref_list_filename)
             self.read_ref_list(ref_list_filename)
 
-        print "Extracting library %s to %s" % (lib_filename, dump_filename)
+        print "Extracting library %s" % (dump_filename)
 
         #
         self.create_empty_lib (template_filename)
@@ -337,6 +415,8 @@ class SymGen:
         docfile = Documentation (template_doc_filename)
 
         #
+        def_width = 600
+
         outf = open (dump_filename,'w')
 
         outf.write ("#\n")
@@ -344,13 +424,24 @@ class SymGen:
         outf.write ("# Source lib: %s\n" % (lib_filename))
         outf.write ("#\n")
 
+        outf.write ("#\n")
+        outf.write ("# Global Defaults\n")
+        outf.write ("#\n")
+        outf.write ("%%lib %s.lib\n" % out_filename)
+        outf.write ("%pinlen 200\n")
+        outf.write ("%width 600\n")
+        outf.write ("%fill back\n")
+        outf.write ("%line 10\n")
+        outf.write ("%%iconlib %s\n" % os.path.basename(template_filename))
+        outf.write ("%%style %s\n" % self.symbol_style.name)
+        outf.write ("#\n")
+
+
         # temp
         #self.gen_comp (template_lib, docfile, "or", "U")
         ##
 
         for comp in lib.components:
-
-            unique_pins = {}
 
             # look for hidden pins
             #hidden = False
@@ -358,12 +449,19 @@ class SymGen:
             #    if pin['pin_type'] == "N":
             #        hidden = True
             #        break
-            hidden = True
+            #hidden = True
 
-            for pin in comp.pins:
-                unique_pins [pin['num']] = "1"
 
-            if hidden:
+            # include all components
+            
+            if True:
+                unique_pins = {}
+                max_pin_number = 0
+                for pin in comp.pins:
+                    unique_pins [pin['num']] = "1"
+                    if int(pin['num']) > max_pin_number: 
+                        max_pin_number = int(pin['num'])
+
                 num_units = int(comp.definition['unit_count'])
 
                 type=""
@@ -375,6 +473,7 @@ class SymGen:
                     family = "Standard"
 
                 desc = self.get_descriptor(std_number)
+                #if self.symbol_style == SymbolStyle.ANSI:
                 if desc:
                     if " AND " in desc.description:
                         type = "AND"
@@ -386,7 +485,9 @@ class SymGen:
                         type = "NOR"
                     elif "XOR" in desc.description:
                         type = "XOR"
-                    elif "inverter" in desc.description:
+                    elif "XNOR" in desc.description:
+                        type = "XNOR"
+                    elif "invert" in desc.description and not "non-invert" in desc.description: # inverter or inverting
                         type = "NOT"
                     elif "buffer" in desc.description:  # check num units, num inputs
                         type = "BUF"
@@ -399,68 +500,103 @@ class SymGen:
                 # need to sort by y coord, detect gaps
                 print comp.name
 
+                outf.write ("#\n")
+                outf.write ("# %s\n" % (comp.name))
+                outf.write ("#\n")
                 outf.write ("COMP %s %s\n" % (comp.name, comp.reference))
 
                 outf.write ("FPLIST\n")
                 if len(comp.fplist) == 0:
-                    if not len(unique_pins) in [4,14,16,20,24]:
-                        print "warning: %s invalid num pins? %d" % (comp.name, len(unique_pins))
+                    if not max_pin_number in [4,14,16,20,24]:
+                        print "warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number)
                         self.num_errors += 1
-                    outf.write ("DIP?%d*\n" % len(unique_pins))
+                    outf.write ("DIP?%d*\n" % max_pin_number)
                 else:
                     for fp in comp.fplist:
                         outf.write ("%s\n" % fp)
 
+                # doc fields
+                f_desc = None
+                f_doc = None  
+                f_keyw = None
+
                 if comp.documentation:
                     descr = comp.documentation['description']
                     if descr:
-                        outf.write ("DESC %s\n" % descr)
+                        f_desc = descr
                     elif desc:
-                        outf.write ("DESC %s\n" % desc.description)
+                        f_desc = desc.description
 
-                    keyw = comp.documentation['keywords']
-                    if keyw:
-                        outf.write ("KEYW %s\n" % keyw)
-                        for kw in keyw.split():
+                    f_keyw = comp.documentation['keywords']
+                    if f_keyw:
+                        for kw in f_keyw.split():
                             keywords [kw] = 1
 
                     ## todo remove invalid keywords, replace with ones from ref list
 
-                    doc = comp.documentation['datasheet']
-                    if doc:
-                        outf.write ("DOC %s\n" % doc)
-                    elif desc:
-                        if 'Standard' in desc.technologies:
-                            outf.write ("DOC %s\n" % desc.technologies['Standard'])
+                    f_doc = comp.documentation['datasheet']
+                    if f_doc is None:
+                        if desc and desc.get_datasheet (family):
+                            f_doc = desc.get_datasheet (family)
                 elif desc:
-                    outf.write ("DESC %s\n" % desc.description)
-                    if len(type)>0:
-                        outf.write ("KEYW %s\n" % type)
-
+                    f_desc = desc.description
+                    
+                    if len(type) > 0:
+                        f_keyw = type
                         keywords [type] = 1
 
-                    if 'Standard' in desc.technologies:
-                        outf.write ("DOC %s\n" % desc.technologies['Standard'])
+                    if desc.get_datasheet (family):
+                        f_doc = desc.get_datasheet (family)
 
+                #
+                if f_desc:
+                    outf.write ("DESC %s\n" % f_desc)
+                else:
+                    print "info: missing DESC %s"  % (comp.name)
+                if f_keyw:
+                    outf.write ("KEYW %s\n" % f_keyw)
+                else:
+                    print "info: missing KEYW %s"  % (comp.name)
+                if f_doc:
+                    outf.write ("DOC %s\n" % f_doc)
+                else:
+                    print "info: missing DOC %s"  % (comp.name)
+
+                # process aliases
                 if len(comp.aliases) > 0:
+                    # todo use desc?
                     for alias in comp.aliases.keys():
+                        f_desc = None
+                        f_doc = None  
+                        f_keyw = None
+
                         outf.write ("ALIAS %s\n" % alias)
                         alias_doc = comp.aliases[alias]
+                        
                         if alias_doc:
-                            descr = alias_doc['description']
-                            if descr:
-                                outf.write ("DESC %s\n" % descr)
+                            f_desc = alias_doc['description']
 
-                            keyw = alias_doc['keywords']
-                            if keyw:
-                                outf.write ("KEYW %s\n" % keyw)
-                                for kw in keyw.split():
+                            f_keyw = alias_doc['keywords']
+                            if f_keyw:
+                                for kw in f_keyw.split():
                                     keywords [kw] = 1
 
-                            doc = alias_doc['datasheet']
-                            if doc:
-                                outf.write ("DOC %s\n" % doc)
+                            f_doc = alias_doc['datasheet']
+                        #
+                        if f_desc:
+                            outf.write ("DESC %s\n" % f_desc)
+                        else:
+                            print "info: missing DESC %s"  % (alias)
+                        if f_keyw:
+                            outf.write ("KEYW %s\n" % f_keyw)
+                        else:
+                            print "info: missing KEYW %s"  % (alias)
+                        if f_doc:
+                            outf.write ("DOC %s\n" % f_doc)
+                        else:
+                            print "info: missing DOC %s"  % (alias)
 
+                #
                 for pin in comp.pins:
                     pin['direction'] = self.kicad_to_symgen_dir (pin['direction'])
 
@@ -491,11 +627,23 @@ class SymGen:
 
                 count = 0
                 for d in comp.drawOrdered:
-                    if d[0] in ['A','C','P','T']:
+                    if d[0] in ['A','C','P','T','S']:
                         count += 1
 
+                if comp.name=="4009":
+                    print "ehhlo"
+
+                unit_template = None
                 if count > 1:
-                    self.copy_icon (templ_comp, comp, 0, Point(0,0))
+                    bb = self.get_bounds (comp, 0)
+
+                    if bb.pmax.y != bb.height /2 :
+                        offset_y = bb.height /2 - bb.pmax.y
+                        offset_y = self.align_to_grid (offset_y+100, 100)
+                    else:   
+                        offset_y = 0
+
+                    self.copy_icon (templ_comp, comp, 0, Point(0, offset_y))
 
                     # compare to template comps
                     this_sum = self.get_checksum (templ_comp, 0, 0)
@@ -508,13 +656,31 @@ class SymGen:
                         if lib_sum == this_sum:
                             found = True
                             print "same as " + xcomp.name
+                            unit_template = xcomp.name
                             break
                     if not found:
                         # add if different
                         template_lib.addComponent (templ_comp)
+                        unit_template = comp.name
 
+                #
                 # units
-                for unit in range (0, num_units+1):
+                bb = BoundingBox(Point(), Point())
+
+                bb = bb + self.get_bounds (comp, 0)
+
+                # check pins
+                for pin in comp.pins:
+                    if pin['name'] != '~' and pin['name'].startswith('~') and 'I' in pin['pin_type']:
+                        pin['name'] = after (pin['name'], "~")
+                        print "info: double inversion %s %s %s"  % (comp.name, pin['num'], pin['name'])
+
+                # 1..1
+                # 1..2
+                for unit in range (1, num_units+1):
+                    
+                    bb = bb + self.get_bounds (comp, unit)
+                    #print "unit %d width %d" % (unit, bb.width)
 
                     unit_pins = self.find_comp_pins (comp, unit)
                     if unit_pins:
@@ -522,14 +688,24 @@ class SymGen:
                         pins = []
                         for pin in unit_pins:
                             # debug
-                            if pin['unit']==str(0) and num_units>1 and not pin['name'] in ["GND", "VCC", "3.3V"]:
-                                print "info: common pin %s %s "  % (comp.name, pin['name'])
+                            if pin['unit']==str(0) and num_units>1 and not self.is_power_pin (pin):
+                                print "info: common pin %s %s %s"  % (comp.name, pin['num'], pin['name'])
 
                             if pin['convert'] in ['0','1'] and not self.is_power_pin(pin):
                                 pins.append (pin)
 
                         if pins:
-                            outf.write ("UNIT %s\n" % type)
+                            line = "UNIT"
+                            if type:
+                                line += " " + type
+                            else:
+                                if bb.width>0 and bb.width != def_width:
+                                    line += " WIDTH %d" % (bb.width)
+                                if unit_template:
+                                    line += " TEMPLATE %s" % (unit_template)
+                            line += '\n'
+
+                            outf.write (line)
 
                             if type == "BUF":
                                 print "ehhlo"
@@ -542,9 +718,15 @@ class SymGen:
                                         pins[i] = pins[i+1]
                                         pins[i+1] = temp
 
+                            max_y = -99999
+                            for pin in pins:
+                                if pin['direction'] in ['L','R']:
+                                    if int(pin['posy']) > max_y:
+                                        max_y = int(pin['posy'])
+
                             # look for horiz pins
                             for _dir in ['L','R']:
-                                cur_y = int(pin['posy'])
+                                cur_y = max_y
                                 for pin in pins:
                                     if pin['direction'] == _dir:
                                         py = int(pin['posy'])    
@@ -578,15 +760,30 @@ class SymGen:
                                         cur_x = px
 
                 # now look for power pins
-                outf.write ("UNIT PWR\n")
+                pins = []
+                pin_map = {}
                 for pin in comp.pins:
-                    if self.is_power_pin(pin):
-                        if pin['name'] == "VCC":
-                            pin['direction'] = "T"
-                        if pin['name'] == "GND":
-                            pin['direction'] = "B"
-                        # type may be power out?
-                        outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'],"PI",pin['direction']))
+                    if self.is_power_pin(pin) and not pin['num'] in pin_map:
+                        pins.append(pin)
+                        pin_map [pin['num']] = 1
+
+                # sort by pin number
+                for passnum in range(len(pins)-1,0,-1):
+                    for i in range(passnum):
+                        if int(pins[i]['num']) > int(pins[i+1]['num']):
+                            temp = pins[i]
+                            pins[i] = pins[i+1]
+                            pins[i+1] = temp
+
+                outf.write ("UNIT PWR\n")
+                for pin in pins:
+                    if self.is_positive_power (pin):
+                        pin['direction'] = "T"
+                    else:
+                        pin['direction'] = "B"
+                    # type may be power out?
+                    # upper case name?
+                    outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'].upper(),"PI",pin['direction']))
 
                 outf.write ("END\n")
 
@@ -809,7 +1006,7 @@ class SymGen:
                 pin.orientation = self.symgen_to_kicad_dir (pin.orientation)
 
                 pins.append (pin)
-                #comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.getvalues()))])
+                #comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
                 
             #self.line = self.file.readline()
             #self.get_next_line()
@@ -842,9 +1039,19 @@ class SymGen:
         #self.comp_keywords = None
         self.comp_datasheet = None
 
-    def copy_icon (self, comp, comp_icon, unit, pos, variant=0, src_unit=0, src_variant=1):
+    def get_fill (self, fill, style):
+        if fill != Background:
+            return fill 
+        else:
+            if style:
+                return style.fill
+            else:
+                return fill
+
+    def copy_icon (self, comp, comp_icon, unit, pos, variant=0, src_unit=0, src_variant=1, style = None):
     
         # TODO: source unit
+        # pensize, fill?
 
         for p in comp_icon.draw['arcs']:
             # TODO apply offset pos
@@ -855,6 +1062,7 @@ class SymGen:
                 item ['posy'] = str(int(item ['posy']) + pos.y)
                 item ['starty'] = str(int(item ['starty']) + pos.y)
                 item ['endy'] = str(int(item ['endy']) + pos.y)
+                item['fill'] = self.get_fill (item['fill'], style)
                 comp.drawOrdered.append (['A', item])
     
         for p in comp_icon.draw['circles']:
@@ -863,6 +1071,7 @@ class SymGen:
                 item ['unit'] = str(unit)
                 item ['convert'] = str(variant)
                 item ['posy'] = str(int(item ['posy']) + pos.y)
+                item['fill'] = self.get_fill (item['fill'], style)
                 comp.drawOrdered.append (['C', item])
 
         for p in comp_icon.draw['polylines']:
@@ -871,10 +1080,23 @@ class SymGen:
                 poly = PolyLine (self.convert_to_string(['P',p]))
                 poly.unit = unit
                 poly.demorgan = variant
+                poly.fill = self.get_fill (item['fill'], style)
                 for pt in poly.points:
                     pt.x += pos.x    
                     pt.y += pos.y    
                 comp.drawOrdered.append (poly.get_element())
+
+        for p in comp_icon.draw['rectangles']:
+            # TODO apply offset pos
+            item = dict(p)
+            if item['convert'] == str(src_variant) or item['convert'] == '0':
+                rect = Rect()
+                rect.unit = unit
+                rect.demorgan = variant
+                rect.fill = self.get_fill (item['fill'], style)
+                rect.p1 = Point(int(item['startx']), int(item['starty'])).Add(pos)
+                rect.p2 = Point(int(item['endx']), int(item['endy'])).Add(pos)
+                comp.drawOrdered.append (rect.get_element())
 
         for p in comp_icon.draw['texts']:
             item = copy.deepcopy(p)
@@ -884,12 +1106,30 @@ class SymGen:
                 item ['posy'] = str(int(item ['posy']) + pos.y)
                 comp.drawOrdered.append (['T',item])
 
+    def parse_fill (self, token):
+        if token in ["F", "f", "N"]:
+            return token
+        elif token.startswith ("f"):
+            return "F"
+        elif token.startswith ("b"):
+            return "f"
+        elif token.startswith ("n"):
+            return "N"
+        else:
+            return None
+
     def parse_directive(self):
 
         tokens = self.line.split()
         
         if tokens[0] == "%lib":
             pass
+
+        elif tokens[0] == "%pinlen":
+            if self.in_component:
+                self.pin_length = int (tokens[1])
+            else:
+                self.def_pin_length = int (tokens[1])
 
         elif tokens[0] == "%width":
             if self.in_component:
@@ -903,37 +1143,46 @@ class SymGen:
             else:
                 self.def_box_pen = int (tokens[1])
 
-        elif tokens[0] == "%pinlen":
-            if self.in_component:
-                self.pin_length = int (tokens[1])
-            else:
-                self.def_pin_length = int (tokens[1])
-
         elif tokens[0] == "%fill":
-            fill = None
-            if tokens[1] in ["F", "f", "N"]:
-                fill = tokens[1]
-            elif tokens[1].startswith ("f"):
-                fill = "F"
-            elif tokens[1].startswith ("b"):
-                fill = "f"
-            elif tokens[1].startswith ("n"):
-                fill = "N"
+            fill = self.parse_fill (tokens[1])
+            if fill:
+                if self.in_component:
+                    self.box_fill = fill
+                    self.logic_fill = fill
+                else:
+                    self.def_box_fill = fill
             else:
                 print "error : unknown fill %s" % self.line
                 self.num_errors += 1
 
-            if fill:
-                if self.in_component:
-                    self.box_fill = fill
-                else:
-                    self.def_box_fill = fill
 
         elif tokens[0] == "%iconlib":
             if not self.in_component:
                 # filename = os.path.join ("data", tokens[1])
                 filename = os.path.abspath(os.path.join(self.out_path, tokens[1]))
                 self.icon_lib = SchLib(filename)
+
+        elif tokens[0] == "%style":
+            tok = tokens[1].upper()
+
+            if tok == "ANSI":
+                self.symbol_style = SymbolStyle.ANSI
+            elif tok == "IEC":
+                self.symbol_style = SymbolStyle.IEC
+            elif tok == "DIN":
+                self.symbol_style = SymbolStyle.DIN
+            else:
+                print "error : unknown style %s : expecting ANSI, IEC or DIN" % tok
+                self.num_errors += 1
+
+            if len(tokens) > 2:
+                fill = self.parse_fill (tokens[2])
+                if fill:
+                    self.def_logic_fill = tokens[2]
+                else:
+                    print "error : unknown fill %s" % self.line
+                    self.num_errors += 1
+
         else:
             print "error : unknown directive %s" % self.line
             self.num_errors += 1
@@ -958,6 +1207,42 @@ class SymGen:
         infile.write ("#End Doc Library\n")
         infile.close()
 
+
+    def create_gate (self, unit_shape, num_inputs, num_outputs, demorgan):
+        if self.symbol_style == SymbolStyle.ANSI:
+            if demorgan == 0:
+                if unit_shape in ["and", "nand"]:
+                    gatedef = AndGate (num_inputs)
+                elif unit_shape in ["or", "nor"]:
+                    gatedef = OrGate (num_inputs)
+                elif unit_shape in ["xor", "xnor"]:
+                    gatedef = XorGate (num_inputs)
+                elif unit_shape in ["not", "buffer"]:
+                    gatedef = NotGate (num_inputs)
+                else:
+                    gatedef = None
+            else:
+                # de morgan variants only for and/or
+                if unit_shape in ["and", "nand"]:
+                    gatedef = OrGate (num_inputs)
+                elif unit_shape in ["or", "nor"]:
+                    gatedef = AndGate (num_inputs)
+                else:
+                    gatedef = None
+        elif self.symbol_style == SymbolStyle.IEC:
+            gatedef = IecGate (num_inputs)
+            gatedef.num_outputs = num_outputs
+            if demorgan == 0:
+                gatedef.type = unit_shape
+            else:
+                if unit_shape in ["and", "nand"]:
+                    gatedef.type = "or"
+                elif unit_shape in ["or", "nor"]:
+                    gatedef.type = "and"
+        else:
+            gatedef = None
+
+        return gatedef
 
     def parse_input_file (self, inp_filename):
 
@@ -1046,9 +1331,15 @@ class SymGen:
                 pins = []
                 unit = 0
                 unit_shape = None
+                last_shape = None
+                template = None
+                icons = []
 
-                self.box_width = self.def_box_width
                 self.pin_length = self.def_pin_length
+                self.box_width = self.def_box_width
+                self.box_pen = self.def_box_pen
+                self.box_fill = self.def_box_fill
+                self.logic_fill = self.def_logic_fill
 
                 self.pin_pos_left = Point()
                 self.pin_pos_left.x = -self.box_width/2
@@ -1122,11 +1413,11 @@ class SymGen:
                         tokens = self.line.split()
 
                     elif self.line.startswith ("ALIAS"):
-                        if not self.comp_datasheet:
-                            if alias_name:
-                                self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + alias_name
-                            else:
-                                self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + name
+                        #if not self.comp_datasheet:
+                        #    if alias_name:
+                        #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + alias_name
+                        #    else:
+                        #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + name
                         self.add_doc(comp, alias_name)
                         #
                         alias_name = after (self.line, " ")
@@ -1143,11 +1434,11 @@ class SymGen:
                         tokens = self.line.split()
                 # while
 
-                if not self.comp_datasheet:
-                    if alias_name:
-                        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + alias_name
-                    else:
-                        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + name
+                #if not self.comp_datasheet:
+                #    if alias_name:
+                #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + alias_name
+                #    else:
+                #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + name
                 self.add_doc(comp, alias_name)
 
             elif self.line.startswith("UNIT"):
@@ -1162,11 +1453,8 @@ class SymGen:
                     unit_shape = "box"
                 unit_combine = "auto"
 
-                template = None
-                icons = []
-
                 vert_margin = 200
-
+                
                 j = 1
                 while j < len(tokens):
                     token = tokens[j].upper()
@@ -1185,21 +1473,31 @@ class SymGen:
                         unit_shape = "nor"
                     elif token == "XOR":
                         unit_shape = "xor"
+                    elif token == "XNOR":
+                        unit_shape = "xnor"
                     elif token == "NOT":
                         unit_shape = "not"
                     elif token == "BUF":
                         unit_shape = "buffer"
+
                     elif token.startswith("SEP"):
                         unit_combine = "seperate"
                     elif token.startswith("COMB"):
                         unit_combine = "combine"
+
                     elif token.startswith("W"):
                         j += 1
                         self.box_width = int(tokens[j])
+
                     elif token.startswith("TEMP"):
                         j += 1
                         template = tokens[j]
+                        unit_shape = "none"
+                        last_shape = unit_shape
+
                     elif token.startswith("ICON"):
+                        last_shape = unit_shape
+                        icons = []
                         while j < len(tokens)-1:
                             j += 1
                             icons.append(tokens[j])
@@ -1208,7 +1506,13 @@ class SymGen:
                         self.num_errors += 1
                     j += 1
 
-                #
+                # 
+                if unit_shape != last_shape:
+                    icons = []
+                    template = None
+
+                last_shape = unit_shape
+
                 if len(icons) == 0 and template:
                     icons.append(template)
 
@@ -1324,7 +1628,14 @@ class SymGen:
                         for icon_name in icons:
                             comp_icon = self.icon_lib.getComponentByName(icon_name)
                             if comp_icon:
-                                self.copy_icon (comp, comp_icon, unit, Point(0, -k * 150 + icons_y_extent/2))
+                                style = StyleAttributes()
+                                # todo: not sure this is right way
+                                if unit_shape == "box":
+                                    style.fill = self.box_fill
+                                else:
+                                    style.fill = self.logic_fill
+                                style.pensize = self.box_pen
+                                self.copy_icon (comp, comp_icon, unit, Point(0, -k * 150 + icons_y_extent/2), style=style)
                                 k += 1
                             else:
                                 print "error: unknown icon %s " % icon_name
@@ -1340,9 +1651,9 @@ class SymGen:
                         rect.p2.y = box_bottom_y + y_offset
 
                         rect.unit = unit
-                        rect.fill = self.def_box_fill
-                        rect.pensize = self.def_box_pen
-                        comp.drawOrdered.append(['S', dict(zip(Component._RECT_KEYS,rect.getvalues() )) ])
+                        rect.fill = self.box_fill
+                        rect.pensize = self.box_pen
+                        comp.drawOrdered.append(['S', dict(zip(Component._RECT_KEYS,rect.get_values() )) ])
 
                     ## todo?
                     if label_style == "floating":
@@ -1367,9 +1678,9 @@ class SymGen:
                     for pin in unit_pins:
                         pin.pos.y += y_offset
                         pin.unit = unit
-                        comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.getvalues()))])
+                        comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
             
-                elif unit_shape in ["and", "nand", "or", "nor", "xor", "not", "buffer"]:
+                elif unit_shape in ["and", "nand", "or", "nor", "xor", "xnor", "not", "buffer"]:
 
                     #
                     # pins
@@ -1386,18 +1697,21 @@ class SymGen:
                     name_pos.y = -50
                     #
                     num_inputs=0
+                    num_outputs=0
                     for pin in unit_pins:
                         if pin.is_input():
                             num_inputs+=1
-                    num_outputs = len(unit_pins) - num_inputs
+                        if pin.is_output():
+                            num_outputs+=1
+                    #num_outputs = len(unit_pins) - num_inputs
 
-                    if num_inputs != len(unit_pins)-1:
+                    if num_inputs != len(unit_pins) - num_outputs:
                         print "error: wrong number of input pins: expected %d got %d" % (len(unit_pins)-1, num_inputs)
                         self.num_errors += 1
                         continue
 
-                    if num_outputs != 1:
-                        print "error: wrong number of input pins: expected %d got %d" % (1, num_outputs)
+                    if not num_outputs in [1,2]:
+                        print "error: wrong number of output pins: expected 1-2 got %d" % (num_outputs)
                         self.num_errors += 1
                         continue
 
@@ -1409,26 +1723,10 @@ class SymGen:
                     
                     for variant in range (0,demorgan+1):
 
-                        if variant==0:
-                            # graphics for main symbol    
-                            if unit_shape in ["and", "nand"]:
-                                gatedef = AndGate (num_inputs)
-                
-                            elif unit_shape in ["or", "nor"]:
-                                gatedef = OrGate (num_inputs)
-
-                            elif unit_shape == "xor":
-                                gatedef = XorGate (num_inputs)
-
-                            elif unit_shape in ["not", "buffer"]:
-                                gatedef = NotGate (num_inputs)
-                        else:
-                            if unit_shape in ["and", "nand"]:
-                                gatedef = OrGate (num_inputs)
-                            elif unit_shape in ["or", "nor"]:
-                                gatedef = AndGate (num_inputs)
+                        gatedef = self.create_gate (unit_shape, num_inputs, num_outputs, variant)
 
                         #
+                        gatedef.fill = self.logic_fill
                         gatedef.add_gate_graphic (comp, unit, variant + demorgan)
             
                         inputs_pos = gatedef.get_input_positions()
@@ -1437,9 +1735,10 @@ class SymGen:
                         if variant==0:
                             input_shape = " "
                             output_shape = " "
-                            if unit_shape in ['nand', 'nor', 'not']:
+                            if unit_shape in ['nand', 'nor', 'xnor', 'not']:
                                 output_shape = "I"
                         else:
+                            # de morgan
                             input_shape = "I"
                             output_shape = "I"
                             if unit_shape in ['nand', 'nor', 'not']:
@@ -1464,7 +1763,10 @@ class SymGen:
                             for icon_name in icons:
                                 comp_icon = self.icon_lib.getComponentByName(icon_name)
                                 if comp_icon:
-                                    self.copy_icon (comp, comp_icon, unit, Point(0,0))
+                                    style = StyleAttributes()
+                                    style.fill = self.logic_fill
+                                    style.pensize = self.box_pen
+                                    self.copy_icon (comp, comp_icon, unit, gatedef.get_center(), style=style)
                                 else:
                                     print "error: unknown icon %s " % icon_name 
                                     self.num_errors += 1
@@ -1474,7 +1776,7 @@ class SymGen:
                             if pin.is_input() and j<len(inputs_pos):
                                 pin.length = self.pin_length + gatedef.offsets[j]
                                 pin.unit = unit
-                                pin.convert = variant + demorgan
+                                pin.demorgan = variant + demorgan
             
                                 if unit_shape == "buffer" and j==1:
                                     dy = self.align_to_grid(abs(inputs_pos[j].y)+99, 100)
@@ -1491,21 +1793,25 @@ class SymGen:
 
                                 j += 1
                                 pins.append (pin)
-                                comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.getvalues()))])
+                                comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
 
                         j = 0
                         for pin in unit_pins:
                             if pin.is_output():
                                 pin.length = self.pin_length
                                 pin.unit = unit
-                                pin.convert = variant + demorgan
-                                pin.orientation="L"
-                                pin.shape = output_shape
+                                pin.demorgan = variant + demorgan
+                                pin.orientation = "L"
+                                if j==0:
+                                    pin.shape = output_shape
+                                else:
+                                    pin.shape = "I" if output_shape == " " else " "
+
                                 pin.pos.x = outputs_pos[j].x + self.pin_length
                                 pin.pos.y = outputs_pos[j].y       
                                 j += 1
                                 pins.append (pin)
-                                comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.getvalues()))])
+                                comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
 
                     ##
                     self.pin_length = temp
@@ -1527,13 +1833,13 @@ class SymGen:
                 values = []
                 values.append (name)
                 values.append (ref)
-                values.append ("0")
-                values.append ("40")
-                values.append ("Y")
-                values.append ("Y")
-                values.append (str(unit))
-                values.append ("L")     # units are not interchangeable
-                values.append ("N")
+                values.append ("0")     # not used
+                values.append ("40")    # text offset
+                values.append ("Y")     # draw pin number    
+                values.append ("Y")     # draw pin name
+                values.append (str(unit))   # unit count
+                values.append ("L")     # L=units are not interchangeable
+                values.append ("N")     # option flag ( Normal or Power)
                 comp.definition = dict(zip(Component._DEF_KEYS, values))
 
                 cur_comp = self.lib.getComponentByName(comp.name)
@@ -1588,7 +1894,7 @@ symgen.verbose = args.verbose
 #symgen.gen_comp ("data")
 
 if args.dump:
-    # -d --lib C:\git_kicad\kicad-library\library\74xx.lib --ref 7400_logic_ref.txt
+    # -d --lib C:\git_bobc\kicad-library\library\74xx.lib --ref ..\74xx\7400_logic_ref.txt
     if not args.lib:
         ExitError("error: library name not supplied (need --lib)")
 
@@ -1596,13 +1902,10 @@ if args.dump:
     dump_path = ""
     symgen.dump_lib (lib_filename, dump_path, args.ref)
 else:
-    # --inp 74xx_gen.txt
+    # --inp 74xx.txt
     if not args.inp:
         ExitError("error: symgen script file not supplied (need --inp)")
 
-    #file = "data\\74xx_gen.txt"
-    #file = "data\\74xgxx_dump.txt"
-    #file = "data\\arduino-pro-mini.txt"
     file = args.inp
 
     symgen.parse_input_file (file)
