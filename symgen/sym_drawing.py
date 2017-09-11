@@ -22,6 +22,36 @@ class Point:
     def Add (self, p):
         return Point (self.x + p.x, self.y + p.y)
 
+class Rectangle:
+
+    def __init__(self, pos=None, size=None):
+        if pos:
+            self.pos = Point(pos.x, pos.y)
+        else:
+            self.pos = Point()
+
+        if size:
+            self.size = Point(size.x, size.y)
+        else:
+            self.size = Point()
+
+    def center(self):
+        return Point ( (self.pos.x + self.size.x) / 2, (self.pos.y - self.size.y) / 2)
+    
+    def left(self):
+        return self.pos.x
+
+    def top(self):
+        return self.pos.y
+
+    def right(self):
+        return self.pos.x + self.size.x
+
+    def bottom(self):
+        return self.pos.y - self.size.y
+
+
+
 class BoundingBox(object):
 
     pmin = Point()
@@ -109,6 +139,9 @@ class Pin (DrawBase):
         self.type = "I"
         self.shape = " "
         self.visible = True
+
+        # extra stuff
+        self.qualifiers = ""
 
         super(Pin, self).__init__()
         self.key = 'X'
@@ -302,6 +335,13 @@ class PolyLine (DrawBase):
             bb.extend (p)
         return bb
 
+    def get_point_list (self):
+        pts=[]
+        for p in self.points:
+            pts.append (str(int(round(p.x))))
+            pts.append (str(int(round(p.y))))
+        return pts
+
 class Rect (DrawBase):
 
     p1 = Point()
@@ -399,7 +439,7 @@ class Text (DrawBase):
         values.append ("0" if self.visible else "1")
         values.append (str(self.unit))
         values.append (str(self.demorgan))
-        values.append (self.value)      # quotes, escaping
+        values.append ('"' + self.value + '"')      # quotes, escaping
         values.append ("Italic" if self.italic else "Normal")
         values.append ("1" if self.bold else "0")
         values.append (self.horiz_alignment)

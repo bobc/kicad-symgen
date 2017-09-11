@@ -1196,6 +1196,7 @@ END
 # HEF4093B
 #
 COMP HEF4093B U
+FIELD $FOOTPRINT "Housings_SOIC:SOIC-14_3.9x8.7mm_Pitch1.27mm"
 FPLIST
 SOIC*3.9x8.7mm*Pitch1.27mm*
 DESC Quad 2-Input NAND Schmitt Trigger, SOIC-14

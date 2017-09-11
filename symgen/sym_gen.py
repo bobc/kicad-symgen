@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# -*- coding: utf-8 -*-
+
 """
  Generate components from text file
  
@@ -42,6 +44,7 @@ import re
 import copy
 import time
 import hashlib
+import shlex
 from enum import Enum
 
 from schlib import *
@@ -51,6 +54,7 @@ from str_utils import *
 from sym_drawing import *
 from sym_comp import *
 from sym_gates import *
+from sym_iec import *
 
 class SymbolStyle (Enum):
     # ANSI/MIL MIL-STD-806, now also IEEE Standard 91-1984 "distinctive shapes" 
@@ -71,7 +75,8 @@ class SymGen:
     docfile = None
 
     logic_list = []
-    kw = ['COMP', 'DESC', 'KEYW', 'DOC', 'ALIAS', 'UNIT', 'END']
+    kw = ['COMP', 'DESC', 'KEYW', 'DOC', 'ALIAS', 'UNIT', 'ELEM', 'END']
+    #  ELEM, GROUP
 
     lib = None
     icon_lib = None
@@ -95,6 +100,9 @@ class SymGen:
     #def_logic_fill = NoFill
     def_logic_fill = Background
 
+    def_name_offset = 20
+    def_extra_offset = 40
+
     # per component settings  
     pin_length = def_pin_length
 
@@ -115,6 +123,26 @@ class SymGen:
 
     in_component = False
 
+    units_have_variant = 0 # 1 for de Morgan variants
+    # unit
+    is_power_unit = False
+    is_overlay = False
+    unit_shape = ""
+
+    cur_pos = Point()
+    max_height = 600
+    
+    unit_rect = Rectangle()
+    #unit_height = 0
+    y_pin_extent = 0
+
+    vert_margin = 0
+    y_offset = 0
+
+    icons = []
+    label_style = ""
+    ref_pos = Point()
+    name_pos = Point()
 
     def __init__(self):
         self.kw = ['COMP', 'DESC', 'KEYW', 'DOC', 'ALIAS', 'UNIT', 'END']
@@ -386,6 +414,19 @@ class SymGen:
         else:
             return sum(bbs)
 
+    # check for short words? : of at to for in by 
+    def capitalise (self, s):
+        words = s.split()
+        result = ""
+        for word in words:
+            if word.isupper():
+                result += word + " "
+            elif word[0].isalpha and len(word)>3:
+                result += word[0].upper() + word[1:] + " "
+            else:
+                result += word + " "
+        return result.strip()
+
     def dump_lib (self, lib_filename, dump_path, ref_list_filename):
 
         print "Reading %s" % (lib_filename)
@@ -505,6 +546,21 @@ class SymGen:
                 outf.write ("#\n")
                 outf.write ("COMP %s %s\n" % (comp.name, comp.reference))
 
+                # 
+                j = 2
+                for field in comp.fields[2:]:
+                    if field['fieldname']:
+                        if field['name'] and field['name'] != '""':
+                            outf.write ("FIELD %s %s\n" % (field['fieldname'], field['name']))
+                    else:
+                        if field['name'] != '""':
+                            if j==2:
+                                outf.write ("FIELD $FOOTPRINT %s\n" % (field['name']))
+                            else:
+                                outf.write ("FIELD $DATASHEET%d %s\n" % (j, field['name']))
+                            j += 1
+
+
                 outf.write ("FPLIST\n")
                 if len(comp.fplist) == 0:
                     if not max_pin_number in [4,14,16,20,24]:
@@ -550,7 +606,7 @@ class SymGen:
 
                 #
                 if f_desc:
-                    outf.write ("DESC %s\n" % f_desc)
+                    outf.write ("DESC %s\n" % self.capitalise(f_desc))
                 else:
                     print "info: missing DESC %s"  % (comp.name)
                 if f_keyw:
@@ -584,7 +640,7 @@ class SymGen:
                             f_doc = alias_doc['datasheet']
                         #
                         if f_desc:
-                            outf.write ("DESC %s\n" % f_desc)
+                            outf.write ("DESC %s\n" % self.capitalise(f_desc))
                         else:
                             print "info: missing DESC %s"  % (alias)
                         if f_keyw:
@@ -813,11 +869,11 @@ class SymGen:
     
         self.line = self.line.strip()
             
-    def find_pins (self, pin_list, direction):
+    def find_pins (self, pin_list, direction, type=None):
         pins = []
 
         for pin in pin_list:
-            if pin.orientation == direction and pin.visible:
+            if pin.orientation == direction and pin.visible and (type is None or pin.type == type):
                 pins.append (pin)
         return pins
 
@@ -846,12 +902,32 @@ class SymGen:
             result.append (result_row)
         return result
 
-    def get_pins (self):
+    def parse_element (self):
         src_lines = []
 
-        self.get_next_line()
+        element = IecElement()
+
         tokens = self.line.split()
-        while not tokens[0] in self.kw:
+
+        #element.shape = "box"
+        # todo: is this right?
+        element.shape = self.unit_shape 
+
+        if tokens[0].upper() == "ELEM":
+            j = 1
+            while j < len(tokens):
+                if tokens[j].upper() == "CONTROL":
+                    element.shape = "control"
+                elif tokens[j].upper() == "LABEL":
+                    j += 1
+                    if j < len(tokens):
+                        element.label = self.strip_quotes(tokens[j])
+                j += 1
+
+            self.get_next_line()
+            tokens = self.line.split()
+        
+        while not tokens[0] in ['COMP', 'UNIT', 'ELEM', 'END']:
             if self.line.startswith ("#") or len(self.line)==0:
                 # ignore comments
                 self.line = self.file.readline().strip()
@@ -887,8 +963,10 @@ class SymGen:
             tokens = self.line.split()
         # end while
 
-        return self.parse_pins (src_lines)
+        element.pins = self.parse_pins (src_lines)
+        return element
 
+    # return list of elements ?
     def parse_pins (self, lines):
         pins = []
 
@@ -898,7 +976,7 @@ class SymGen:
 
         for line in lines:
             tokens = line.split()
-            if tokens[0] == "SPC":
+            if tokens[0].upper() == "SPC":
                 if len(tokens) == 2:
                     _dir = tokens[1]
                 else:
@@ -908,13 +986,24 @@ class SymGen:
                     self.pin_pos_left.y -= 100
                 elif "R" in _dir:
                     self.pin_pos_right.y-= 100
-                elif "T" in _dir:
-                    self.pin_pos_top.x += 100
-                elif "B" in _dir:
-                    self.pin_pos_bottom.x += 100
+                #elif "T" in _dir:
+                #    self.pin_pos_top.x += 100
+                #elif "B" in _dir:
+                #    self.pin_pos_bottom.x += 100
 
                 if "C" in _dir:
                     cur_pin_align = "C"
+
+                pin = Pin()
+                pin.length = self.pin_length
+                pin.number = "~"
+                pin.name = "~"
+                pin.type = " "
+                pin.orientation = _dir
+                pin.align = cur_pin_align
+                pin.orientation = self.symgen_to_kicad_dir (pin.orientation)
+
+                pins.append (pin)
 
             else:    
                 pin = Pin()
@@ -929,10 +1018,15 @@ class SymGen:
                 if len(tokens) >= 3:
                     cur_pin_type = tokens[2]
 
+                # position, alignment
                 if len(tokens) >= 4:
                     cur_pin_dir = tokens[3][0]
                     if "C" in tokens[3]:
                         cur_pin_align = "C"
+
+                # qualifers (string) e.g. for schmitt inputs
+                if len(tokens) >= 5:
+                    pin.qualifiers = self.strip_quotes(tokens[4])
 
                 #inverted =  len(pin.name) > 1 and pin.name.startswith("~")
             
@@ -995,22 +1089,18 @@ class SymGen:
                 elif pin.orientation=="T":
                     pin.pos.x = self.pin_pos_top.x
                     pin.pos.y = self.pin_pos_top.y  + pin.length
-                    if not can_stack:
-                        self.pin_pos_top.x += 100
+                    #if not can_stack:
+                    #    self.pin_pos_top.x += 100
                 elif pin.orientation=="B":
                     pin.pos.x = self.pin_pos_bottom.x
                     pin.pos.y = self.pin_pos_bottom.y - pin.length
-                    if not can_stack:
-                        self.pin_pos_bottom.x += 100
+                    #if not can_stack:
+                    #    self.pin_pos_bottom.x += 100
                 # 
                 pin.orientation = self.symgen_to_kicad_dir (pin.orientation)
 
                 pins.append (pin)
-                #comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
                 
-            #self.line = self.file.readline()
-            #self.get_next_line()
-            #tokens = self.line.split()
         #end while
 
         return pins
@@ -1244,6 +1334,434 @@ class SymGen:
 
         return gatedef
 
+    def parse_unit (self):
+
+        unit = IecSymbol()
+
+        self.get_next_line()
+        tokens = self.line.split()
+
+        while tokens[0].upper() not in ['UNIT','END']:
+            element = self.parse_element ()
+
+            unit.elements.append (element)
+
+            tokens = self.line.split()
+
+        return unit
+
+    def draw_pin_text (self, comp, unit, pin, text):
+        
+        pos = Point(pin.pos.x, pin.pos.y)
+        fontsize = pin.sizename
+
+        offset = Point()
+        offset.x = pin.length
+        # todo handle overbars, variable width?
+        if comp.definition['draw_pinname'] == "Y" and pin.name != "~":
+            offset.x += len(pin.name) * fontsize 
+
+        offset.x += int(comp.definition['text_offset'])
+
+        # left edge ?
+        if pin.orientation == "L":
+            offset.x += fontsize
+
+        # center v
+        offset.y =  fontsize / 2
+
+        if pin.orientation == "L":
+            pos.x -= offset.x
+            pos.y -= offset.y
+        elif pin.orientation == "R":
+            pos.x += offset.x
+            pos.y -= offset.y
+
+        self.draw_text (comp, unit, pos, text, fontsize)
+
+    def get_chars (self, text):
+        list = []
+
+        while len(text)>0:
+            if text.startswith ("&"):
+                tok = before (text, ";")
+                text = after (text, ";")
+                list.append (tok+";")
+            else:
+                list.append (text[0])
+                text = text[1:]
+                
+        return list
+
+    def draw_text (self, comp, unit, pos, s, fontsize):
+
+        chars = self.get_chars (s)
+        for char in chars :
+            if char == "&xdtri;":
+                # white down-pointing triangle
+                # unicode U+025BD
+                poly = PolyLine ()
+                poly.unit = unit
+                poly.pensize = 0
+                poly.points.append (Point (0,fontsize).Add (pos))
+                poly.points.append (Point (fontsize,fontsize).Add (pos))
+                poly.points.append (Point (fontsize/2,0).Add (pos))
+                poly.points.append (Point (0,fontsize).Add (pos))
+                poly.point_count = len(poly.points)
+                comp.drawOrdered.append( poly.get_element() )
+                pos.x += fontsize + 10
+            #elif char == "&xrtri;":
+            #    # white right-pointing triangle
+            #    # unicode U+025B7
+            #    poly = PolyLine ()
+            #    poly.unit = unit
+            #    poly.pensize = 0
+            #    poly.points.append (Point (0,fontsize).Add (pos))
+            #    poly.points.append (Point (fontsize,fontsize).Add (pos))
+            #    poly.points.append (Point (fontsize/2,0).Add (pos))
+            #    poly.points.append (Point (0,fontsize).Add (pos))
+            #    poly.point_count = len(poly.points)
+            #    comp.drawOrdered.append( poly.get_element() )
+            #    pos.x += fontsize + 15
+            elif char == "&st;":
+                # schmitt trigger
+                poly = PolyLine ()
+                poly.unit = unit
+                poly.pensize = 0
+                poly.points.append (Point (0,0).Add (pos))
+                poly.points.append (Point (30,0).Add (pos))
+                poly.points.append (Point (40,50).Add (pos))
+                poly.points.append (Point (50,50).Add (pos))
+                poly.points.append (Point (20,50).Add (pos))
+                poly.points.append (Point (10,0).Add (pos))
+                poly.point_count = len(poly.points)
+                comp.drawOrdered.append( poly.get_element() )
+                pos.x += fontsize + 10
+            else:
+                text = Text()        
+                if char.startswith ("&"):
+                    if char == "&xrtri;":
+                        char = u'\u25B7'
+                        char = char.encode('utf-8')
+                    else:
+                        char = '?'
+                    #char = u'\ufffd'
+                text.value = char
+                text.unit = unit
+                text.pos = pos
+                text.horiz_alignment="L"
+                text.vert_alignment="B"
+                comp.drawOrdered.append (text.get_element())
+                pos.x += fontsize + 10
+
+
+    def set_label_pos(self):
+        if self.label_style == "floating":
+            self.max_height = max (self.max_height, self.unit_rect.size.y)
+    
+            if self.unit_shape == "box":
+                margin = 50
+            else:
+                margin = 50 # ??
+
+            y = self.unit_rect.top() + margin
+            #if y > self.ref_pos.y:
+            self.ref_pos.x = self.unit_rect.left()
+            self.ref_pos.y = y
+
+            y = self.unit_rect.bottom() - margin
+            #if y < self.name_pos.y:
+            self.name_pos.x = self.unit_rect.left()
+            self.name_pos.y = y
+
+    def draw_element (self, xunit, element, comp, unit, variant):
+
+        left_pins = self.find_pins (element.pins, "R")
+        right_pins = self.find_pins (element.pins, "L")
+
+        top_pins = self.find_pins (element.pins, "D")
+        bottom_pins = self.find_pins (element.pins, "U")
+
+        self.unit_rect.pos.x = -self.box_width/2
+        self.unit_rect.size.x = self.box_width
+
+        box_size = Point ()
+        box_size.x = self.box_width
+        box_size.y = max (len(left_pins), len(right_pins)) * 100
+
+        if box_size.y == 0:
+            box_size.y = 100
+
+            if self.is_power_unit:
+                box_size.y = self.unit_rect.size.y
+
+        if element.shape == "control":
+            box_size.y += 100
+
+        # apply a min height (power units only?)
+        # should apply to unit?
+        # shape, template
+        min_size =0
+        if len(top_pins) > 0:
+            min_size += 200
+        if len(bottom_pins) > 0:
+            min_size += 200
+
+        box_size.y = max (box_size.y, min_size)
+
+        #
+        #self.unit_height =  -self.cur_pos.y + 50 + box_size.y 
+        self.unit_rect.size.y = -self.cur_pos.y + box_size.y 
+        #self.unit_height =  -self.cur_pos.y + box_size.y 
+
+        #offset = Point (0,50)
+
+        # draw element outline
+        if element.shape == "box":
+            rect = Rect()
+            rect.p1.x = -box_size.x/2
+            rect.p1.y = self.cur_pos.y
+
+            rect.p2.x = box_size.x/2
+            rect.p2.y = self.cur_pos.y - box_size.y
+
+            rect.unit = unit
+            rect.demorgan = variant
+            rect.fill = self.box_fill
+            rect.pensize = self.box_pen
+            comp.drawOrdered.append( rect.get_element() )
+
+        elif element.shape == "control":
+            poly = PolyLine ()
+            poly.unit = unit
+            poly.demorgan = variant
+            poly.fill = self.box_fill
+            poly.pensize = self.box_pen
+            poly.points.append (Point (-box_size.x/2 + 50, self.cur_pos.y - box_size.y))
+            poly.points.append (Point (-box_size.x/2 + 50, self.cur_pos.y - box_size.y+50))
+            poly.points.append (Point (-box_size.x/2, self.cur_pos.y - box_size.y+50))
+            poly.points.append (Point (-box_size.x/2, self.cur_pos.y))
+            poly.points.append (Point (box_size.x/2, self.cur_pos.y))
+            poly.points.append (Point (box_size.x/2, self.cur_pos.y - box_size.y+50))
+            poly.points.append (Point (box_size.x/2 - 50, self.cur_pos.y - box_size.y+50))
+            poly.points.append (Point (box_size.x/2 - 50, self.cur_pos.y - box_size.y))
+            poly.point_count = len(poly.points)
+            comp.drawOrdered.append( poly.get_element() )
+
+        if element.label:
+            fontsize = 50
+            pos = Point (0, self.cur_pos.y - box_size.y/2).Sub (Point(fontsize/2, fontsize/2))
+            
+            self.draw_text (comp, unit, pos, element.label, fontsize)
+
+        # add element pins
+
+        self.pin_pos_left.x = -box_size.x/2
+        self.pin_pos_left.y = self.cur_pos.y - 50
+
+        self.pin_pos_right.x = box_size.x/2
+        self.pin_pos_right.y = self.cur_pos.y - 50
+
+        if not self.is_overlay:
+            #self.pin_pos_top.x = 0
+
+            self.pin_pos_bottom.x = 0
+            
+            if self.unit_shape == "none":
+                # power unit (combine) ?
+                # Note : might be template 
+                self.pin_pos_bottom.y = self.cur_pos.y - self.max_height
+            else:
+                self.pin_pos_bottom.y = self.cur_pos.y - box_size.y
+
+        for pin in element.pins:
+            if pin.orientation == 'R':
+                pin.pos.y = self.pin_pos_left.y
+                self.pin_pos_left.y -= 100
+            elif pin.orientation == 'L':
+                pin.pos.y = self.pin_pos_right.y
+                self.pin_pos_right.y -= 100
+
+                if pin.type == "T":
+                    self.draw_pin_text (comp, unit, pin, "&xdtri;")
+            elif pin.orientation == 'D':
+                pin.pos.x = self.pin_pos_top.x
+                pin.pos.y = self.pin_pos_top.y + pin.length
+                #pin.pos.y = self.unit_rect.top() + pin.length
+                self.pin_pos_top.x += 100
+            elif pin.orientation == 'U':
+                pin.pos.x = self.pin_pos_bottom.x
+                
+                pin.pos.y = self.pin_pos_bottom.y - pin.length
+                #pin.pos.y = self.unit_rect.bottom() - pin.length
+                self.pin_pos_bottom.x += 100
+
+            if pin.qualifiers:
+                self.draw_pin_text (comp, unit, pin, pin.qualifiers)
+
+            pin.unit = unit
+            pin.demorgan = variant
+            if pin.type != " ":
+                comp.drawOrdered.append( pin.get_element() )
+
+
+        # add icons
+        if self.icon_lib and len(self.icons)>0:
+            k=0
+            y_pos = self.cur_pos.y - self.unit_rect.size.y/2
+            if len(self.icons) > 1:
+                icons_y_extent = len(self.icons) * 125 + (len(self.icons)-1)*25
+            else:
+                icons_y_extent = 0
+            for icon_name in self.icons:
+                comp_icon = self.icon_lib.getComponentByName(icon_name)
+                if comp_icon:
+                    style = StyleAttributes()
+                    # todo: not sure this is right way
+                    if self.unit_shape == "box":
+                        style.fill = self.box_fill
+                    else:
+                        style.fill = self.logic_fill
+                    style.pensize = self.box_pen
+                    self.copy_icon (comp, comp_icon, unit, Point(0, y_pos -k * 150 + icons_y_extent/2), style=style)
+                    k += 1
+                else:
+                    print "error: unknown icon %s " % icon_name
+                    self.num_errors += 1
+
+        #
+        if self.label_style == "floating":
+            self.max_height = max (self.max_height, self.unit_rect.size.y)
+    
+            if self.unit_shape == "box":
+                margin = 50
+            else:
+                margin = 50 # ??
+
+            y = 0 + margin
+            if y > self.ref_pos.y:
+                self.ref_pos.x = -box_size.x/2
+                self.ref_pos.y = y
+
+            y = -self.unit_rect.size.y - margin
+            if y < self.name_pos.y:
+                self.name_pos.x = -box_size.x/2
+                self.name_pos.y = y
+        #endif
+
+        return box_size.y
+
+
+        if self.pin_pos_left.y == 0 and self.pin_pos_left.y == self.pin_pos_right.y:
+            # there are no horiz pins, probably a power unit
+            # ??
+            if self.unit_shape == "none":
+                # ??
+                # self.y_pin_extent = self.pin_pos_top.y - self.pin_pos_bottom.y
+                self.unit_height = self.y_pin_extent
+
+                box_top_y    = self.pin_pos_top.y
+                box_bottom_y = self.pin_pos_bottom.y
+            else:
+                self.y_pin_extent = self.pin_pos_top.y - self.pin_pos_bottom.y
+                self.unit_height = self.y_pin_extent
+
+                box_top_y = 0
+                box_bottom_y = box_top_y - self.unit_height
+        else:
+            self.y_pin_extent = -min (self.pin_pos_left.y, self.pin_pos_right.y)-100
+            if self.y_pin_extent % 200 == 100:
+                self.vert_margin = 200
+            else:
+                self.vert_margin = 200
+            self.unit_height = self.y_pin_extent + self.vert_margin
+                        
+            #self.vert_margin = align_to_grid(self.unit_height - self.y_pin_extent + 199, 200)
+            box_top_y = self.vert_margin/2
+            box_bottom_y = box_top_y - self.unit_height
+
+        # move top/bottom pins
+        top_pins = self.find_pins (element.pins, "D")
+        if len(top_pins)>1:
+            self.pin_pos_top.x = - 100 * int((len(top_pins)-1) / 2)
+        else:
+            self.pin_pos_top.x = 0
+
+        bottom_pins = self.find_pins (element.pins, "U")
+        if len(bottom_pins)>1:
+            self.pin_pos_bottom.x = - 100 * int((len(bottom_pins)-1) / 2)
+        else:
+            self.pin_pos_bottom.x = 0
+
+        for pin in element.pins:
+            if pin.orientation == 'D':
+                pin.pos.x += self.pin_pos_top.x
+                pin.pos.y = box_top_y + pin.length
+            elif pin.orientation == 'U':
+                pin.pos.x += self.pin_pos_bottom.x
+                pin.pos.y = box_bottom_y - pin.length
+
+        # align pins (right)
+        right_pins = self.find_pins (element.pins, "L")
+        if len(right_pins)>0:
+            if right_pins[0].align == "C":
+                # need to force alignment to 100 mil grid?
+                #top_y = 100 * (len(right_pins)-1) / 2
+                top_y = (right_pins[0].pos.y - right_pins[-1].pos.y) / 2
+                top_y = top_y - self.unit_height / 2 + 100
+
+                dy = top_y - right_pins[0].pos.y
+
+                j = 0
+                for pin in element.pins:
+                    if pin.orientation == 'L':
+                        pin.pos.y += dy  # top_y - j * 100
+                        j += 1
+
+        self.y_offset = self.align_to_grid (self.y_pin_extent/2, 100)
+        #self.y_offset = 0
+        #print "unit %d ext %d offset %d" % (unit, self.y_pin_extent, self.y_offset)
+
+
+    def get_pos (self, params, name):
+        x = int(params[name+'x'])
+        y = int(params[name+'y'])
+        return Point(x,y)
+
+    def set_pos (self, params, name, p):
+        params[name+'x'] = str(p.x)
+        params[name+'y'] = str(p.y)
+
+    def move_items (self, comp, unit, offset):
+        for elem in comp.drawOrdered:
+            params = elem[1]
+            if params['unit'] == str(unit):
+                if elem[0] == "P":
+                    poly = PolyLine (self.convert_to_string(elem))
+                    for p in poly.points:
+                        p.x += offset.x
+                        p.y += offset.y
+                    params['points'] = poly.get_point_list()
+                elif elem[0] == "A":
+                    p = self.get_pos (params, "pos").Add (offset)
+                    self.set_pos (params, "pos", p)            
+
+                    p = self.get_pos (params, "start").Add (offset)
+                    self.set_pos (params, "start", p)            
+
+                    p = self.get_pos (params, "end").Add (offset)
+                    self.set_pos (params, "end", p)            
+
+                elif elem[0] == "S":
+                    p = self.get_pos (params, "start").Add (offset)
+                    self.set_pos (params, "start", p)            
+
+                    p = self.get_pos (params, "end").Add (offset)
+                    self.set_pos (params, "end", p)            
+                else:
+                    p = self.get_pos (params, "pos").Add (offset)
+                    self.set_pos (params, "pos", p)            
+    
     def parse_input_file (self, inp_filename):
 
         self.out_path, out_filename = os.path.split (inp_filename)
@@ -1320,6 +1838,9 @@ class SymGen:
                 comp.definition['reference'] = ref
                 comp.definition['name'] = name
 
+                comp.definition['text_offset'] = str(self.def_name_offset)
+                
+
                 print "Component: "+ name
 
                 desc = self.get_descriptor(re.sub('[^0-9]', '', name))
@@ -1330,10 +1851,11 @@ class SymGen:
 
                 pins = []
                 unit = 0
-                unit_shape = None
-                last_shape = None
                 template = None
-                icons = []
+                last_shape = None
+
+                self.unit_shape = None
+                self.icons = []
 
                 self.pin_length = self.def_pin_length
                 self.box_width = self.def_box_width
@@ -1357,15 +1879,22 @@ class SymGen:
                 self.pin_pos_bottom.x = 0
                 self.pin_pos_bottom.y = -600
 
-                max_height = 0
-                y_offset = 0
+                self.unit_rect.pos.x = -self.box_width/2
+                self.unit_rect.pos.y = 0
+                self.unit_rect.size.x = self.box_width
+                self.unit_rect.size.y = 0
 
-                label_style = "floating"
-                ref_pos= Point()
-                ref_pos.x = -self.box_width/2
+                self.max_height = 0
+                #self.y_offset = 0
 
-                name_pos = Point()
-                name_pos.x = -self.box_width/2
+                self.label_style = "floating"
+                self.ref_pos= Point()
+                self.ref_pos.x = -self.box_width/2
+                self.ref_pos.y = 0
+
+                self.name_pos = Point()
+                self.name_pos.x = -self.box_width/2
+                self.name_pos.y = 0
 
                 #cur_pin_type = "I"
                 #cur_pin_dir = "L"
@@ -1375,6 +1904,7 @@ class SymGen:
                 self.comp_datasheet = None
 
                 self.in_component = True
+                self.units_have_variant = 0
 
                 # 
                 self.get_next_line()
@@ -1383,6 +1913,27 @@ class SymGen:
                 while self.line.startswith ("%"):
                     self.parse_directive()
 
+                #
+                tokens = self.line.split()
+                while tokens[0].startswith ("FIELD"):
+
+                    if tokens[1].upper()== "$FOOTPRINT":
+                        field_text = after(self.line, tokens[1]).strip()
+                        comp.fields [2]['name'] = field_text
+                    else:
+                        field_text = after(self.line, tokens[1]).strip()
+                        line = 'F%d %s 0 0 50 H I C CNN "%s"' % (len(comp.fields), field_text, tokens[1])
+                        s = shlex.shlex(line)
+                        s.whitespace_split = True
+                        s.commenters = ''
+                        s.quotes = '"'
+                        line = list(s)
+                        values = line[1:] + ['' for n in range(len(Component._FN_KEYS) - len(line[1:]))] 
+                        comp.fields.append(dict(zip(Component._FN_KEYS,values)))
+
+                    self.get_next_line()
+                    tokens = self.line.split()
+    
                 #
                 if self.line.startswith ("FPLIST"):
                     self.get_next_line()
@@ -1395,6 +1946,7 @@ class SymGen:
 
                 # get aliases, documentation fields
                 alias_name = None
+                tokens = self.line.split()
        
                 while tokens[0] != "UNIT":
                     if self.line.startswith ("DESC"):
@@ -1449,36 +2001,36 @@ class SymGen:
                 tokens = self.line.split()
 
                 # unit [ PWR|AND|... [ SEPerate | COMBined ] ] | Width int | ICON name
-                if not unit_shape:
-                    unit_shape = "box"
+                if not self.unit_shape:
+                    self.unit_shape = "box"
                 unit_combine = "auto"
 
-                vert_margin = 200
+                self.vert_margin = 200
                 
                 j = 1
                 while j < len(tokens):
                     token = tokens[j].upper()
 
                     if token == "PWR":
-                        unit_shape = "power"
+                        self.unit_shape = "power"
                     elif token == "NONE":
-                        unit_shape = "none"
+                        self.unit_shape = "none"
                     elif token == "AND":
-                        unit_shape = "and"
+                        self.unit_shape = "and"
                     elif token == "NAND":
-                        unit_shape = "nand"
+                        self.unit_shape = "nand"
                     elif token == "OR":
-                        unit_shape = "or"
+                        self.unit_shape = "or"
                     elif token == "NOR":
-                        unit_shape = "nor"
+                        self.unit_shape = "nor"
                     elif token == "XOR":
-                        unit_shape = "xor"
+                        self.unit_shape = "xor"
                     elif token == "XNOR":
-                        unit_shape = "xnor"
+                        self.unit_shape = "xnor"
                     elif token == "NOT":
-                        unit_shape = "not"
+                        self.unit_shape = "not"
                     elif token == "BUF":
-                        unit_shape = "buffer"
+                        self.unit_shape = "buffer"
 
                     elif token.startswith("SEP"):
                         unit_combine = "seperate"
@@ -1492,43 +2044,53 @@ class SymGen:
                     elif token.startswith("TEMP"):
                         j += 1
                         template = tokens[j]
-                        unit_shape = "none"
-                        last_shape = unit_shape
+                        self.unit_shape = "none"
+                        last_shape = self.unit_shape
 
                     elif token.startswith("ICON"):
-                        last_shape = unit_shape
-                        icons = []
+                        last_shape = self.unit_shape
+                        self.icons = []
                         while j < len(tokens)-1:
                             j += 1
-                            icons.append(tokens[j])
+                            self.icons.append(tokens[j])
                     else:
                         print "error : unknown parameter %s in UNIT" % token
                         self.num_errors += 1
                     j += 1
 
                 # 
-                if unit_shape != last_shape:
-                    icons = []
+                if self.unit_shape != last_shape:
+                    self.icons = []
                     template = None
 
-                last_shape = unit_shape
+                last_shape = self.unit_shape
 
-                if len(icons) == 0 and template:
-                    icons.append(template)
+                if len(self.icons) == 0 and template:
+                    self.icons.append(template)
 
-                if unit_shape == "power":
+
+                self.is_overlay = False
+                if self.unit_shape == "power":
+                    self.is_power_unit = True
+
                     if unit_combine == "seperate":
                         self.box_width = 400
-                        unit_shape = "box"
+                        self.unit_shape = "box"
                     # this relies on pwr unit being last unit...
                     elif self.opt_combine_power_for_single_units and unit==2 or unit_combine=="combine":
-                        unit_shape = "none"
+                        self.unit_shape = "none"
+                        self.is_overlay = True
                         unit = unit - 1
-                        self.pin_pos_top.y = vert_margin/2
-                        self.pin_pos_bottom.y = -max_height + vert_margin/2
+
+                        self.pin_pos_top.y    = self.unit_rect.top()
+                        self.pin_pos_bottom.y = self.unit_rect.bottom()
                     else:
                         self.box_width = 400
-                        unit_shape = "box"
+                        self.unit_shape = "box"
+                else:
+                    self.is_power_unit = False
+
+                # print "unit %d %s %s" % (unit, self.unit_shape, "power" if self.is_power_unit else "")
 
                 # need pin pos generator ?
 
@@ -1543,158 +2105,63 @@ class SymGen:
                 self.pin_pos_top.x = 0
                 self.pin_pos_bottom.x = 0
 
-                if unit_shape == "box" or unit_shape == "none":
+                # ===============================================================================
+                if self.unit_shape == "box" or self.unit_shape == "none":
 
                     ##
-                    unit_pins = self.get_pins ()
+                    # unit_pins = self.get_pins ()
+                    xunit = self.parse_unit ()
 
-                    if self.pin_pos_left.y == 0 and self.pin_pos_left.y == self.pin_pos_right.y:
-                        # there are no horiz pins, probably a power unit
-                        # ??
-                        if unit_shape == "none":
-                            # ??
-                            # y_pin_extent = self.pin_pos_top.y - self.pin_pos_bottom.y
-                            unit_height = y_pin_extent
+                    # draw unit
+                    #left_pins = self.find_pins (element.pins, "R")
+                    #right_pins = self.find_pins (element.pins, "L")
+                    #if len(left_pins) + len(right_pins) > 0 :
 
-                            box_top_y    = self.pin_pos_top.y
-                            box_bottom_y = self.pin_pos_bottom.y
-                        else:
-                            y_pin_extent = self.pin_pos_top.y - self.pin_pos_bottom.y
-                            unit_height = y_pin_extent
+                    #self.cur_pos = Point(0,50)
+                    self.cur_pos = Point(0,0)
 
-                            box_top_y = 0
-                            box_bottom_y = box_top_y - unit_height
-                    else:
-                        y_pin_extent = -min (self.pin_pos_left.y, self.pin_pos_right.y)-100
-                        if y_pin_extent % 200 == 100:
-                            vert_margin = 200
-                        else:
-                            vert_margin = 200
-                        unit_height = y_pin_extent + vert_margin
+                    for element in xunit.elements:
+                        for pin in element.pins:
+                            if "C" in pin.shape:
+                                comp.definition['text_offset'] = str(self.def_extra_offset)
+                                break
                         
-                        #vert_margin = align_to_grid(unit_height - y_pin_extent + 199, 200)
-                        box_top_y = vert_margin/2
-                        box_bottom_y = box_top_y - unit_height
+                        #
+                        for variant in range (0, self.units_have_variant+1):
+                            elem_height = self.draw_element (xunit, element, comp, unit, variant + self.units_have_variant)
 
-                    # move top/bottom pins
-                    top_pins = self.find_pins (unit_pins, "D")
-                    if len(top_pins)>1:
-                        self.pin_pos_top.x = - 100 * int((len(top_pins)-1) / 2)
+                        self.cur_pos.y -= elem_height
+
+                    if not self.is_overlay:
+                        offset = Point()
+                        offset.y = self.align_to_grid (self.unit_rect.size.y/2, 100)
+                        self.move_items (comp, unit, offset)
+                        self.unit_rect.pos.y = offset.y
+                        # move labels?
+                        self.set_label_pos()
                     else:
-                        self.pin_pos_top.x = 0
+                        self.set_label_pos() # ??
 
-                    bottom_pins = self.find_pins (unit_pins, "U")
-                    if len(bottom_pins)>1:
-                        self.pin_pos_bottom.x = - 100 * int((len(bottom_pins)-1) / 2)
-                    else:
-                        self.pin_pos_bottom.x = 0
-
-                    for pin in unit_pins:
-                        if pin.orientation == 'D':
-                            pin.pos.x += self.pin_pos_top.x
-                            pin.pos.y = box_top_y + pin.length
-                        elif pin.orientation == 'U':
-                            pin.pos.x += self.pin_pos_bottom.x
-                            pin.pos.y = box_bottom_y - pin.length
-
-                    # align pins (right)
-                    right_pins = self.find_pins (unit_pins, "L")
-                    if len(right_pins)>0:
-                        if right_pins[0].align == "C":
-                            # need to force alignment to 100 mil grid?
-                            #top_y = 100 * (len(right_pins)-1) / 2
-                            top_y = (right_pins[0].pos.y - right_pins[-1].pos.y) / 2
-                            top_y = top_y - unit_height / 2 + 100
-
-                            dy = top_y - right_pins[0].pos.y
-
-                            j = 0
-                            for pin in unit_pins:
-                                if pin.orientation == 'L':
-                                    pin.pos.y += dy  # top_y - j * 100
-                                    j += 1
-
-                    y_offset = self.align_to_grid (y_pin_extent/2, 100)
-                    #y_offset = 0
-                    #print "unit %d ext %d offset %d" % (unit, y_pin_extent, y_offset)
-
-                    # add icons
-                    if self.icon_lib and len(icons)>0:
-                        k=0
-                        if len(icons) > 1:
-                            icons_y_extent = len(icons) * 125 + (len(icons)-1)*25
-                        else:
-                            icons_y_extent = 0
-                        for icon_name in icons:
-                            comp_icon = self.icon_lib.getComponentByName(icon_name)
-                            if comp_icon:
-                                style = StyleAttributes()
-                                # todo: not sure this is right way
-                                if unit_shape == "box":
-                                    style.fill = self.box_fill
-                                else:
-                                    style.fill = self.logic_fill
-                                style.pensize = self.box_pen
-                                self.copy_icon (comp, comp_icon, unit, Point(0, -k * 150 + icons_y_extent/2), style=style)
-                                k += 1
-                            else:
-                                print "error: unknown icon %s " % icon_name
-                                self.num_errors += 1
-                     
-
-                    if unit_shape == "box":
-                        rect = Rect()
-                        rect.p1.x = -self.box_width/2
-                        rect.p1.y = box_top_y + y_offset
-
-                        rect.p2.x = self.box_width/2
-                        rect.p2.y = box_bottom_y + y_offset
-
-                        rect.unit = unit
-                        rect.fill = self.box_fill
-                        rect.pensize = self.box_pen
-                        comp.drawOrdered.append(['S', dict(zip(Component._RECT_KEYS,rect.get_values() )) ])
-
-                    ## todo?
-                    if label_style == "floating":
-                        max_height = max (max_height, unit_height)
-    
-                        if unit_shape == "box":
-                            margin = 50
-                        else:
-                            margin = 0
-
-                        #y = box_top_y + vert_margin/2 + y_offset
-                        y = box_top_y + margin + y_offset
-                        if y > ref_pos.y:
-                            ref_pos.y = y
-
-                        # y = box_bottom_y - vert_margin/2 + y_offset 
-                        y = box_bottom_y - margin + y_offset 
-                        if y < name_pos.y:
-                            name_pos.y = y
-                    #endif
-            
-                    for pin in unit_pins:
-                        pin.pos.y += y_offset
-                        pin.unit = unit
-                        comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
-            
-                elif unit_shape in ["and", "nand", "or", "nor", "xor", "xnor", "not", "buffer"]:
+                elif self.unit_shape in ["and", "nand", "or", "nor", "xor", "xnor", "not", "buffer"]:
 
                     #
                     # pins
                     temp = self.pin_length
                     self.pin_length = 150
 
-                    unit_pins = self.get_pins ()
+                    self.get_next_line()
+                    element = self.parse_element()
+                    unit_pins = []
+                    for pin in element.pins:
+                        if pin.type != " ":
+                            unit_pins.append (pin)
 
-                    label_style = "fixed"
-                    ref_pos.x = 0
-                    ref_pos.y = 50
+                    self.label_style = "fixed"
+                    self.ref_pos.x = 0
+                    self.ref_pos.y = 50
 
-                    name_pos.x = 0
-                    name_pos.y = -50
+                    self.name_pos.x = 0
+                    self.name_pos.y = -50
                     #
                     num_inputs=0
                     num_outputs=0
@@ -1716,14 +2183,15 @@ class SymGen:
                         continue
 
                     ##
-                    if unit_shape in ["and", "nand", "or", "nor"]:
+                    if self.unit_shape in ["and", "nand", "or", "nor"]:
                         demorgan = 1
+                        self.units_have_variant = 1
                     else:
                         demorgan = 0
                     
                     for variant in range (0,demorgan+1):
 
-                        gatedef = self.create_gate (unit_shape, num_inputs, num_outputs, variant)
+                        gatedef = self.create_gate (self.unit_shape, num_inputs, num_outputs, variant)
 
                         #
                         gatedef.fill = self.logic_fill
@@ -1735,22 +2203,39 @@ class SymGen:
                         if variant==0:
                             input_shape = " "
                             output_shape = " "
-                            if unit_shape in ['nand', 'nor', 'xnor', 'not']:
+                            if self.unit_shape in ['nand', 'nor', 'xnor', 'not']:
                                 output_shape = "I"
                         else:
                             # de morgan
                             input_shape = "I"
                             output_shape = "I"
-                            if unit_shape in ['nand', 'nor', 'not']:
+                            if self.unit_shape in ['nand', 'nor', 'not']:
                                 output_shape = " "
 
-                        self.pin_pos_top.x = 0
-                        self.pin_pos_top.y = 0
-                        self.pin_pos_bottom.x = 0
-                        self.pin_pos_bottom.y = -600
-                        max_height = 600
-                        unit_height = max_height
-                        y_pin_extent = max_height
+
+                        if unit == 1:
+                            self.pin_pos_top.x = 0
+                            self.pin_pos_top.y = gatedef.height/2
+
+                            self.pin_pos_bottom.x = 0
+                            self.pin_pos_bottom.y = -gatedef.height/2
+
+                            self.max_height = gatedef.height
+                            self.unit_rect.pos.y = gatedef.height/2
+                            self.unit_rect.size.y = self.max_height
+                            #self.y_pin_extent = self.max_height
+                        else:
+                            self.pin_pos_top.x = 0
+                            self.pin_pos_top.y = 0
+
+                            self.pin_pos_bottom.x = 0
+                            self.pin_pos_bottom.y = -600
+
+                            self.max_height = 600
+                            self.unit_rect.size.y = self.max_height
+                            #self.y_pin_extent = self.max_height
+
+                        
 
                         if num_inputs > len(inputs_pos):
                             print "error: too many input pins, expected %d got %d" % ( len(inputs_pos), num_inputs)
@@ -1759,8 +2244,8 @@ class SymGen:
             #            if comp.name=="74LS136":
             #                print "oops"
 
-                        if self.icon_lib and len(icons)>0:
-                            for icon_name in icons:
+                        if self.icon_lib and len(self.icons)>0:
+                            for icon_name in self.icons:
                                 comp_icon = self.icon_lib.getComponentByName(icon_name)
                                 if comp_icon:
                                     style = StyleAttributes()
@@ -1778,7 +2263,7 @@ class SymGen:
                                 pin.unit = unit
                                 pin.demorgan = variant + demorgan
             
-                                if unit_shape == "buffer" and j==1:
+                                if self.unit_shape == "buffer" and j==1:
                                     dy = self.align_to_grid(abs(inputs_pos[j].y)+99, 100)
                                     dy = dy - abs(inputs_pos[j].y)
                                     pin.length += dy
@@ -1793,7 +2278,7 @@ class SymGen:
 
                                 j += 1
                                 pins.append (pin)
-                                comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
+                                comp.drawOrdered.append( pin.get_element () )
 
                         j = 0
                         for pin in unit_pins:
@@ -1811,7 +2296,11 @@ class SymGen:
                                 pin.pos.y = outputs_pos[j].y       
                                 j += 1
                                 pins.append (pin)
-                                comp.drawOrdered.append( ['X', dict(zip(comp._PIN_KEYS,pin.get_values()))])
+                                comp.drawOrdered.append( pin.get_element () )
+
+                                # pin text
+                                if pin.qualifiers:
+                                    self.draw_pin_text (comp, unit, pin, pin.qualifiers)
 
                     ##
                     self.pin_length = temp
@@ -1822,11 +2311,11 @@ class SymGen:
                     self.get_pins()
                 #
 
-                comp.fields [0]['posx'] = str(ref_pos.x)
-                comp.fields [0]['posy'] = str(ref_pos.y)
+                comp.fields [0]['posx'] = str(self.ref_pos.x)
+                comp.fields [0]['posy'] = str(self.ref_pos.y)
 
-                comp.fields [1]['posx'] = str(name_pos.x)
-                comp.fields [1]['posy'] = str(name_pos.y)
+                comp.fields [1]['posx'] = str(self.name_pos.x)
+                comp.fields [1]['posy'] = str(self.name_pos.y)
 
             elif self.line.startswith ("END"):
 
@@ -1840,7 +2329,8 @@ class SymGen:
                 values.append (str(unit))   # unit count
                 values.append ("L")     # L=units are not interchangeable
                 values.append ("N")     # option flag ( Normal or Power)
-                comp.definition = dict(zip(Component._DEF_KEYS, values))
+                # comp.definition = dict(zip(Component._DEF_KEYS, values))
+                comp.definition['unit_count'] = str(unit)
 
                 cur_comp = self.lib.getComponentByName(comp.name)
     

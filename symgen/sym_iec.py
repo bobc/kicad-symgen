@@ -13,16 +13,10 @@ class IecBase(object):
         pass
 """
 symbol-unit
-    section :    [1+]
-        control  [0..1]
-            group 
-                pin    
-            pin
-
-        element  [1+]
-            group 
-                pin    
-            pin
+    element  [control] [1+]
+        group 
+            pin    
+        pin
       
 
 --
@@ -65,39 +59,33 @@ unit pwr
 # aka Unit
 class IecSymbol (IecBase):
     #control = None
-    sections = []
+    elements = []
 
     def __init__(self):
-        pass
+        self.elements = []
 
     def draw (self, comp, unit, variant):
         pos = Point(0,0)
         width = 600
-        for section in sections:
-            height = section.draw (comp, unit, variant, pos, width)
+        for element in elements:
+            height = element.draw (comp, unit, variant, pos, width)
             pos.y += height
         # return height
         return pos.y
 
 
-class IecSection (IecBase):
-    groups = []
+class IecElement (IecBase):
+#    groups = []
+
+#    shape = "box"
 
     # todo: for now
-    pins = []
-    
-    def __init__(self):
-        pass
-
-class IecControl (IecSection):
+#    pins = []
 
     def __init__(self):
-        pass
-
-class IecElement (IecSection):
-
-    def __init__(self):
-        pass
+        self.pins = []
+        self.shape = "box"
+        self.label = ""
 
     def draw (self, comp, unit, variant, pos, width):
         height = 100
