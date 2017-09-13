@@ -1116,21 +1116,24 @@ END
 #
 COMP 4538 U
 FPLIST
-DIP?16*
-DESC Monostable
-KEYW CMOS
+ SOIC*3.9x9.9mm*Pitch1.27mm*
+ SOIC*7.5x10.3mm*Pitch1.27mm*
+ SOEIAJ*5.275x10.2mm*Pitch1.27mm*
+ TSSOP*4.4x5mm*Pitch0.65mm*
+DESC Dual Precision Retriggerable, Resettable Monostable Multivibrator
+KEYW CMOS Monostable Multivibrator
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4538B.pdf
 ALIAS 4528
-DESC Monostable
-KEYW CMOS
+DESC Dual Retriggerable, Resettable Monostable Multivibrator
+KEYW CMOS Monostable Multivibrator
 DOC http://datasheet.octopart.com/CD4528BCN-Fairchild-datasheet-143503.pdf
 ALIAS 14528
-DESC Monostable
-KEYW CMOS
+DESC Dual Retriggerable, Resettable Monostable Multivibrator, SOIC-16
+KEYW CMOS Monostable Multivibrator
 DOC https://www.onsemi.com/pub/Collateral/MC14528B-D.PDF
 ALIAS 14538
-DESC Monostable
-KEYW CMOS
+DESC Dual Precision Retriggerable, Resettable Monostable Multivibrator, SOIC-16/SOIC-16W/SOEIAJ-16/TSSOP-16
+KEYW CMOS Monostable Multivibrator
 DOC https://www.onsemi.com/pub/Collateral/MC14538B-D.PDF
 UNIT 
 2 RxCx I L

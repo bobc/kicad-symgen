@@ -82,6 +82,7 @@ COMP 4006 U
 FPLIST
 DIP?14*
 DESC 18-stage Shift Register
+KEYW CMOS Shift Register
 DOC http://pdf.datasheetcatalog.com/datasheet/philips/HEF4006BN.pdf
 UNIT WIDTH 500
 
@@ -117,18 +118,21 @@ COMP 4008 U
 FPLIST
 DIP?16*
 DESC 4-bit Binary Full Adder
+KEYW CMOS adder
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4008bms.pdf
 UNIT WIDTH 500
-7 A0 I L
-5 A1 I L
-3 A2 I L
-1 A3 I L
-
-6 B0 I L
-4 B1 I L
-2 B2 I L
-15 B3 I L
-
+GROUP "" - "P"
+  7 A0 I L
+  5 A1 I L
+  3 A2 I L
+  1 A3 I L
+END-GROUP 
+GROUP "" - "Q"
+  6 B0 I L
+  4 B1 I L
+  2 B2 I L
+  15 B3 I L
+END-GROUP
 9 Cin I L
 
 SPC R
@@ -152,7 +156,7 @@ COMP 4009 U
 FPLIST
 DIP?16*
 DESC Hex Inverting Buffer
-KEYW NOT
+KEYW CMOS NOT inverter
 DOC http://pdf.datasheetcatalog.com/datasheet_pdf/motorola/MC14009AL_to_MC14010CP.pdf
 UNIT NOT
 3 ~ I L
@@ -184,7 +188,7 @@ COMP 4010 U
 FPLIST
 DIP?16*
 DESC Hex Non-inverting Buffer
-KEYW buffer
+KEYW CMOS buffer
 DOC http://pdf.datasheetcatalog.com/datasheet_pdf/motorola/MC14009AL_to_MC14010CP.pdf
 UNIT BUF
 3 ~ I L
@@ -216,6 +220,9 @@ COMP 40104 U
 FPLIST
 DIP?16*
 DESC 4-bit Bidirectional Parallel-in/Parallel-out Shift Register (Tri-state)
+KEYW CMOS shift register
+DOC http://pdf.datasheetcatalog.com/datasheets/134/108591_DS.pdf
+#
 UNIT WIDTH 500
 
 ELEM CONTROL
@@ -251,11 +258,18 @@ END
 #
 COMP 40106 U
 FPLIST
-DIP?14*
+ DIP*7.62mm*
+ SOP*5.3x10.3mm*Pitch1.27mm*
+#
 DESC Hex Inverting Schmitt Trigger (NOT gates)
-KEYW NOT
+KEYW CMOS NOT inverter
 DOC https://assets.nexperia.com/documents/data-sheet/HEF40106B.pdf
+#
 ALIAS 4584
+DESC Hex Inverting Schmitt Trigger (NOT gates)
+KEYW CMOS NOT inverter
+DOC https://toshiba.semicon-storage.com/info/docget.jsp?did=20900&prodName=TC4584BF
+#
 UNIT NOT
 1 ~ I L "&st;"
 2 ~ ~O R
@@ -285,7 +299,7 @@ COMP 4011 U
 FPLIST
 DIP?14*
 DESC Quad 2-input NAND Gate
-KEYW NAND
+KEYW CMOS NAND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf
 UNIT NAND
 1 ~ I L
@@ -318,6 +332,7 @@ COMP 40110 U
 FPLIST
 DIP?16*
 DESC Up/down Counter Latch Decoder Driver
+KEYW CMOS counter
 DOC http://www.ti.com/lit/gpn/cd40110b
 UNIT
 6 LE I L
@@ -349,7 +364,7 @@ COMP 4012 U
 FPLIST
 DIP?14*
 DESC Dual 4-input NAND Gate
-KEYW NAND
+KEYW CMOS NAND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf
 UNIT NAND
 2 ~ I L
@@ -373,6 +388,7 @@ END
 # 4013
 #
 COMP 4013 U
+%pinlen 100
 FPLIST
 DIP?14*
 DESC Dual D-type Flip-flop
@@ -386,7 +402,7 @@ UNIT WIDTH 400
 1 Q O R
 SPC R
 SPC R
-2 Q ~O R
+2 ~Q O R
 UNIT
 9 D I L
 11 Cp CI L
@@ -395,7 +411,7 @@ UNIT
 13 Q O R
 SPC R
 SPC R
-12 Q ~O R
+12 ~Q O R
 UNIT PWR
 7 VSS PI B
 14 VDD PI T
@@ -407,6 +423,7 @@ COMP 4014 U
 FPLIST
 DIP?16*
 DESC 8-stage Shift Register
+KEYW CMOS shift register
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4014B.pdf
 UNIT WIDTH 500
 
@@ -454,6 +471,7 @@ COMP 4015 U
 FPLIST
 DIP?16*
 DESC Dual 4-stage Shift Register
+KEYW CMOS shift register
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4015bms.pdf
 UNIT WIDTH 500
 9 CP CI L "&st;"
@@ -481,11 +499,19 @@ END
 # 4016
 #
 COMP 4016 U
+%pinlen 100
 FPLIST
 DIP?14*
+#
 DESC Quad Bilateral Switch
+KEYW CMOS switch
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4016B_CNV.pdf
+#
 ALIAS 4066
+DESC Quad Bilateral Switch
+KEYW CMOS switch
+DOC http://www.ti.com/lit/ds/symlink/cd4066b.pdf 
+#
 UNIT WIDTH 400
 1 I/O P L
 SPC L
@@ -517,18 +543,17 @@ COMP 4017 U
 FPLIST
 DIP?16*
 DESC Decade Counter with 10 Decoded Outputs (5-stage Johnson Counter)
+KEYW CMOS counter johnson
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4017bms-22bms.pdf
-UNIT WIDTH 500 TEMPLATE 4017
+UNIT WIDTH 500
+SPC L
+SPC L
+SPC L
+GROUP "&st;&amp;" C ""
 14 CP0 I L
 SPC L
-SPC L
 13 CP1 ~I L
-SPC L
-SPC L
-SPC L
-SPC L
-SPC L
-SPC L
+END-GROUP
 SPC L
 15 MR I L
 3 Q0 O R
@@ -551,15 +576,19 @@ END
 # 4174
 #
 COMP 4174 U
+%pinlen 100
 FPLIST
 DIP?16*
+#
 DESC Hex D-type Flip-flop
 KEYW CMOS DFF
 DOC http://www.onsemi.com/pub/Collateral/MC14174B-D.PDF
+#
 ALIAS 40174
 DESC Hex D-type Flip-flop
 KEYW CMOS DFF
 DOC https://assets.nexperia.com/documents/data-sheet/HEF40174B.pdf
+#
 UNIT WIDTH 400
 
 ELEM CONTROL
@@ -599,6 +628,7 @@ END
 # 4175
 #
 COMP 4175 U
+%pinlen 100
 FPLIST
 DIP?16*
 #
@@ -621,22 +651,22 @@ ELEM CONTROL
 ELEM
 4 D I L
 2 Q O R
-3 Q ~O R
+3 ~Q O R
 
 ELEM
 5 D I L
 7 Q O R
-6 Q ~O R
+6 ~Q O R
 
 ELEM
 12 D I L
 10 Q O R
-11 Q ~O R
+11 ~Q O R
 
 ELEM
 13 D I L
 15 Q O R
-14 Q ~O R
+14 ~Q O R
 
 UNIT PWR
 8 VSS PI B
@@ -649,6 +679,7 @@ COMP 4018 U
 FPLIST
 DIP?16*
 DESC Presettable Divide-by-N Counter
+KEYW CMOS counter divider
 DOC http://pdf.datasheetcatalog.com/datasheets/166/78007_DS.pdf
 UNIT WIDTH 500
 
@@ -690,6 +721,7 @@ COMP 4019 U
 FPLIST
 DIP?16*
 DESC Quad AND/OR Select Gate
+KEYW CMOS AND OR
 DOC http://pdf.datasheetcatalog.com/datasheet2/1/02fx2315a3c3hrqrhxrtr4hj4wpy.pdf
 UNIT WIDTH 500
 
@@ -729,10 +761,12 @@ FPLIST
 DIP?16*
 #
 DESC Presettable 4-bit Up/down BCD Counter
+KEYW CMOS counter
 DOC http://www.ti.com/lit/gpn/cd40192b
 #
 ALIAS 40193
 DESC Presettable 4-bit Up/down Binary Counter
+KEYW CMOS counter
 DOC http://www.ti.com/lit/gpn/cd40193b
 #
 UNIT WIDTH 500
@@ -779,6 +813,7 @@ FPLIST
 DIP?16*
 #
 DESC 4-bit Bidirectional Universal Shift Register
+KEYW CMOS shift register
 DOC http://www.ti.com/lit/gpn/cd40194b
 #
 UNIT WIDTH 500
@@ -818,6 +853,7 @@ COMP 4020 U
 FPLIST
 DIP?16*
 DESC 14-stage Binary Ripple Counter
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4020bms-24bms-40bms.pdf
 UNIT WIDTH 500
 SPC L
@@ -848,31 +884,40 @@ COMP 4021 U
 FPLIST
 DIP?16*
 DESC 8-stage Shift Register
+KEYW CMOS shft register
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4014bms-21bms.pdf
-UNIT WIDTH 500 TEMPLATE 4021
+#
+UNIT WIDTH 500
+ELEM CONTROL
+GROUP "&ge;1" "C" ""
 9 PL O L
-10 CP O L
 SPC L
+10 CP O L "&st;"
+END-GROUP 
+
+ELEM
 11 DS O L
 7 P0 I L
+ELEM
 6 P1 I L
+ELEM
 5 P2 I L
+ELEM
 4 P3 I L
+ELEM
 13 P4 I L
+ELEM
 14 P5 I L
-15 P6 I L
-1 P7 I L
-SPC R
-SPC R
-SPC R
-SPC R
-SPC R
-SPC R
-SPC R
-SPC R
 2 Q5 O R
+ELEM
+15 P6 I L
 12 Q6 O R
+ELEM
+1 P7 I L
 3 Q7 O R
+
+SPC L
+
 UNIT PWR
 8 VSS PI B
 16 VDD PI T
@@ -884,15 +929,16 @@ COMP 4022 U
 FPLIST
 DIP?16*
 DESC Octal Counter With 8 Decoded Outputs (4-stage Johnson Counter)
+KEYW CMOS counter johnson
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4017bms-22bms.pdf
-UNIT WIDTH 500 TEMPLATE 4022
-14 CP0 O L
+UNIT WIDTH 500
+SPC L
+SPC L
+GROUP "&amp;" C ""
+14 CP0 O L "&st;"
 SPC L
 13 CP1 ~I L
-SPC L
-SPC L
-SPC L
-SPC L
+END-GROUP
 SPC L
 15 MR I L
 2 Q0 O R
@@ -916,7 +962,7 @@ COMP 4023 U
 FPLIST
 DIP?14*
 DESC Triple 3-input NAND Gate
-KEYW NAND
+KEYW CMOS NAND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf
 UNIT NAND
 1 ~ I L
@@ -944,6 +990,7 @@ COMP 4024 U
 FPLIST
 DIP?14*
 DESC 7-stage Binary Ripple Counter
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4020bms-24bms-40bms.pdf
 UNIT
 SPC L
@@ -967,10 +1014,12 @@ END
 #
 COMP 40240 U
 FPLIST
-DIP?20*
+ DIP*7.62mm*
+ SOIC*7.5x12.8mm*Pitch1.27mm*
 #
-DESC Buffer/Line Driver ; Inverting (tri-state)
-KEYW inverter
+DESC Buffer/Line Driver, Inverting, Tri-state
+KEYW CMOS inverter
+DOC http://pdf.datasheetcatalog.com/datasheet/NXP_Semiconductors/HEF40240B.pdf
 #
 UNIT WIDTH 500
 
@@ -1019,10 +1068,12 @@ END
 #
 COMP 40244 U
 FPLIST
-DIP?20*
+ DIP*7.62mm*
+ SOIC*7.5x12.8mm*Pitch1.27mm*
 #
-DESC Buffer/Line Driver ; Non-Inverting (tri-state)
-KEYW buffer
+DESC Buffer/Line Driver, Non-Inverting, Tri-state
+KEYW CMOS buffer 3-state
+DOC https://assets.nexperia.com/documents/data-sheet/HEF40244B_CNV.pdf 
 #
 UNIT WIDTH 500
 
@@ -1071,8 +1122,12 @@ END
 #
 COMP 40245 U
 FPLIST
-DIP?20*
-DESC Octal Bus Transceiver ; (tri-state) Outputs
+ DIP*7.62mm*
+ SOIC*7.5x12.8mm*Pitch1.27mm*
+DESC Octal Bus Transceiver, Tri-state Outputs
+KEYW CMOS transceiver
+DOC https://www.digchip.com/datasheets/download_datasheet.php?id=1603101&part-number=HEF40245
+#
 UNIT WIDTH 500
 
 ELEM CONTROL
@@ -1123,7 +1178,7 @@ COMP 4025 U
 FPLIST
 DIP?14*
 DESC Triple 3-input NOR Gate
-KEYW NOR
+KEYW CMOS NOR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf
 UNIT NOR
 1 ~ I L
@@ -1148,6 +1203,7 @@ END
 # 4027
 #
 COMP 4027 U
+%pinlen 100
 FPLIST
 DIP?16*
 DESC Dual J-K Master-Slave Flip-flop
@@ -1162,7 +1218,7 @@ UNIT WIDTH 400
 SPC R
 1 Q O R
 SPC R
-2 Q ~O R
+2 ~Q O R
 UNIT
 9 S I L
 10 J I L
@@ -1172,7 +1228,7 @@ UNIT
 SPC R
 15 Q O R
 SPC R
-14 Q ~O R
+14 ~Q O R
 UNIT PWR
 8 VSS PI B
 16 VDD PI T
@@ -1184,6 +1240,7 @@ COMP 4028 U
 FPLIST
 DIP?16*
 DESC BCD To Decimal (1-of-10) Decoder
+KEYW CMOS dcoder
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4028bms.pdf
 UNIT
 SPC L
@@ -1214,6 +1271,7 @@ COMP 4029 U
 FPLIST
 DIP?16*
 DESC Presettable Up/down Counter, Binary Or BCD-decade
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4029bms.pdf
 UNIT WIDTH 500
 
@@ -1258,7 +1316,7 @@ COMP 4030 U
 FPLIST
 DIP?14*
 DESC Quad XOR Gate
-KEYW XOR
+KEYW CMOS XOR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4030bms.pdf
 UNIT XOR
 1 ~ I L
@@ -1395,6 +1453,7 @@ COMP 4040 U
 FPLIST
 DIP?16*
 DESC 12-stage Binary Ripple Counter
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4020bms-24bms-40bms.pdf
 UNIT
 SPC L
@@ -1424,8 +1483,8 @@ END
 COMP 4041 U
 FPLIST
 DIP?14*
-DESC Quad true/complement  buffer
-KEYW BUFFER
+DESC Quad True/Complement Buffer
+KEYW CMOS BUFFER
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4041ubms.pdf
 UNIT BUF
 3 ~ I L
@@ -1458,28 +1517,38 @@ COMP 4042 U
 FPLIST
 DIP?16*
 DESC Quad D-type Latch
+KEYW CMOS latch
 DOC http://pdf.datasheetcatalog.com/datasheet/philips/HEF4042BF.pdf
-UNIT WIDTH 500 TEMPLATE 4042
+
+UNIT WIDTH 500
+
+ELEM CONTROL
+GROUP "=1" ~ ""
 5 E0 CI L
+SPC L
 6 E1 I L
-SPC L
+END-GROUP
+
+ELEM
 4 ~ I L
-SPC L
-7 ~ I L
-SPC L
-13 ~ I L
-SPC L
-14 ~ I L
-SPC R
-SPC R
 2 ~ O R
 3 ~ ~O R
+
+ELEM
+7 ~ I L
 10 ~ O R
 9 ~ ~O R
+
+ELEM
+13 ~ I L
 11 ~ O R
 12 ~ ~O R
+
+ELEM
+14 ~ I L
 1 ~ O R
 15 ~ ~O R
+
 UNIT PWR
 8 VSS PI B
 16 VDD PI T
@@ -1487,11 +1556,13 @@ END
 #
 # 4043
 #
+# TODO: Not NOR gates...
+#
 COMP 4043 U
 FPLIST
 DIP?16*
-DESC Quad NOR R/S Latch With Tri-state Outputs
-KEYW NOR
+DESC Quad NOR R/S Latch with Tri-state Outputs
+KEYW CMOS NOR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4043bms-44bms.pdf
 UNIT WIDTH 500 TEMPLATE 4043
 5 EN I L
@@ -1524,7 +1595,8 @@ END
 COMP 4044 U
 FPLIST
 DIP?16*
-DESC Quad NAND R/S Latch With Tri-state Outputs
+DESC Quad NAND R/S Latch with Tri-state Outputs
+KEYW CMOS latch
 KEYW NAND
 DOC http://pdf.datasheetcatalog.com/datasheets/120/109065_DS.pdf
 UNIT WIDTH 500 TEMPLATE 4044
@@ -1558,9 +1630,10 @@ END
 COMP 4046 U
 FPLIST
 DIP?16*
-DESC Phase-locked Loop With VCO
+DESC Phase-locked Loop with VCO
+KEYW CMOS PLL
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4046B.pdf
-UNIT WIDTH 600
+UNIT WIDTH 700
 14 RefIn I L
 3 SigIn I L
 SPC L
@@ -1590,7 +1663,8 @@ END
 COMP 4048 U
 FPLIST
 DIP?16*
-DESC Multifunctional Expandable 8-input Gate With Tri-state Output
+DESC Multifunctional Expandable 8-input Gate with Tri-state Output
+KEYW CMOS 
 DOC http://pdf.datasheetcatalog.com/datasheets/150/109091_DS.pdf
 UNIT
 2 EN I L
@@ -1624,8 +1698,8 @@ END
 COMP 4049 U
 FPLIST
 DIP?15*
-DESC Hex Buffer /converter (inverting)
-KEYW NOT
+DESC Hex Buffer/Converter, Inverting        
+KEYW CMOS NOT buffer inverter
 DOC http://www.intersil.com/content/dam/intersil/documents/cd40/cd4049ubms.pdf
 UNIT NOT
 3 ~ I L
@@ -1655,8 +1729,8 @@ END
 COMP 4050 U
 FPLIST
 DIP?15*
-DESC Hex  buffer /converter (non-inverting)
-KEYW buffer
+DESC Hex Buffer/Converter, Non-inverting
+KEYW CMOS buffer
 DOC http://www.intersil.com/content/dam/intersil/documents/cd40/cd4050bms.pdf
 UNIT BUF
 3 ~ I L
@@ -1686,7 +1760,8 @@ END
 COMP 4051 U
 FPLIST
 DIP?16*
-DESC 8-channel Analog Multiplexer/ Demultiplexer
+DESC 8-channel Analog Multiplexer/Demultiplexer
+KEYW CMOS multiplexer demultiplexer
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf
 UNIT
 13 X0 P L
@@ -1717,6 +1792,7 @@ COMP 4052 U
 FPLIST
 DIP?16*
 DESC Dual 4-channel Analog Multiplexer/demultiplexer
+KEYW CMOS multiplexer demultiplexer 
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf
 UNIT
 
@@ -1750,7 +1826,8 @@ END
 COMP 4053 U
 FPLIST
 DIP?16*
-DESC Triple 2-channel Analog Multiplexer/demultiplexer
+DESC Triple 2-channel Analog Multiplexer/Demultiplexer
+KEYW CMOS multiplexer demultiplexer
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf
 UNIT
 
@@ -1786,7 +1863,8 @@ END
 COMP 4067 U
 FPLIST
 DIP?24*
-DESC 16-channel Analog Multiplexer/demultiplexer (1-of-16 Switch)
+DESC 16-channel Analog Multiplexer/Demultiplexer (1-of-16 Switch)
+KEYW CMOS multiplexer demultiplexer
 DOC http://pdf.datasheetcatalog.com/datasheets/120/109382_DS.pdf
 UNIT
 SPC L
@@ -1829,7 +1907,7 @@ COMP 4068 U
 FPLIST
 DIP?14*
 DESC 8-input NAND/AND gate
-KEYW NAND AND
+KEYW CMOS NAND AND
 DOC http://pdf.datasheetcatalog.com/datasheets/70/109237_DS.pdf
 UNIT AND
 2 ~ I L
@@ -1856,7 +1934,7 @@ COMP 4069 U
 FPLIST
 DIP?14*
 DESC Hex Inverter
-KEYW NOT
+KEYW CMOS NOT
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4069ubms.pdf
 UNIT NOT
 1 ~ I L
@@ -1887,7 +1965,7 @@ COMP 4070 U
 FPLIST
 DIP?14*
 DESC Quad 2-input XOR Gate
-KEYW XOR
+KEYW CMOS XOR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4070bms-77bms.pdf
 UNIT XOR
 1 ~ I L
@@ -1920,7 +1998,7 @@ COMP 4071 U
 FPLIST
 DIP?14*
 DESC Quad 2-input OR Gate
-KEYW OR
+KEYW CMOS OR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf
 UNIT OR
 1 ~ I L
@@ -1953,7 +2031,7 @@ COMP 4072 U
 FPLIST
 DIP?14*
 DESC Dual 4-input OR Gate
-KEYW OR
+KEYW CMOS OR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf
 UNIT OR
 2 ~ I L
@@ -1980,7 +2058,7 @@ COMP 4073 U
 FPLIST
 DIP?14*
 DESC Triple 3-input AND Gate
-KEYW AND
+KEYW CMOS AND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf
 UNIT AND
 1 ~ I L
@@ -2008,7 +2086,7 @@ COMP 4075 U
 FPLIST
 DIP?14*
 DESC Triple 3-input OR Gate
-KEYW OR
+KEYW CMOS OR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf
 UNIT OR
 1 ~ I L
@@ -2036,7 +2114,7 @@ COMP 4077 U
 FPLIST
 DIP?14*
 DESC Quad 2-input XNOR Gate
-KEYW XNOR
+KEYW CMOS XNOR
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4076bms.pdf
 UNIT XNOR
 1 ~ I L
@@ -2069,7 +2147,7 @@ COMP 4078 U
 FPLIST
 DIP?14*
 DESC 8-input NOR / OR Gate
-KEYW OR
+KEYW CMOS NOR OR
 DOC http://pdf.datasheetcatalog.com/datasheets/70/109237_DS.pdf
 UNIT OR
 2 ~ I L
@@ -2096,7 +2174,7 @@ COMP 4081 U
 FPLIST
 DIP?14*
 DESC Quad 2-input AND Gate
-KEYW AND
+KEYW CMOS AND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf
 UNIT AND
 1 ~ I L
@@ -2129,7 +2207,7 @@ COMP 4082 U
 FPLIST
 DIP?14*
 DESC Dual 4-input AND Gate
-KEYW AND
+KEYW CMOS AND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf
 UNIT AND
 2 ~ I L
@@ -2156,7 +2234,7 @@ COMP 4093 U
 FPLIST
 DIP?14*
 DESC Quad 2-input Schmitt Trigger NAND Gate
-KEYW NAND
+KEYW CMOS NAND
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4093bms.pdf
 UNIT NAND SCHMITT
 1 ~ I L "&st;"
@@ -2191,22 +2269,28 @@ DIP?14*
 DESC Gated J-K Flip-flop (Non-inverting)
 KEYW CMOS jkff
 DOC http://pdf.datasheetcatalog.com/datasheets/105/109379_DS.pdf
-UNIT WIDTH 500 TEMPLATE 4095
+UNIT WIDTH 500
 13 S I L
 12 CK CI L
 2 R I L
+GROUP "&amp;" - "J"
 3 J1 I L
 4 J2 I L
 5 J3 I L
+END-GROUP
+GROUP "&amp;" - "K"
 11 K1 I L
 10 K2 I L
 9 K3 I L
+END-GROUP
+
 SPC R
 8 Q O R
 SPC R
 SPC R
 SPC R
 6 Q ~O R
+
 UNIT PWR
 7 VSS PI B
 14 VDD PI T
@@ -2220,16 +2304,23 @@ DIP?14*
 DESC Gated J-K Flip-flop (Inverting and Non-inverting)
 KEYW CMOS jkff
 DOC http://pdf.datasheetcatalog.com/datasheets/105/109379_DS.pdf
-UNIT WIDTH 500 TEMPLATE 4096
+UNIT WIDTH 500
 13 S I L
 12 CK CI L
 2 R I L
+
+GROUP "&amp;" - "J"
 3 J1 I L
 4 J2 I L
 5 J3 ~I L
+END-GROUP
+
+GROUP "&amp;" - "K"
 11 K1 I L
 10 K2 I L
 9 K3 ~I L
+END-GROUP
+
 SPC R
 8 Q O R
 SPC R
@@ -2247,6 +2338,7 @@ COMP 4099 U
 FPLIST
 DIP?16*
 DESC 8-bit Addressable Latch
+KEYW CMOS latch 
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4099bms.pdf
 UNIT WIDTH 500
 
@@ -2296,6 +2388,7 @@ COMP 4104 U
 FPLIST
 DIP?16*
 DESC Quad Low-to-high Voltage Translator With Tri-state Outputs
+KEYW CMOS translator
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4104B.pdf
 UNIT WIDTH 500
 
@@ -2334,24 +2427,43 @@ END
 COMP 4160 U
 FPLIST
 DIP?16*
+#
 DESC Decade Counter With Asynchronous Clear
+KEYW CMOS counter
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
+#
 ALIAS 40160
 DESC Decade Counter with Asynchronous Clear
+KEYW CMOS counter
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
 #
 ALIAS 4161
 DESC 4-bit Binary Counter with Asynchronous Clear
+KEYW CMOS counter
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
+#
 ALIAS 40161
 DESC 4-bit Binary Counter with Asynchronous Clear
+KEYW CMOS counter
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
 #
 ALIAS 4162
 DESC Decade Counter with Synchronous Clear
+KEYW CMOS counter
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
+#
 ALIAS 40162
 DESC Decade Counter with Synchronous Clear
+KEYW CMOS counter
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
 #
 ALIAS 4163
 DESC 4-bit Binary Counter with Synchronous Clear
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
+#
 ALIAS 40163
 DESC 4-bit Binary Counter with Synchronous Clear
+DOC http://pdf1.alldatasheet.com/datasheet-pdf/view/66410/INTERSIL/CD40160.html
 #
 UNIT
 
@@ -2396,8 +2508,8 @@ END
 COMP 4502 U
 FPLIST
 DIP?16*
-DESC Hex Inverting Buffer (tri-state)
-KEYW NOT
+DESC Hex Inverting Buffer Tri-state
+KEYW CMOS NOT
 DOC http://pdf.datasheetcatalog.com/datasheets/90/109492_DS.pdf
 UNIT WIDTH 500
 
@@ -2440,8 +2552,8 @@ END
 COMP 4504 U
 FPLIST
 DIP?16*
-DESC 4504 Hex Voltage-level Shifter
-KEYW cmos, level converter
+DESC Hex Voltage-level Shifter
+KEYW CMOS level converter
 DOC http://www.ti.com/lit/ds/symlink/cd4504b.pdf
 UNIT WIDTH 500
 
@@ -2485,7 +2597,8 @@ COMP 4507 U
 FPLIST
 DIP?14*
 DESC Quad 2-input XOR Gate
-KEYW XOR
+KEYW CMOS XOR
+DOC https://www.silicon-ark.co.uk/datasheets/mc14507-datasheet-motorola.pdf
 UNIT XOR
 1 ~ I L
 SPC L
@@ -2517,13 +2630,14 @@ COMP 4508 U
 FPLIST
 DIP?24*
 DESC Dual 4-bit Latch With Tri-state Outputs
+KEYW CMOS latch
 DOC http://pdf.datasheetcatalog.com/datasheets/90/109516_DS.pdf
 UNIT WIDTH 500
 
 ELEM CONTROL
-6 EN ~I L
 1 MR I L
 2 ST I L
+3 DIS I L
 
 ELEM
 4 D0 I L
@@ -2544,9 +2658,9 @@ ELEM
 UNIT WIDTH 500
 
 ELEM CONTROL
-15 EN ~I L
 13 MR I L
 14 ST I L
+15 DIS I L
 
 ELEM
 16 D0 I L
@@ -2575,6 +2689,7 @@ COMP 4510 U
 FPLIST
 DIP?16*
 DESC Presettable 4-bit BCD Up/down Counter
+KEYW CMOS counter
 DOC http://pdf.datasheetcatalog.com/datasheets/150/109581_DS.pdf
 UNIT
 ELEM CONTROL
@@ -2610,7 +2725,8 @@ END
 COMP 4511 U
 FPLIST
 DIP?16*
-DESC BCD To 7-segment Latch/decoder/driver
+DESC BCD To 7-segment Latch/Decoder/Driver
+KEYW CMOS latch decoder driver
 DOC http://pdf.datasheetcatalog.com/datasheets/135/109536_DS.pdf
 UNIT
 5 EL ~I L
@@ -2637,8 +2753,11 @@ END
 COMP 4512 U
 FPLIST
 DIP?16*
+#
 DESC 8-input Multiplexer (Data Selector) With Tri-state Output
+KEYW CMOS multiplexer
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4512bms.pdf
+#
 UNIT WIDTH 500
 
 ELEM CONTROL
@@ -2668,7 +2787,8 @@ END
 COMP 4514 U
 FPLIST
 DIP?24*
-DESC 1-of-16 Decoder/demultiplexer Active HIGH Output
+DESC 1-of-16 Decoder/Demultiplexer Active HIGH Output
+KEYW CMOS decoder demultiplexer
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4514bms-15bms.pdf
 UNIT
 SPC L
@@ -2710,7 +2830,8 @@ END
 COMP 4515 U
 FPLIST
 DIP?24*
-DESC 1-of-16 Decoder/demultiplexer Active LOW Output
+DESC 1-of-16 Decoder/Demultiplexer Active LOW Output
+KEYW CMOS decoder demultiplexer
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4514bms-15bms.pdf
 UNIT
 SPC L
@@ -2752,56 +2873,39 @@ END
 COMP 4518 U
 FPLIST
 DIP?16*
+#
 DESC Dual BCD Up Counter
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4518bms-20bms.pdf
-UNIT WIDTH 500 TEMPLATE 4518
-1 CP0 I L
-SPC L
-2 CP1 ~I L
-SPC L
-7 MR I L
-3 Q0 O R
-4 Q1 O R
-5 Q2 O R
-6 Q3 O R
-UNIT WIDTH 500 TEMPLATE 4518
-9 CP0 I L
-SPC L
-10 CP1 ~I L
-SPC L
-15 MR I L
-11 Q0 O R
-12 Q1 O R
-13 Q2 O R
-14 Q3 O R
-UNIT PWR
-8 VSS PI B
-16 VDD PI T
-END
 #
-# 4520
-#
-COMP 4520 U
-FPLIST
-DIP?16*
+ALIAS 4520
 DESC Dual 4-bit Binary Up Counter
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4518bms-20bms.pdf
-UNIT WIDTH 500 TEMPLATE 4518
-1 CP0 I L
-SPC L
-2 CP1 ~I L
-SPC L
+#
+UNIT WIDTH 500
+
+GROUP "&ge;1" C ""
+  1 CP0 I L
+  SPC L
+  2 CP1 ~I L
+END-GROUP
 7 MR I L
+
 3 Q0 O R
 4 Q1 O R
 5 Q2 O R
 6 Q3 O R
-UNIT WIDTH 500 TEMPLATE 4518
-9 CP0 I L
-SPC L
-10 CP1 ~I L
-SPC L
+
+UNIT WIDTH 500
+
+GROUP "&ge;1" C ""
+  9 CP0 I L
+  SPC L
+  10 CP1 ~I L
+END-GROUP
 15 MR I L
+
 11 Q0 O R
 12 Q1 O R
 13 Q2 O R
@@ -2816,7 +2920,9 @@ END
 COMP 4529 U
 FPLIST
 DIP?16*
-DESC Dual 4-channel Analog Data Selector/multiplexer
+DESC Dual 4-channel Analog Data Selector/Multiplexer
+KEYW CMOS multiplexer
+DOC http://www.komponenten.es.aau.dk/fileadmin/komponenten/Data_Sheet/4000/4529.pdf.pdf
 UNIT
 2 X0 I L
 3 X1 I L
@@ -2850,24 +2956,35 @@ COMP 4530 U
 FPLIST
 DIP?16*
 DESC Dual 5-input Majority Logical Gate
-UNIT WIDTH 500 TEMPLATE 4530
+KEYW CMOS logic
+DOC http://www.logingel.com/Files/Write/Files/163055/cd4530_datasheet_en.pdf?dt=120804104740
+UNIT WIDTH 500
+ELEM LABEL "=1"
+GROUP "M5" - ""
 1 ~ I L
 2 ~ I L
 3 ~ I L
 4 ~ I L
 5 ~ I L
+END-GROUP
 6 ~ I L
+
 SPC R
 7 Y ~O R
-UNIT WIDTH 500 TEMPLATE 4530
+
+UNIT WIDTH 500
+ELEM LABEL "=1"
+GROUP "M5" - ""
 9 ~ I L
 10 ~ I L
 11 ~ I L
 12 ~ I L
 13 ~ I L
+END-GROUP
 14 ~ I L
 SPC R
 15 Y ~O R
+
 UNIT PWR
 8 VSS PI B
 16 VDD PI T
@@ -2878,35 +2995,45 @@ END
 COMP 4538 U
 FPLIST
 DIP?16*
+#
 DESC Dual Retriggerable Precision Monostable Multivibrator
+KEYW CMOS multivibrator
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4538B.pdf
-ALIAS 4528                   
-UNIT TEMPLATE 4538
+#
+ALIAS 4528
+DESC Dual Retriggerable Monostable Multivibrator
+KEYW CMOS multivibrator
+DOC https://assets.nexperia.com/documents/data-sheet/HEF4528B.pdf
+#                   
+UNIT
 2 Rx I L
-SPC L
 1 CX I L
-SPC L
+GROUP "&ge;1" C ""
 4 B I L
 5 A ~I L
+END-GROUP
+3 R ~I L
+
 SPC R
 6 Q O R
 SPC R
-SPC R
 7 Q ~O R
-3 R ~I B
-UNIT TEMPLATE 4538
+
+#
+UNIT
 14 Rx I L
-SPC L
 15 CX I L
-SPC L
+GROUP "&ge;1" C ""
 12 B I L
 11 A ~I L
+END-GROUP
+13 R ~I L
+
 SPC R
 10 Q O R
 SPC R
-SPC R
 9 Q ~O R
-13 R ~I B
+#
 UNIT PWR
 8 VSS PI B
 16 VDD PI T
@@ -2917,7 +3044,11 @@ END
 COMP 4539 U
 FPLIST
 DIP?16*
+#
 DESC Dual 4-input Multiplexer
+KEYW CMOS Multiplexer
+DOC http://pdf.datasheetcatalog.com/datasheet/philips/HEF4539BF.pdf
+#
 UNIT WIDTH 500
 
 ELEM CONTROL
@@ -2950,7 +3081,8 @@ END
 COMP 4543 U
 FPLIST
 DIP?16*
-DESC BCD To 7-segment Latch/decoder/driver With Phase Input
+DESC BCD To 7-segment Latch/Decoder/Driver with Phase Input
+KEYW CMOS driver
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4543B.pdf
 UNIT
 1 LD I L
@@ -2977,7 +3109,8 @@ END
 COMP 4555 U
 FPLIST
 DIP?16*
-DESC Dual 1-of-4 Decoder/demultiplexer Active HIGH Output
+DESC Dual 1-of-4 Decoder/Demultiplexer Active HIGH Output
+KEYW CMOS decoder demultiplexer
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4555B.pdf
 UNIT WIDTH 500
 2 A0 I L
@@ -3008,6 +3141,7 @@ COMP 4556 U
 FPLIST
 DIP?16*
 DESC Dual 1-of-4 Decoder/demultiplexer Active LOW Output
+KEYW CMOS decoder demultiplexer
 DOC http://www.onsemi.com/pub/Collateral/MC14555B-D.PDF
 UNIT WIDTH 500
 2 A0 I L
@@ -3038,25 +3172,35 @@ COMP 4585 U
 FPLIST
 DIP?16*
 DESC 4-bit Digital Comparator
+KEYW CMOS comparator
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4585B.pdf
-UNIT WIDTH 500 TEMPLATE 4585
+UNIT WIDTH 500
+GROUP "" - "A"
 10 A0 I L
 7 A1 I L
 2 A2 I L
 15 A3 I L
+END-GROUP
+
 5 Ia<b I L
 6 Ia=b I L
 4 Ia>b I L
+
+GROUP "" - "B"
 11 B0 I L
 9 B1 I L
 1 B2 I L
 14 B3 I L
+END-GROUP
+
+SPC R
 SPC R
 SPC R
 SPC R
 13 Qa>b O R
 3 Qa=b O R
 12 Qa<b O R
+
 UNIT PWR
 8 VSS PI B
 16 VDD PI T

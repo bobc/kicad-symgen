@@ -598,10 +598,10 @@
 741035	6	hex non-inverting buffer, open-collector outputs			ALS	http://www.ti.com/lit/gpn/sn74als1035
 741245	8	octal bus transceiver			ALS	http://www.ti.com/lit/gpn/sn74als1245a
 742960	1	error detection and correction  (EDAC)				
-742961	1	edac bus buffer, inverting				
-742962	1	edac bus buffer, non-inverting				
+742961	1	EDAC bus buffer, inverting				
+742962	1	EDAC bus buffer, non-inverting				
 742968	1	dynamic memory controller				
-742969	1	memory timing controller for use,  EDAC				
+742969	1	memory timing controller for use with EDAC				
 742970	1	memory timing controller for use without EDAC				
 743037	4	quad 2-input NAND 30Ω driver				
 743040	2	dual 4-input NAND 30Ω line driver			F	https://archive.org/download/74f3040Datasheet/74f3040%20datasheet.pdf

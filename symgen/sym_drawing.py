@@ -22,6 +22,9 @@ class Point:
     def Add (self, p):
         return Point (self.x + p.x, self.y + p.y)
 
+    def __str__(self):
+        return "P(%r, %r)" % (self.x, self.y)
+
 class Rectangle:
 
     def __init__(self, pos=None, size=None):
@@ -57,15 +60,22 @@ class BoundingBox(object):
     pmin = Point()
     pmax = Point()
 
-    def __init__(self, min_p, max_p):
-        self.pmin = min_p
-        self.pmax = max_p
+    def __init__(self):
+        self.pmin = Point()
+        self.pmax = Point()
+        self.valid = False
 
     def extend (self, p):
-        self.pmin.x = min(self.pmin.x, p.x)
-        self.pmin.y = min(self.pmin.y, p.y)
-        self.pmax.x = max(self.pmax.x, p.x)
-        self.pmax.y = max(self.pmax.y, p.y)
+        if self.valid:
+            self.pmin.x = min(self.pmin.x, p.x)
+            self.pmin.y = min(self.pmin.y, p.y)
+            self.pmax.x = max(self.pmax.x, p.x)
+            self.pmax.y = max(self.pmax.y, p.y)
+        else:
+            self.pmin.x = p.x
+            self.pmin.y = p.y
+            self.pmax.x = p.x
+            self.pmax.y = p.y
 
     def __add__(self, other):
         if other == 0:

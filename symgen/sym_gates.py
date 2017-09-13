@@ -446,8 +446,9 @@ class NotGate (Gate):
 
     def get_center (self):
         return Point (self.width/3-self.width/2, 0)
+
 #
-#
+# IEC style (box) lofic symbols
 #
 class IecGate (Gate):
 
@@ -459,11 +460,19 @@ class IecGate (Gate):
     def get_input_positions(self):
         inputs_pos = []
         self.offsets = []
-        top = (self.num_inputs-1) * 100 / 2
-        #top = int(top/100) * 100
-        for j in range(0, self.num_inputs):
-            inputs_pos.append (Point (-self.size_x_by_2, top - j*100))
+
+        if self.num_inputs == 2:
+            inputs_pos.append (Point (-self.size_x_by_2, 100))
+            inputs_pos.append (Point (-self.size_x_by_2, -100))
             self.offsets.append (0)
+            self.offsets.append (0)
+
+        else:
+            top = (self.num_inputs-1) * 100 / 2
+            #top = int(top/100) * 100
+            for j in range(0, self.num_inputs):
+                inputs_pos.append (Point (-self.size_x_by_2, top - j*100))
+                self.offsets.append (0)
         return inputs_pos
 
     def get_output_positions(self):
