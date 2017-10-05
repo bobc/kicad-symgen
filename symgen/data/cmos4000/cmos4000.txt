@@ -52,25 +52,25 @@ END
 COMP 4001 U
 FPLIST
 DIP?14*
-DESC Quad Nor 2 inputs
-KEYW CMOS Nor2
+DESC Quad 2-input NOR Gate
+KEYW CMOS NOR2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf
 UNIT NOR
 1 ~ I L
 SPC L
 2 ~ I L
 3 ~ ~O R
-UNIT 
+UNIT NOR
 5 ~ I L
 SPC L
 6 ~ I L
 4 ~ ~O R
-UNIT 
+UNIT NOR
 8 ~ I L
 SPC L
 9 ~ I L
 10 ~ ~O R
-UNIT 
+UNIT NOR
 12 ~ I L
 SPC L
 13 ~ I L
@@ -85,8 +85,8 @@ END
 COMP 4002 U
 FPLIST
 DIP?14*
-DESC Dual  4 input NOR gate
-KEYW CMOS Nor4
+DESC Dual 4-input NOR Gate
+KEYW CMOS NOR4
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf
 UNIT NOR
 2 ~ I L
@@ -95,7 +95,7 @@ UNIT NOR
 5 ~ I L
 SPC R
 1 ~ ~O R
-UNIT 
+UNIT NOR
 9 ~ I L
 10 ~ I L
 11 ~ I L
@@ -111,26 +111,28 @@ END
 #
 COMP 40106 U
 FPLIST
-DIP?14*
-DESC Hex Schmitt trigger inverter
-KEYW CMOS
+ DIP*7.62mm*
+ SOP*5.3x10.3mm*Pitch1.27mm*
+#
+DESC Hex Inverting Schmitt Trigger (NOT gates)
+KEYW CMOS NOT inverter
 DOC https://assets.nexperia.com/documents/data-sheet/HEF40106B.pdf
 UNIT NOT ICON icon_schmitt 
 1 ~ I L
 2 ~ ~O R
-UNIT 
+UNIT NOT
 3 ~ I L
 4 ~ ~O R
-UNIT 
+UNIT NOT
 5 ~ I L
 6 ~ ~O R
-UNIT 
+UNIT NOT
 9 ~ I L
 8 ~ ~O R
-UNIT 
+UNIT NOT
 11 ~ I L
 10 ~ ~O R
-UNIT 
+UNIT NOT
 13 ~ I L
 12 ~ ~O R
 UNIT PWR
@@ -143,25 +145,25 @@ END
 COMP 4011 U
 FPLIST
 DIP?14*
-DESC Quad Nand 2 inputs
-KEYW CMOS Nand2
+DESC Quad 2-input NAND Gate
+KEYW CMOS NAND2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf
 UNIT NAND
 1 ~ I L
 SPC L
 2 ~ I L
 3 ~ ~O R
-UNIT 
+UNIT NAND
 5 ~ I L
 SPC L
 6 ~ I L
 4 ~ ~O R
-UNIT 
+UNIT NAND
 8 ~ I L
 SPC L
 9 ~ I L
 10 ~ ~O R
-UNIT 
+UNIT NAND
 12 ~ I L
 SPC L
 13 ~ I L
@@ -176,8 +178,8 @@ END
 COMP 4012 U
 FPLIST
 DIP?14*
-DESC Dual 4 inputs Nand
-KEYW CMOS Nand4
+DESC Dual 4-input NAND Gate
+KEYW CMOS NAND4
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf
 UNIT NAND
 2 ~ I L
@@ -186,7 +188,7 @@ UNIT NAND
 5 ~ I L
 SPC R
 1 ~ ~O R
-UNIT 
+UNIT NAND
 9 ~ I L
 10 ~ I L
 11 ~ I L
@@ -204,7 +206,7 @@ COMP 4013 U
 %pinlen 100
 FPLIST
 DIP?14*
-DESC Dual D  FlipFlop, Set & reset
+DESC Dual D-type Flip-Flop, Set & reset
 KEYW CMOS DFF
 DOC http://www.onsemi.com/pub/Collateral/MC14013B-D.PDF
 UNIT WIDTH 400
@@ -266,8 +268,8 @@ END
 COMP 4017 U
 FPLIST
 DIP?16*
-DESC Johnson Counter ( 10 outputs )
-KEYW CNT CNT10
+DESC Decade Counter with 10 Decoded Outputs (5-stage Johnson Counter)
+KEYW CMOS counter johnson CNT10
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4017bms-22bms.pdf
 UNIT 
 14 CLK CI L
@@ -353,24 +355,24 @@ END
 COMP 4023 U
 FPLIST
 DIP?14*
-DESC Triple Nand 3 inputs
-KEYW CMOS Nand3
+DESC Triple 3-input NAND Gate
+KEYW CMOS NAND3
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf
 UNIT NAND
 1 ~ I L
 2 ~ I L
 8 ~ I L
-9 ~ ~C R
-UNIT 
+9 ~ ~O R
+UNIT NAND
 3 ~ I L
 4 ~ I L
 5 ~ I L
-6 ~ ~C R
-UNIT 
+6 ~ ~O R
+UNIT NAND
 11 ~ I L
 12 ~ I L
 13 ~ I L
-10 ~ ~C R
+10 ~ ~O R
 UNIT PWR
 7 VSS PI B
 14 VDD PI T
@@ -381,24 +383,24 @@ END
 COMP 4025 U
 FPLIST
 DIP?14*
-DESC Triple Nor 3 inputs
-KEYW CMOS Nor3
+DESC Triple 3-input NOR Gate
+KEYW CMOS NOR3
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf
 UNIT NOR
 1 ~ I L
 2 ~ I L
 8 ~ I L
-9 ~ ~C R
-UNIT 
+9 ~ ~O R
+UNIT NOR
 3 ~ I L
 4 ~ I L
 5 ~ I L
-6 ~ ~C R
-UNIT 
+6 ~ ~O R
+UNIT NOR
 11 ~ I L
 12 ~ I L
 13 ~ I L
-10 ~ ~C R
+10 ~ ~O R
 UNIT PWR
 7 VSS PI B
 14 VDD PI T
@@ -441,10 +443,11 @@ END
 COMP 4028 U
 FPLIST
 DIP?16*
-DESC Decoder 4 to 10 lines
-KEYW CMOS DECOD DECOD10
+DESC BCD To Decimal (1-of-10) Decoder
+KEYW CMOS decoder DECOD10
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4028bms.pdf
 UNIT 
+SPC L
 SPC L
 SPC L
 10 A I L
@@ -471,8 +474,8 @@ END
 COMP 4029 U
 FPLIST
 DIP?16*
-DESC Up/Down Counter
-KEYW CMOS COUNTER
+DESC Presettable Up/down Counter, Binary Or BCD-decade
+KEYW CMOS counter
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4029bms.pdf
 UNIT 
 
@@ -532,7 +535,7 @@ END
 COMP 4046 U
 FPLIST
 DIP?16*
-DESC Phase Comp & VCO
+DESC Phase-locked Loop with VCO
 KEYW CMOS PLL
 DOC https://assets.nexperia.com/documents/data-sheet/HEF4046B.pdf
 UNIT 
@@ -609,25 +612,25 @@ END
 COMP 4049 U
 FPLIST
 DIP?16*
-DESC Hex Buffer Inverter
-KEYW CMOS BUFFER
+DESC Hex Buffer/Converter, Inverting        
+KEYW CMOS NOT buffer inverter
 DOC http://www.intersil.com/content/dam/intersil/documents/cd40/cd4049ubms.pdf
 UNIT NOT
 3 ~ I L
 2 ~ ~O R
-UNIT 
+UNIT NOT
 5 ~ I L
 4 ~ ~O R
-UNIT 
+UNIT NOT
 7 ~ I L
 6 ~ ~O R
-UNIT 
+UNIT NOT
 9 ~ I L
 10 ~ ~O R
-UNIT 
+UNIT NOT
 11 ~ I L
 12 ~ ~O R
-UNIT 
+UNIT NOT
 14 ~ I L
 15 ~ ~O R
 UNIT PWR
@@ -640,25 +643,25 @@ END
 COMP 4050 U
 FPLIST
 DIP?16*
-DESC Hex Buffer
-KEYW CMOS BUFFER
+DESC Hex Buffer/Converter, Non-inverting
+KEYW CMOS buffer
 DOC http://www.intersil.com/content/dam/intersil/documents/cd40/cd4050bms.pdf
 UNIT BUF
 3 ~ I L
 2 ~ O R
-UNIT 
+UNIT BUF
 5 ~ I L
 4 ~ O R
-UNIT 
+UNIT BUF
 7 ~ I L
 6 ~ O R
-UNIT 
+UNIT BUF
 9 ~ I L
 10 ~ O R
-UNIT 
+UNIT BUF
 11 ~ I L
 12 ~ O R
-UNIT 
+UNIT BUF
 14 ~ I L
 15 ~ O R
 UNIT PWR
@@ -671,8 +674,8 @@ END
 COMP 4051 U
 FPLIST
 DIP?16*
-DESC Analog Multiplexer 8 to 1 lins
-KEYW CMOS MUX MUX8
+DESC 8-channel Analog Multiplexer/Demultiplexer
+KEYW CMOS multiplexer demultiplexer MUX8
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf
 UNIT 
 13 X0 P L
@@ -733,8 +736,8 @@ END
 COMP 4053 U
 FPLIST
 DIP?16*
-DESC Triple analog Multiplexer 2 to 1 line
-KEYW CMOS MUX MUX2
+DESC Triple 2-channel Analog Multiplexer/Demultiplexer
+KEYW CMOS multiplexer demultiplexer MUX2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf
 UNIT 
 12 X0 P L
@@ -802,25 +805,25 @@ END
 COMP 4069 U
 FPLIST
 DIP?14*
-DESC Hex inverter
+DESC Hex Inverter
 KEYW CMOS NOT
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4069ubms.pdf
 UNIT NOT
 1 ~ I L
 2 ~ ~O R
-UNIT 
+UNIT NOT
 3 ~ I L
 4 ~ ~O R
-UNIT 
+UNIT NOT
 5 ~ I L
 6 ~ ~O R
-UNIT 
+UNIT NOT
 9 ~ I L
 8 ~ ~O R
-UNIT 
+UNIT NOT
 11 ~ I L
 10 ~ ~O R
-UNIT 
+UNIT NOT
 13 ~ I L
 12 ~ ~O R
 UNIT PWR
@@ -833,22 +836,22 @@ END
 COMP 4070 U
 FPLIST
 DIP?14*
-DESC Quad Xor 2 inputs
+DESC Quad 2-input XOR Gate
 KEYW CMOS XOR2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4070bms-77bms.pdf
 UNIT XOR
 1 ~ I L
 2 ~ I L
 3 ~ O R
-UNIT 
+UNIT XOR
 5 ~ I L
 6 ~ I L
 4 ~ O R
-UNIT 
+UNIT XOR
 8 ~ I L
 9 ~ I L
 10 ~ O R
-UNIT 
+UNIT XOR
 12 ~ I L
 13 ~ I L
 11 ~ O R
@@ -862,7 +865,7 @@ END
 COMP 4071 U
 FPLIST
 DIP?14*
-DESC Quad Or 2 inputs
+DESC Quad 2-input OR Gate
 KEYW CMOS OR2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf
 UNIT OR
@@ -870,17 +873,17 @@ UNIT OR
 SPC L
 2 ~ I L
 3 ~ O R
-UNIT 
+UNIT OR
 5 ~ I L
 SPC L
 6 ~ I L
 4 ~ O R
-UNIT 
+UNIT OR
 8 ~ I L
 SPC L
 9 ~ I L
 10 ~ O R
-UNIT 
+UNIT OR
 12 ~ I L
 SPC L
 13 ~ I L
@@ -895,7 +898,7 @@ END
 COMP 4072 U
 FPLIST
 DIP?14*
-DESC Dual 4 input OR gate
+DESC Dual 4-input OR Gate
 KEYW CMOS OR4
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf
 UNIT OR
@@ -905,7 +908,7 @@ UNIT OR
 5 ~ I L
 SPC R
 1 ~ O R
-UNIT 
+UNIT OR
 9 ~ I L
 10 ~ I L
 11 ~ I L
@@ -922,32 +925,51 @@ END
 COMP 4073 U
 FPLIST
 DIP?14*
-DESC Triple And 3 inputs
-KEYW CMOS And3
+DESC Triple 3-input AND Gate
+KEYW CMOS AND3
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf
 UNIT AND
 1 ~ I L
-SPC L
 2 ~ I L
-SPC L
 8 ~ I L
-SPC R
 9 ~ O R
-UNIT 
+UNIT AND
 3 ~ I L
-SPC L
 4 ~ I L
-SPC L
 5 ~ I L
-SPC R
 6 ~ O R
-UNIT 
+UNIT AND
 11 ~ I L
-SPC L
 12 ~ I L
-SPC L
 13 ~ I L
-SPC R
+10 ~ O R
+UNIT PWR
+7 VSS PI B
+14 VDD PI T
+END
+#
+# 4075
+#
+COMP 4075 U
+FPLIST
+DIP?14*
+DESC Triple 3-input OR Gate
+KEYW CMOS OR
+DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf
+UNIT OR
+1 ~ I L
+2 ~ I L
+8 ~ I L
+9 ~ O R
+UNIT OR
+3 ~ I L
+4 ~ I L
+5 ~ I L
+6 ~ O R
+UNIT OR
+11 ~ I L
+12 ~ I L
+13 ~ I L
 10 ~ O R
 UNIT PWR
 7 VSS PI B
@@ -959,25 +981,25 @@ END
 COMP 4077 U
 FPLIST
 DIP?14*
-DESC Quad Xnor 2 inputs
-KEYW CMOS XOR XNOR XNOR2
+DESC Quad 2-input XNOR Gate
+KEYW CMOS XOR XNOR2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4076bms.pdf
 UNIT XNOR
 1 ~ I L
 SPC L
 2 ~ I L
 3 ~ ~O R
-UNIT 
+UNIT XNOR
 5 ~ I L
 SPC L
 6 ~ I L
 4 ~ ~O R
-UNIT 
+UNIT XNOR
 8 ~ I L
 SPC L
 9 ~ I L
 10 ~ ~O R
-UNIT 
+UNIT XNOR
 12 ~ I L
 SPC L
 13 ~ I L
@@ -992,25 +1014,25 @@ END
 COMP 4081 U
 FPLIST
 DIP?14*
-DESC Quad And 2 inputs
-KEYW CMOS And2
+DESC Quad 2-input AND Gate
+KEYW CMOS AND2
 DOC http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf
 UNIT AND
 1 ~ I L
 SPC L
 2 ~ I L
 3 ~ O R
-UNIT 
+UNIT AND
 5 ~ I L
 SPC L
 6 ~ I L
 4 ~ O R
-UNIT 
+UNIT AND
 8 ~ I L
 SPC L
 9 ~ I L
 10 ~ O R
-UNIT 
+UNIT AND
 12 ~ I L
 SPC L
 13 ~ I L
