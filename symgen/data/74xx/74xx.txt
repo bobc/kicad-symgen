@@ -9,11 +9,12 @@
 %line 10
 %iconlib template.lib
 #
+# 74469
 #
 COMP 74469 U
 FPLIST
 DIP?24*
-DESC 8-bit synchronous up/down counter, parallel load and hold capability (obsolete)
+DESC 8-bit Synchronous Up/down Counter, Parallel Load and Hold Capability (obsolete)
 KEYW counter
 UNIT 
 3 D0 I L
@@ -44,11 +45,14 @@ UNIT PWR
 12 GND PI B
 24 VCC PI T
 END
+#
+# 74CBTLV3861
+#
 COMP 74CBTLV3861 U
 FPLIST
 DIP?24*
-DESC Low-voltage 10-bit FET Bus switch
-KEYW bus
+DESC Low-voltage 10-bit FET Bus Switch
+KEYW bus switch
 DOC http://www.ti.com/lit/gpn/sn74cbtlv3861
 UNIT ICON icon_bidi_buffer 
 2 A1 B L
@@ -77,19 +81,25 @@ UNIT PWR
 12 GND PI B
 24 VCC PI T
 END
+#
+# 74HC240
+#
 COMP 74HC240 U
 FPLIST
 DIP*W7.62mm*
 SOIC*7.5x12.8mm*Pitch1.27mm*
 TSSOP*4.4x6.5mm*Pitch0.65mm*
-SSOP*4.4x6.5mm*Pitch0.65mm*
+SSOP*5.3x7.2mm*Pitch0.65mm*
+#
 DESC 8-bit Buffer/Line Driver 3-state Inverting
 KEYW TTL BUFFER 3State inv
 DOC http://www.nxp.com/documents/data_sheet/74HC_HCT240.pdf
+#
 ALIAS 74HCT240
-DESC 8-bit buffer; 3-state; inverting
+DESC 8-bit Buffer; 3-state; Inverting
 KEYW octal buffer line driver inverting
 DOC http://www.nxp.com/documents/data_sheet/74HC_HCT240.pdf
+#
 UNIT ICON icon_inverter
 2 1A0 I L
 4 1A1 I L
@@ -114,6 +124,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74HC244
+#
 COMP 74HC244 U
 FPLIST
 TSSOP*4.4x6.5mm*Pitch0.65mm*
@@ -149,18 +162,21 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74HC595
+#
 COMP 74HC595 U
 FPLIST
 DIP?16*
-DESC 8-bit serial in/out Shift Register 3-State Outputs
+DESC 8-bit Serial In/out Shift Register 3-State Outputs
 KEYW HCMOS SR 3State
 DOC http://www.nxp.com/documents/data_sheet/74HC_HCT595.pdf
 ALIAS 74LS596
-DESC 8-bit serial in/out Shift Register Open Collector outputs
+DESC 8-bit Serial In/out Shift Register Open Collector Outputs
 KEYW HCMOS SR OpenCollector
 DOC http://www.ti.com/lit/gpn/sn74ls596
 ALIAS 74LS595
-DESC 8-bit serial in/out Shift Register 3-State Outputs
+DESC 8-bit Serial In/out Shift Register 3-State Outputs
 KEYW TTL SR 3State
 DOC http://www.ti.com/lit/gpn/sn74ls595 
 UNIT 
@@ -185,22 +201,31 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74HCT04
+#
 COMP 74HCT04 U
 FPLIST
 DIP?14*
-DESC hex inverter
+DESC Hex Inverter
 KEYW HCTMOS not inverter
 DOC http://www.nxp.com/documents/data_sheet/74HC_HCT04.pdf
+#
 ALIAS 74HC14
-DESC Hex inverter schmitt trigger
+DESC Hex Inverter Schmitt Trigger
 KEYW HCMOS not inverter
+DOC http://www.nxp.com/documents/data_sheet/74HC_HCT14.pdf
+#
 ALIAS 74HC04
-DESC hex inverter
+DESC Hex Inverter
 KEYW HCMOS not inverter
 DOC http://www.nxp.com/documents/data_sheet/74HC_HCT04.pdf
+#
 ALIAS 74LS14
-DESC Hex inverter schmitt trigger
+DESC Hex Inverter Schmitt Trigger
 KEYW TTL not inverter
+DOC http://www.onsemi.com/pub/Collateral/SN74LS14-D.PDF
+#
 UNIT NOT
 1 ~ I L
 2 ~ ~O R
@@ -223,27 +248,30 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS00
+#
 COMP 74LS00 U
 FPLIST
 DIP*W7.62mm*
 SO14*
-DESC quad 2-input NAND gate
+DESC Quad 2-input NAND Gate
 KEYW TTL nand 2-input
 DOC http://www.ti.com/lit/gpn/sn74ls00
 ALIAS 74LS37
-DESC quad 2-input NAND buffer
+DESC Quad 2-input NAND Buffer
 KEYW TTL nand 2-input buffer
 DOC http://www.ti.com/lit/gpn/sn74ls37
 ALIAS 7400
-DESC quad 2-input NAND gate
+DESC Quad 2-input NAND Gate
 KEYW TTL nand 2-input
 DOC http://www.ti.com/lit/gpn/sn7400
 ALIAS 74HCT00
-DESC quad 2-input NAND gate
+DESC Quad 2-input NAND Gate
 KEYW HCTMOS nand 2-input
 DOC http://www.ti.com/lit/gpn/sn74hct00
 ALIAS 74HC00
-DESC quad 2-input NAND gate
+DESC Quad 2-input NAND Gate
 KEYW HCMOS nand 2-input
 DOC http://www.ti.com/lit/gpn/sn74hc00
 UNIT NAND
@@ -270,10 +298,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS01
+#
 COMP 74LS01 U
 FPLIST
 DIP?14*
-DESC quad 2-input NAND gate, open collector outputs NRND
+DESC Quad 2-input NAND Gate, Open Collector Outputs NRND
 KEYW TTL nand 2-input open collector
 DOC http://www.nteinc.com/specs/7400to7499/pdf/nte74LS01.pdf
 UNIT NAND
@@ -300,27 +331,30 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS02
+#
 COMP 74LS02 U
 FPLIST
 SO14*
 DIP*W7.62mm*
-DESC quad 2-input NOR gate
+DESC Quad 2-input NOR Gate
 KEYW TTL Nor2
 DOC http://www.ti.com/lit/gpn/sn74ls02
 ALIAS 74HC02
-DESC quad 2-input NOR gate
+DESC Quad 2-input NOR Gate
 KEYW HCMOS Nor2
 DOC http://www.ti.com/lit/gpn/sn74hc02
 ALIAS 74HCT02
-DESC quad 2-input NOR gate
+DESC Quad 2-input NOR Gate
 KEYW HCTMOS Nor2
 DOC http://www.ti.com/lit/gpn/sn74hct02
 ALIAS 7402
-DESC quad 2-input NOR gate
+DESC Quad 2-input NOR Gate
 KEYW TTL Nor2
 DOC http://www.ti.com/lit/gpn/sn7402
 ALIAS 74LS28
-DESC quad 2-input NOR buffer NRND
+DESC Quad 2-input NOR Buffer NRND
 KEYW TTL Nor2 Buffer
 DOC http://eeshop.unl.edu/pdf/74ls28.pdf
 UNIT NOR
@@ -347,11 +381,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS03
+#
 COMP 74LS03 U
 FPLIST
 DIP?14*
-DESC Quad 2-input NAND open collector
+DESC Quad 2-input NAND Open Collector
 KEYW TTL Nand2 OpenColl
+DOC http://www.ti.com/lit/gpn/sn74ls03
 UNIT NAND
 1 ~ I L
 SPC L
@@ -376,11 +414,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS04
+#
 COMP 74LS04 U
 FPLIST
 DIP?14*
 DESC Hex Inverter
 KEYW TTL not inv
+DOC http://www.ti.com/lit/gpn/sn74ls04
 UNIT NOT
 1 ~ I L
 2 ~ ~O R
@@ -403,13 +445,22 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS05
+#
 COMP 74LS05 U
 FPLIST
 DIP?14*
-DESC Inverter Open Collect
+#
+DESC Hex Inverter Buffers, Open Collecter
 KEYW TTL not inv OpenCol
+DOC http://www.ti.com/lit/gpn/sn74ls05
+#
 ALIAS 74LS06
-ALIAS 74LS06N
+DESC Hex Inverter Buffers / Drivers with High-voltage Outputs
+KEYW TTL not inv OpenCol
+DOC http://www.ti.com/lit/gpn/sn74ls06
+#
 UNIT NOT
 1 ~ I L
 2 ~ ~C R
@@ -432,14 +483,21 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS08
+#
 COMP 74LS08 U
 FPLIST
 DIP?14*
-DESC Quad And2
+DESC Quad 2-Input AND Gates
 KEYW TTL and2
+DOC http://www.ti.com/lit/gpn/sn74ls08
+#
 ALIAS 74LS09
-DESC Quad 2-input AND Open Collect
+DESC Quad 2-input AND Gates, Open Collector
 KEYW TTL and2 OpenCol
+DOC http://www.ti.com/lit/gpn/sn74ls09
+#
 UNIT AND
 1 ~ I L
 SPC L
@@ -464,11 +522,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS10
+#
 COMP 74LS10 U
 FPLIST
 DIP?14*
-DESC Triple 3-input NAND
+DESC Triple 3-input NAND Gates
 KEYW TTL Nand3
+DOC http://www.ti.com/lit/gpn/sn74ls10
 UNIT NAND
 1 ~ I L
 2 ~ I L
@@ -488,12 +550,16 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS107
+#
 COMP 74LS107 U
 %pinlen 100
 FPLIST
 DIP?14*
-DESC Dual JK Flip-Flop, reset
+DESC Dual JK Flip-Flop, Reset
 KEYW TTL JK
+DOC http://www.ti.com/lit/gpn/sn74ls107a
 UNIT WIDTH 400 
 1 J I L
 12 C CI L
@@ -514,12 +580,16 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS109
+#
 COMP 74LS109 U
 %pinlen 100
 FPLIST
 DIP?16*
 DESC Dual JK Flip-Flop, Set & Reset
 KEYW TTL JK
+DOC http://www.ti.com/lit/gpn/sn74ls109a
 UNIT WIDTH 400 
 2 J I L
 4 C CI L
@@ -542,11 +612,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS11
+#
 COMP 74LS11 U
 FPLIST
 DIP?14*
-DESC Triple 3-input AND
+DESC Triple 3-input AND Gates
 KEYW TTL And3
+DOC http://www.ti.com/lit/gpn/sn74ls109a
 UNIT AND
 1 ~ I L
 2 ~ I L
@@ -566,12 +640,16 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS112
+#
 COMP 74LS112 U
 %pinlen 100
 FPLIST
 DIP?16*
-DESC dual JK Flip-Flop, Set & Reset
+DESC Dual JK Flip-Flop, Set & Reset
 KEYW TTL JK
+DOC http://www.ti.com/lit/gpn/sn74ls112a
 UNIT WIDTH 400 
 3 J I L
 1 C CI L
@@ -594,12 +672,16 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS113
+#
 COMP 74LS113 U
 %pinlen 100
 FPLIST
 DIP?14*
-DESC dual JK flip-flop, Set
+DESC Dual JK Flip-flop, Set
 KEYW TTL JK
+DOC http://datasheet.octopart.com/SN74LS113AFN-Texas-Instruments-datasheet-38163188.pdf
 UNIT WIDTH 400 
 3 J I L
 1 C CI L
@@ -620,12 +702,16 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS114
+#
 COMP 74LS114 U
 %pinlen 100
 FPLIST
 DIP?14*
-DESC Dual JK flip-flop, common Clock & Reset, Set
+DESC Dual JK Flip-flop, Common Clock & Reset, Set
 KEYW TTL JK
+DOC http://www.unicornelectronics.com/ftp/Data%20Sheets/74ls114.pdf
 UNIT WIDTH 400 
 3 J I L
 13 C CI L
@@ -647,11 +733,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS12
+#
 COMP 74LS12 U
 FPLIST
 DIP?14*
 DESC Triple 3-input NAND Open Collector
 KEYW TTL Nand3 OpenCol
+DOC http://datasheet.octopart.com/74LS12N-Rochester-Electronics-datasheet-38161794.pdf
 UNIT NAND
 1 ~ I L
 2 ~ I L
@@ -671,11 +761,14 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS121
+#
 COMP 74LS121 U
 FPLIST
 DIP?14*
-DESC monostable multivibrator with Schmitt-trigger inputs
-KEYW monostable
+DESC Monostable Multivibrator with Schmitt-trigger Inputs
+KEYW monostable multivibrator
 DOC http://www.ti.com/lit/gpn/sn74121
 UNIT WIDTH 800 
 11 R/Cext I L
@@ -694,11 +787,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS122
+#
 COMP 74LS122 U
 FPLIST
 DIP?14*
-DESC Retriggerable Monostable
-KEYW TTL monostable
+DESC Retriggerable Monostable Multivibrator
+KEYW TTL monostable multivibrator
+DOC http://www.ti.com/lit/gpn/sn74ls122
 UNIT WIDTH 800 
 13 R/Cext I L
 9 Rint I L
@@ -718,11 +815,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS123
+#
 COMP 74LS123 U
 FPLIST
 DIP?16*
-DESC Dual retriggerable Monostable
+DESC Dual Retriggerable Monostable Multivibrator
 KEYW TTL monostable
+DOC http://www.ti.com/lit/gpn/sn74ls123
 UNIT
 15 RCext I L
 14 Cext I L
@@ -751,14 +852,21 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS125
+#
 COMP 74LS125 U
 FPLIST
 DIP?14*
-DESC Quad buffer 3-State outputs
+DESC Quad Bus Buffer with 3-State Outputs
 KEYW TTL buffer 3State
+DOC http://www.ti.com/lit/gpn/sn74ls125a
+#
 ALIAS 74LVC125
-DESC Quad buffer 3-State outputs
+DESC Quad Bus Buffer with 3-State Outputs
 KEYW TTL buffer 3State
+DOC http://www.ti.com/lit/gpn/sn74lvc125a
+#
 UNIT BUF
 2 ~ I L
 3 ~ T R
@@ -779,11 +887,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS126
+#
 COMP 74LS126 U
 FPLIST
 DIP?14*
-DESC Quad buffer 3-State outputs
+DESC Quad Bus Buffer with 3-State Outputs
 KEYW TTL Buffer 3State
+DOC http://www.ti.com/lit/gpn/sn74ls126a
 UNIT BUF
 2 ~ I L
 3 ~ T R
@@ -804,11 +916,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS13
+#
 COMP 74LS13 U
 FPLIST
 DIP?14*
-DESC Dual 4-input NAND Schmitt trigger
+DESC Dual 4-input NAND Gate with Schmitt Trigger
 KEYW TTL Nand4
+DOC http://www.applelogic.org/files/74LS13.pdf
 UNIT NAND
 1 ~ I L
 2 ~ I L
@@ -825,11 +941,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS132
+#
 COMP 74LS132 U
 FPLIST
 DIP?14*
-DESC Quad 2-input NAND Schmitt trigger
+DESC Quad 2-input NAND Gate with Schmitt Trigger
 KEYW TTL Nand2
+DOC http://www.ti.com/lit/gpn/sn74ls132
 UNIT NAND ICON icon_schmitt
 1 ~ I L
 SPC L
@@ -854,11 +974,21 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS133
+#
 COMP 74LS133 U
 FPLIST
 DIP?16*
-DESC NAND 13-input
+DESC 13-input NAND Gate
 KEYW TTL Nand13
+DOC http://datasheet.octopart.com/NTE74LS133-NTE-Electronics-datasheet-21328411.pdf
+#
+ALIAS 74ALS133
+DESC 13-input NAND Gate
+KEYW TTL Nand13
+DOC http://www.ti.com/lit/gpn/sn74als133
+#
 UNIT NAND
 1 ~ I L
 2 ~ I L
@@ -878,6 +1008,9 @@ UNIT PWR SEP
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS136
+#
 COMP 74LS136 U
 FPLIST
 DIP?14*
@@ -908,11 +1041,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS137
+#
 COMP 74LS137 U
 FPLIST
 DIP?16*
-DESC Decoder 3 to 8, address latches
+DESC Decoder 3 to 8, Address Latches
 KEYW TTL DECOD8 DECOD
+DOC http://datasheet.octopart.com/SN74LS137D-Texas-Instruments-datasheet-41217029.pdf
 UNIT 
 1 A0 I L
 2 A1 I L
@@ -934,11 +1071,15 @@ UNIT PWR
 16 VCC PI T
 8 GND PI B
 END
+#
+# 74LS138
+#
 COMP 74LS138 U
 FPLIST
 DIP?16*
-DESC Decoder 3 to 8 active low outputs
+DESC Decoder 3 to 8 Active low Outputs
 KEYW TTL DECOD DECOD8
+DOC http://www.ti.com/litv/sdls014
 UNIT 
 1 A0 I L
 2 A1 I L
@@ -960,11 +1101,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS139
+#
 COMP 74LS139 U
 FPLIST
 DIP?16*
-DESC Dual Decoder 1 of 4, Active low outputs
+DESC Dual Decoder 1 of 4, Active low Outputs
 KEYW TTL DECOD4
+DOC http://www.ti.com/lit/gpn/sn74ls139a
 UNIT 
 3 A1 I L
 2 A0 I L
@@ -987,11 +1132,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS145
+#
 COMP 74LS145 U
 FPLIST
 DIP?16*
 DESC Decoder 1 to 10, Open Collector
 KEYW TTL DECOD10 OpenColl
+DOC http://www.ti.com/lit/gpn/sn74ls145
 UNIT 
 15 P0 I L
 14 P1 I L
@@ -1011,11 +1160,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS147
+#
 COMP 74LS147 U
 FPLIST
 DIP?16*
 DESC Priority Encoder, 10 to 4
 KEYW TTL ENCOD
+DOC http://www.ti.com/lit/gpn/sn74ls148
 UNIT 
 11 E1 ~I L
 12 E2 ~I L
@@ -1034,11 +1187,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS148
+#
 COMP 74LS148 U
 FPLIST
 DIP?16*
-DESC Priority Encoder 3 to 8 cascadable
+DESC Priority Encoder 3 to 8 Cascadable
 KEYW TTL ENCOD
+DOC http://www.ti.com/lit/gpn/sn74ls148
 UNIT 
 10 IO ~I L
 11 I1 ~I L
@@ -1060,11 +1217,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS15
+#
 COMP 74LS15 U
 FPLIST
 DIP?14*
 DESC Triple 3-input AND
 KEYW TTL And3
+DOC http://www.skot9000.com/ttl/datasheets/15.pdf
 UNIT AND
 1 ~ I L
 2 ~ I L
@@ -1084,11 +1245,15 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS151
+#
 COMP 74LS151 U
 FPLIST
 DIP?16*
 DESC Multiplexer 8 to 1
 KEYW TTL MUX8
+DOC http://www.ti.com/lit/gpn/sn74ls151
 UNIT 
 4 I0 I L
 3 I1 I L
@@ -1110,11 +1275,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS153
+#
 COMP 74LS153 U
 FPLIST
 DIP?16*
 DESC Dual Multiplexer 4 to 1
 KEYW TTL Mux4
+DOC http://www.ti.com/lit/gpn/sn74ls153
 UNIT 
 6 I0a I L
 5 I1a I L
@@ -1144,11 +1313,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS154
+#
 COMP 74LS154 U
 FPLIST
 DIP?24*
 DESC Decoder 4 to 16
 KEYW TTL DECOD16 DECOD
+DOC http://datasheet.octopart.com/DM74LS154N-National-Semiconductor-datasheet-38152175.pdf
 UNIT 
 23 A0 I L
 22 A1 I L
@@ -1177,14 +1350,19 @@ UNIT PWR
 12 GND PI B
 24 VCC PI T
 END
+#
+# 74LS155
+#
 COMP 74LS155 U
 FPLIST
 DIP?16*
-DESC Dual 2 to 4 lines Decoder/Demultiplexer
+DESC Dual 2 to 4 Lines Decoder/Demultiplexer
 KEYW TTL DECOD8 DECOD4 DEMUX4 DEMUX8 DEMUX DECOD
+DOC https://www.onsemi.com/pub/Collateral/SN74LS155-D.PDF
 ALIAS 74LS156
-DESC Dual 2 to 4 lines Decoder/Demultiplexer, Open Collector
+DESC Dual 2 to 4 Lines Decoder/Demultiplexer, Open Collector
 KEYW TTL DECOD8 DECOD4 DEMUX4 DEMUX8 OpenCol
+DOC http://www.ti.com/lit/gpn/sn74ls156
 UNIT 
 1 Ea1 I L
 2 Ea2 ~I L
@@ -1207,11 +1385,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS157
+#
 COMP 74LS157 U
 FPLIST
 DIP?16*
-DESC Quad 2 to 1 line Multiplexer
+DESC Quad 2 to 1 Line Multiplexer
 KEYW TTL MUX MUX2
+DOC http://www.ti.com/lit/gpn/sn74ls157
 UNIT 
 2 I0a I L
 3 I1a I L
@@ -1241,11 +1423,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS158
+#
 COMP 74LS158 U
 FPLIST
 DIP?16*
-DESC Quad 2 to 1 multiplexer
+DESC Quad 2 to 1 Multiplexer
 KEYW TTL Mux MUX2
+DOC http://www.ti.com/lit/gpn/sn74ls158
 UNIT 
 2 I0a I L
 3 I1a I L
@@ -1275,21 +1461,28 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS161
+#
 COMP 74LS161 U
 FPLIST
 DIP?16*
-DESC Synchronous 4-bit programmable binary Counter
+DESC Synchronous 4-bit Programmable Binary Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls161a
 ALIAS 74LS160
-DESC Synchronous 4-bit programmable decimal Counter
+DESC Synchronous 4-bit Programmable Decimal Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls161a
 ALIAS 74LS162
-DESC Synchronous 4-bit programmable decimal Counter
+DESC Synchronous 4-bit Programmable Decimal Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls161a
 ALIAS 74LS163
-DESC Synchronous 4-bit programmable binary Counter
+DESC Synchronous 4-bit Programmable Binary Counter
 KEYW TTL CNT CNT4
-UNIT 
+DOC http://www.ti.com/lit/gpn/sn74ls161a
+UNIT
 3 D0 I L
 4 D1 I L
 5 D2 I L
@@ -1311,11 +1504,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS165
+#
 COMP 74LS165 U
 FPLIST
 DIP?16*
-DESC Shift Register 8-bit, parallel load
+DESC Shift Register 8-bit, Parallel Load
 KEYW TTL SR SR8
+DOC http://www.ti.com/lit/gpn/sn74ls165a
 UNIT 
 10 DS I L
 11 D0 I L
@@ -1337,11 +1534,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS166
+#
 COMP 74LS166 U
 FPLIST
 DIP?16*
-DESC Shift Register 8-bit, parallel load
+DESC Shift Register 8-bit, Parallel Load
 KEYW TTL SR SR8
+DOC http://www.ti.com/lit/gpn/sn74ls166a
 UNIT 
 1 Ds I L
 2 A I L
@@ -1363,14 +1564,19 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS168
+#
 COMP 74LS168 U
 FPLIST
 DIP?16*
-DESC Synchronous 4-bit Up/Down Decimal counter
+DESC Synchronous 4-bit Up/Down Decimal Counter
 KEYW TTL CNT CNT4
+DOC http://datasheet.octopart.com/NTE74LS168A-NTE-Electronics-datasheet-22129561.pdf
 ALIAS 74LS169
-DESC Synchronous 4-bit Up/Down binary counter
+DESC Synchronous 4-bit Up/Down Binary Counter
 KEYW TTL CNT CNT4
+DOC http://datasheet.octopart.com/NTE74LS168A-NTE-Electronics-datasheet-22129561.pdf
 UNIT 
 3 P0 I L
 4 P1 I L
@@ -1396,14 +1602,19 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS170
+#
 COMP 74LS170 U
 FPLIST
 DIP?16*
 DESC 4 x 4 Register Files Open Collector
 KEYW TTL Register OpenCol
+DOC http://datasheet.octopart.com/SN74LS170N-Texas-Instruments-datasheet-41214434.pdf
 ALIAS 74LS670
 DESC 4 x 4 Register Files 3-State Outputs
 KEYW TTL Register 3State
+DOC http://www.ti.com/lit/gpn/sn74ls670
 UNIT 
 15 D1 I L
 1 D2 I L
@@ -1425,11 +1636,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS173
+#
 COMP 74LS173 U
 FPLIST
 DIP?16*
-DESC 4-bit D-type Register, 3 state out
+DESC 4-bit D-type Register, 3-State Outputs
 KEYW TTL REG REG4 3State DFF
+DOC http://www.ti.com/lit/gpn/sn74ls173a
 UNIT 
 14 D0 I L
 13 D1 I L
@@ -1452,11 +1667,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS174
+#
 COMP 74LS174 U
 FPLIST
 DIP?16*
-DESC Hex D-type Flip-Flop, reset
+DESC Hex D-type Flip-Flop, Reset
 KEYW TTL REG REG6 DFF
+DOC http://www.ti.com/lit/gpn/sn74ls174
 UNIT 
 3 D0 I L
 4 D1 I L
@@ -1478,11 +1697,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS175
+#
 COMP 74LS175 U
 FPLIST
 DIP?16*
-DESC 4-bit D Flip-Flop, reset
+DESC 4-bit D Flip-Flop, Reset
 KEYW TTL REG REG4 DFF
+DOC http://www.ti.com/lit/gpn/sn74ls175
 UNIT 
 4 D0 I L
 SPC L
@@ -1506,14 +1729,17 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS181
+#
 COMP 74LS181 U
 %fill back
 FPLIST
 DIP?24*
-DESC Arithmetic logic unit
+DESC Arithmetic Logic Unit
 KEYW TTL ALU ARITH
-DOC 74xx/74F181.pdf
-UNIT W 800 TEMPLATE 74LS181 
+DOC http://datasheet.octopart.com/SN74LS181N-Texas-Instruments-datasheet-33018771.pdf
+UNIT W 800 ICON 74LS181
 2 A0 I L
 23 A1 I L
 21 A2 I L
@@ -1547,11 +1773,15 @@ UNIT PWR
 12 GND PI B
 24 VCC PI T
 END
+#
+# 74LS182
+#
 COMP 74LS182 U
 FPLIST
 DIP?16*
-DESC Carry generator
+DESC Carry Generator
 KEYW TTL ALU ARITH
+DOC http://pdf.datasheetcatalog.com/datasheets/185/492993_DS.pdf
 UNIT 
 4 P0 ~I L
 2 P1 ~I L
@@ -1573,14 +1803,19 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS190
+#
 COMP 74LS190 U
 FPLIST
 DIP?16*
 DESC 4-bit Synchronous Up/Down BCD Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls191
 ALIAS 74LS191
-DESC 4-bit Synchronous Up/Down binary Counter
+DESC 4-bit Synchronous Up/Down Binary Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls191
 UNIT 
 15 P0 I L
 1 P1 I L
@@ -1604,14 +1839,19 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS192
+#
 COMP 74LS192 U
 FPLIST
 DIP?16*
-DESC Synchronous 4-bit Up/Down (2 clk) counter
+DESC Synchronous 4-bit Up/Down (2 Clk) Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls193
 ALIAS 74LS193
-DESC Synchronous 4-bit Up/Down (2 clk) counter
+DESC Synchronous 4-bit Up/Down (2 Clk) Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74ls193
 UNIT 
 15 P0 I L
 1 P1 I L
@@ -1635,11 +1875,15 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS194
+#
 COMP 74LS194 U
 FPLIST
 DIP?16*
 DESC Shift Register 4-bit Bidirectional
 KEYW TTL RS SR4
+DOC http://www.ti.com/lit/ds/symlink/sn74ls19a.pdf
 UNIT 
 3 P0 I L
 4 P1 I L
@@ -1663,10 +1907,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS195
+#
 COMP 74LS195 U
 FPLIST
 DIP?16*
-DESC Shift Register 4-bit, parallel
+DESC Shift Register 4-bit, Parallel
 KEYW TTL SR SR4
 UNIT 
 4 P0 I L
@@ -1689,13 +1936,16 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS196
+#
 COMP 74LS196 U
 FPLIST
 DIP?14*
-DESC 4 (3+1)-bit presettable BCD counter
+DESC 4 (3+1)-bit Presettable BCD Counter
 KEYW TTL CNT CNT4
 ALIAS 74LS197
-DESC 4 (3+1)-bit presettable binary counter
+DESC 4 (3+1)-bit Presettable Binary Counter
 KEYW TTL CNT CNT4
 UNIT 
 4 P0 I L
@@ -1717,6 +1967,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS20
+#
 COMP 74LS20 U
 FPLIST
 DIP?12*
@@ -1744,6 +1997,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS21
+#
 COMP 74LS21 U
 FPLIST
 DIP?12*
@@ -1765,6 +2021,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS221
+#
 COMP 74LS221 U
 FPLIST
 DIP?16*
@@ -1775,8 +2034,7 @@ UNIT
 2 B I L
 SPC L
 3 ~CLR I L
-13 Q O RC
-SPC R
+13 Q O R
 SPC R
 SPC R
 4 ~Q O R
@@ -1787,8 +2045,7 @@ UNIT
 10 B I L
 SPC L
 11 ~CLR I L
-5 Q O RC
-SPC R
+5 Q O R
 SPC R
 SPC R
 12 ~Q O R
@@ -1798,10 +2055,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS240
+#
 COMP 74LS240 U
 FPLIST
 DIP?20*
-DESC 8-bit BUS Buffer (Inverter) 3-State outputs
+DESC 8-bit BUS Buffer (Inverter) 3-State Outputs
 KEYW TTL Buffer BUS 3State
 UNIT ICON icon_schmitt 
 2 I0a I L
@@ -1827,13 +2087,16 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS241
+#
 COMP 74LS241 U
 FPLIST
 DIP?20*
-DESC 8-bit Bus Buffer 3-State outputs
+DESC 8-bit Bus Buffer 3-State Outputs
 KEYW TTL Buffer BUS 3State
 ALIAS 74LS244
-DESC 8-bit Bus Buffer 3-State outputs
+DESC 8-bit Bus Buffer 3-State Outputs
 KEYW TTL Buffer BUS 3State
 UNIT ICON icon_schmitt 
 2 I0a I L
@@ -1859,10 +2122,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS242
+#
 COMP 74LS242 U
 FPLIST
 DIP?12*
-DESC quad bus transceiver, inverting 3-state outputs
+DESC Quad bus Transceiver, Inverting 3-state Outputs
 KEYW bus 3state
 UNIT 
 3 A0 I L
@@ -1880,6 +2146,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS243
+#
 COMP 74LS243 U
 FPLIST
 DIP?12*
@@ -1901,13 +2170,16 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS245
+#
 COMP 74LS245 U
 FPLIST
 DIP?20*
-DESC Octal BUS Transceivers, 3-State outputs
+DESC Octal BUS Transceivers, 3-State Outputs
 KEYW TTL BUS 3State
 ALIAS 74HC245
-DESC Octal BUS Transceivers, 3-State outputs
+DESC Octal BUS Transceivers, 3-State Outputs
 KEYW HCMOS BUS 3State
 UNIT ICON icon_schmitt 
 2 A0 T L
@@ -1933,13 +2205,16 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS247
+#
 COMP 74LS247 U
 FPLIST
 DIP?16*
-DESC BCD to 7 segments Decoder Open Collector active Low
+DESC BCD to 7 Segments Decoder Open Collector Active Low
 KEYW TTL DECOD
 ALIAS 74LS246
-DESC BCD to 7-segment Decoder Open Collector active Low
+DESC BCD to 7-segment Decoder Open Collector Active Low
 KEYW TTL DECOD
 UNIT 
 7 A I L
@@ -1964,13 +2239,16 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS248
+#
 COMP 74LS248 U
 FPLIST
 DIP?16*
 DESC BCD to 7-segment Decoder, Active High
 KEYW TTL DECOD
 ALIAS 74LS249
-DESC BCD to 7-segment Decoder, Open collector, Active High
+DESC BCD to 7-segment Decoder, Open Collector, Active High
 KEYW TTL DECOD OpenCol
 UNIT WIDTH 800 
 7 A I L
@@ -1995,6 +2273,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS251
+#
 COMP 74LS251 U
 FPLIST
 DIP?16*
@@ -2021,6 +2302,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS253
+#
 COMP 74LS253 U
 FPLIST
 DIP?16*
@@ -2055,10 +2339,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS256
+#
 COMP 74LS256 U
 FPLIST
 DIP?16*
-DESC dual 4-bit addressable latch
+DESC Dual 4-bit Addressable Latch
 KEYW latch
 UNIT 
 1 Ea1 I L
@@ -2082,6 +2369,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS257
+#
 COMP 74LS257 U
 FPLIST
 DIP?16*
@@ -2116,10 +2406,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS258
+#
 COMP 74LS258 U
 FPLIST
 DIP?16*
-DESC Quad 2 to 1 Multiplexer, inverting
+DESC Quad 2 to 1 Multiplexer, Inverting
 KEYW TTL MUX MUX2
 UNIT 
 2 I0a I L
@@ -2150,10 +2443,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS259
+#
 COMP 74LS259 U
 FPLIST
 DIP?16*
-DESC 8-bit addressable latch
+DESC 8-bit Addressable Latch
 KEYW TTL REG DFF
 UNIT 
 13 D I L
@@ -2177,13 +2473,16 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS26
+#
 COMP 74LS26 U
 FPLIST
 DIP?14*
-DESC Quad 2-input NAND Open collector
+DESC Quad 2-input NAND Open Collector
 KEYW TTL Nand2 OpenCol
 ALIAS 74LS38
-DESC Quad Buffer 2-input NAND Open collector
+DESC Quad Buffer 2-input NAND Open Collector
 KEYW TTL Nand2 OpenCol Buffer
 UNIT NAND
 1 ~ I L
@@ -2209,6 +2508,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS27
+#
 COMP 74LS27 U
 FPLIST
 DIP?14*
@@ -2233,10 +2535,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS273
+#
 COMP 74LS273 U
 FPLIST
 DIP?20*
-DESC 8-bit D Flip-Flop, reset
+DESC 8-bit D Flip-Flop, Reset
 KEYW TTL DFF DFF8
 UNIT 
 3 D0 I L
@@ -2262,6 +2567,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS280
+#
 COMP 74LS280 U
 FPLIST
 DIP?14*
@@ -2284,10 +2592,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS283
+#
 COMP 74LS283 U
 FPLIST
 DIP?16*
-DESC 4-bit full Adder
+DESC 4-bit Full Adder
 KEYW TTL ADD Arith ALU
 UNIT 
 7 C0 I L
@@ -2311,13 +2622,16 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS290
+#
 COMP 74LS290 U
 FPLIST
 DIP?12*
-DESC 4-bit BCD counter
+DESC 4-bit BCD Counter
 KEYW TTL CNT CNT4
 ALIAS 74LS293
-DESC 4-bit binary counter
+DESC 4-bit Binary Counter
 KEYW TTL CNT CNT4
 UNIT 
 10 Cp0 ~CI L
@@ -2336,10 +2650,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS295
+#
 COMP 74LS295 U
 FPLIST
 DIP?14*
-DESC 4-bit bidirectional register, 3-state outputs
+DESC 4-bit Bidirectional Register, 3-state Outputs
 KEYW register
 UNIT 
 1 Ds I L
@@ -2362,10 +2679,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS298
+#
 COMP 74LS298 U
 FPLIST
 DIP?16*
-DESC Quad 2 to 1 multiplexer with storage
+DESC Quad 2 to 1 Multiplexer with Storage
 KEYW TTL MUX MUX2
 UNIT 
 3 I0a I L
@@ -2390,10 +2710,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS299
+#
 COMP 74LS299 U
 FPLIST
 DIP?20*
-DESC 8-bit Universal shift/storage Register
+DESC 8-bit Universal Shift/storage Register
 KEYW TTL REG SR SR8
 UNIT 
 11 Ds0 I L
@@ -2423,6 +2746,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS30
+#
 COMP 74LS30 U
 FPLIST
 DIP?14*
@@ -2442,6 +2768,9 @@ UNIT PWR SEP
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS32
+#
 COMP 74LS32 U
 FPLIST
 DIP?14*
@@ -2471,10 +2800,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS322
+#
 COMP 74LS322 U
 FPLIST
 DIP?20*
-DESC 8-bit shift register, sign extend, 3-state outputs
+DESC 8-bit Shift Register, Sign Extend, 3-state Outputs
 KEYW register
 UNIT 
 3 D0 I L
@@ -2502,6 +2834,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS323
+#
 COMP 74LS323 U
 FPLIST
 DIP?20*
@@ -2534,10 +2869,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS33
+#
 COMP 74LS33 U
 FPLIST
 DIP?14*
-DESC Quad 2-input NOR, Open collector
+DESC Quad 2-input NOR, Open Collector
 KEYW TTL Nor2 OpenColl
 UNIT NOR
 2 ~ I L
@@ -2563,10 +2901,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS348
+#
 COMP 74LS348 U
 FPLIST
 DIP?16*
-DESC 8 to 3 lines Priority Encoder
+DESC 8 to 3 Lines Priority Encoder
 KEYW TTL ENCOD Arith
 UNIT 
 5 EI ~I L
@@ -2589,10 +2930,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS352
+#
 COMP 74LS352 U
 FPLIST
 DIP?16*
-DESC Dual 4 to 1 line Multiplexer
+DESC Dual 4 to 1 Line Multiplexer
 KEYW TTL Mux MUX4
 UNIT 
 6 I0a I L
@@ -2623,10 +2967,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS353
+#
 COMP 74LS353 U
 FPLIST
 DIP?16*
-DESC Dual 4 to 1 line Multiplexer, inverter
+DESC Dual 4 to 1 Line Multiplexer, Inverter
 KEYW TTL MUX MUX2
 UNIT 
 6 I0a I L
@@ -2657,6 +3004,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS365
+#
 COMP 74LS365 U
 FPLIST
 DIP?16*
@@ -2682,10 +3032,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS366
+#
 COMP 74LS366 U
 FPLIST
 DIP?16*
-DESC Hex Bus Driver inverter, 3-state outputs
+DESC Hex Bus Driver Inverter, 3-state Outputs
 KEYW TTL Buffer BUS 3State
 UNIT 
 2 I1 I L
@@ -2707,10 +3060,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS367
+#
 COMP 74LS367 U
 FPLIST
 DIP?16*
-DESC Hex Bus Driver 3-state outputs
+DESC Hex Bus Driver 3-state Outputs
 KEYW TTL Buffer BUS 3State
 UNIT 
 2 I1 I L
@@ -2732,10 +3088,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS368
+#
 COMP 74LS368 U
 FPLIST
 DIP?16*
-DESC Hex Bus Driver inverter, 3-state outputs
+DESC Hex Bus Driver Inverter, 3-state Outputs
 KEYW TTL Buffer BUS 3State
 UNIT 
 2 I1 I L
@@ -2757,10 +3116,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS373
+#
 COMP 74LS373 U
 FPLIST
 DIP?20*
-DESC 8-bit Latch, 3-state outputs
+DESC 8-bit Latch, 3-state Outputs
 KEYW TTL REG DFF DFF8 LATCH
 UNIT 
 3 D0 I L
@@ -2786,10 +3148,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS374
+#
 COMP 74LS374 U
 FPLIST
 DIP?20*
-DESC 8-bit Register, 3-state outputs
+DESC 8-bit Register, 3-state Outputs
 KEYW TTL DFF DFF8 REG 3State
 UNIT 
 3 D0 I L
@@ -2815,6 +3180,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS375
+#
 COMP 74LS375 U
 FPLIST
 DIP?16*
@@ -2843,6 +3211,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS377
+#
 COMP 74LS377 U
 FPLIST
 DIP?20*
@@ -2872,6 +3243,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS378
+#
 COMP 74LS378 U
 FPLIST
 DIP?16*
@@ -2897,6 +3271,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS379
+#
 COMP 74LS379 U
 FPLIST
 DIP?16*
@@ -2925,10 +3302,13 @@ UNIT PWR
 16 VCC PI T
 8 GND PI B
 END
+#
+# 74LS385
+#
 COMP 74LS385 U
 FPLIST
 DIP?20*
-DESC Quad serial Adder
+DESC Quad Serial Adder
 KEYW TTL ADD Arith ALU
 UNIT 
 2 1S I L
@@ -2954,6 +3334,9 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS386
+#
 COMP 74LS386 U
 FPLIST
 DIP?14*
@@ -2983,10 +3366,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS390
+#
 COMP 74LS390 U
 FPLIST
 DIP?16*
-DESC Dual BCD 4-bit counter
+DESC Dual BCD 4-bit Counter
 KEYW TTL CNT CNT4
 UNIT 
 1 ~CP0 CI L
@@ -3010,10 +3396,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS393
+#
 COMP 74LS393 U
 FPLIST
 DIP?14*
-DESC Dual BCD 4-bit counter
+DESC Dual BCD 4-bit Counter
 KEYW TTL CNT CNT4
 DOC 74xx\74LS393.pdf
 UNIT 
@@ -3038,10 +3427,13 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS395
+#
 COMP 74LS395 U
 FPLIST
 DIP?16*
-DESC 4-bit universal shift register, 3-state outputs
+DESC 4-bit Universal Shift Register, 3-state Outputs
 KEYW TTL SR SR4 REG 3State
 UNIT 
 2 Ds I L
@@ -3064,10 +3456,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS398
+#
 COMP 74LS398 U
 FPLIST
 DIP?20*
-DESC Quad 2 to 1 line Multiplexer, 3-state outputs
+DESC Quad 2 to 1 Line Multiplexer, 3-state Outputs
 KEYW TTL MUX MUX2 3State
 UNIT 
 4 I0a I L
@@ -3093,10 +3488,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS399
+#
 COMP 74LS399 U
 FPLIST
 DIP?16*
-DESC Quad 2 to 1 line multiplexer with storage
+DESC Quad 2 to 1 Line Multiplexer with Storage
 KEYW TTL MUX MUX2
 UNIT 
 3 I0a I L
@@ -3122,10 +3520,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS42
+#
 COMP 74LS42 U
 FPLIST
 DIP?16*
-DESC 4 to 10 line Decoder
+DESC 4 to 10 Line Decoder
 KEYW TTL DECOD DECOD10
 UNIT 
 15 A0 I L
@@ -3146,13 +3547,16 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS47
+#
 COMP 74LS47 U
 FPLIST
 DIP?16*
-DESC BCD to 7-segment Driver, Open Collector, 30V outputs
+DESC BCD to 7-segment Driver, Open Collector, 30V Outputs
 KEYW TTL DECOD DECOD7 OpenCol
 ALIAS 74LS46
-DESC BCD to 7-segment Driver, Open Collector, 15V outputs
+DESC BCD to 7-segment Driver, Open Collector, 15V Outputs
 KEYW TTL DECOD DECOD7 OpenCol
 UNIT 
 7 A I L
@@ -3174,10 +3578,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS48
+#
 COMP 74LS48 U
 FPLIST
 DIP?16*
-DESC BCD to 7-segment Decoder/driver, Active High outputs
+DESC BCD to 7-segment Decoder/driver, Active High Outputs
 KEYW TTL DECOD DECOD7
 UNIT 
 7 A I L
@@ -3199,10 +3606,13 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS49
+#
 COMP 74LS49 U
 FPLIST
 DIP?14*
-DESC BCD to 7-segment decoder/driver, Open collector
+DESC BCD to 7-segment Decoder/driver, Open Collector
 KEYW TTL DECOD DECOD7 OpenCol
 DOC http://www.ti.com/lit/gpn/sn74ls47
 UNIT 
@@ -3224,6 +3634,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS51
+#
 COMP 74LS51 U
 FPLIST
 DIP?14*
@@ -3258,13 +3671,16 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS54
+#
 COMP 74LS54 U
 %pinlen 150
 FPLIST
 DIP?14*
 DESC And-Nor (S = /(AB + CD + EF + GH) )
 KEYW TTL ANDNOR 
-UNIT NONE W 300 ICON 74LS54 
+UNIT NONE W 300 TEMPLATE 74LS54
 1 ~ I L
 13 ~ I L
 2 ~ I L
@@ -3273,15 +3689,20 @@ UNIT NONE W 300 ICON 74LS54
 5 ~ I L
 9 ~ I L
 10 ~ I L
-8 ~ ~O RC
+
+8 ~ ~O R
+
 UNIT PWR SEP
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS540
+#
 COMP 74LS540 U
 FPLIST
 DIP?20*
-DESC 8-bit Buffer/Line driver Inverter, 3-state outputs
+DESC 8-bit Buffer/Line Driver Inverter, 3-state Outputs
 KEYW BUFFER BUS TTL 3State
 UNIT ICON icon_inverter icon_schmitt 
 2 A0 I L
@@ -3307,10 +3728,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS541
+#
 COMP 74LS541 U
 FPLIST
 DIP?20*
-DESC 8-bit Buffer/Line Driver 3-state outputs
+DESC 8-bit Buffer/Line Driver 3-state Outputs
 KEYW TTL BUFFER 3State BUS
 ALIAS 74HCT541
 UNIT ICON icon_buffer icon_schmitt  
@@ -3337,13 +3761,16 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS55
+#
 COMP 74LS55 U
 %pinlen 150
 FPLIST
 DIP?14*
 DESC AND-NOR ( S = / (ABCD + EFGH) )
 KEYW TTL ANDNOR
-UNIT NONE W 300 ICON 74LS55 
+UNIT NONE W 300 TEMPLATE 74LS55
 1 ~ I L
 2 ~ I L
 3 ~ I L
@@ -3352,18 +3779,20 @@ UNIT NONE W 300 ICON 74LS55
 11 ~ I L
 12 ~ I L
 13 ~ I L
-SPC R
-SPC R
-SPC R
-8 ~ ~O RC
+
+8 ~ ~O R
+
 UNIT PWR SEP
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS573
+#
 COMP 74LS573 U
 FPLIST
 DIP?20*
-DESC 8-bit Latch 3-state outputs
+DESC 8-bit Latch 3-state Outputs
 KEYW TTL DFF DFF8 LATCH 3State
 DOC 74xx/74hc573.pdf
 UNIT 
@@ -3390,10 +3819,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS574
+#
 COMP 74LS574 U
 FPLIST
 DIP?20*
-DESC 8-bit Register, 3-state outputs
+DESC 8-bit Register, 3-state Outputs
 KEYW TTL REG DFF DFF8 3State
 ALIAS 74HCT574
 UNIT 
@@ -3420,10 +3852,13 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS629
+#
 COMP 74LS629 U
 FPLIST
 DIP?16*
-DESC dual voltage-controlled oscillator, enable control, range control
+DESC Dual Voltage-controlled Oscillator, Enable Control, Range Control
 KEYW VCO
 UNIT 
 6 EN ~I L
@@ -3453,6 +3888,9 @@ UNIT PWR
 9 GND PI B
 16 VCC PI T
 END
+#
+# 74LS688
+#
 COMP 74LS688 U
 FPLIST
 DIP?20*
@@ -3483,11 +3921,14 @@ UNIT PWR
 10 GND PI B
 20 VCC PI T
 END
+#
+# 74LS73
+#
 COMP 74LS73 U
 %pinlen 100
 FPLIST
 DIP?14*
-DESC Dual JK Flip-Flop, reset
+DESC Dual JK Flip-Flop, Reset
 KEYW TTL JK JKFF
 UNIT  WIDTH 400
 7 J I L
@@ -3509,6 +3950,9 @@ UNIT PWR
 4 VCC PI T
 11 GND PI B
 END
+#
+# 74LS74
+#
 COMP 74LS74 U
 %pinlen 100
 FPLIST
@@ -3540,6 +3984,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS75
+#
 COMP 74LS75 U
 FPLIST
 DIP?16*
@@ -3565,6 +4012,9 @@ UNIT PWR
 5 VCC PI T
 12 GND PI B
 END
+#
+# 74LS76
+#
 COMP 74LS76 U
 %pinlen 100
 FPLIST
@@ -3593,6 +4043,9 @@ UNIT PWR
 5 VCC PI T
 13 GND PI B
 END
+#
+# 74LS77
+#
 COMP 74LS77 U
 FPLIST
 DIP?12*
@@ -3614,11 +4067,14 @@ UNIT PWR
 4 VCC PI T
 11 GND PI B
 END
+#
+# 74LS78
+#
 COMP 74LS78 U
 %pinlen 100
 FPLIST
 DIP?14*
-DESC Dual JK Flip-flop, Set, Common clock & reset
+DESC Dual JK Flip-flop, Set, Common Clock & Reset
 KEYW TTL JK JKFF
 UNIT  WIDTH 400
 3 J I L
@@ -3642,6 +4098,9 @@ UNIT PWR
 4 VCC PI T
 11 GND PI B
 END
+#
+# 74LS83
+#
 COMP 74LS83 U
 FPLIST
 DIP?16*
@@ -3669,6 +4128,9 @@ UNIT PWR
 5 VCC PI T
 12 GND PI B
 END
+#
+# 74LS85
+#
 COMP 74LS85 U
 FPLIST
 DIP?16*
@@ -3697,6 +4159,9 @@ UNIT PWR
 8 GND PI B
 16 VCC PI T
 END
+#
+# 74LS86
+#
 COMP 74LS86 U
 FPLIST
 DIP?14*
@@ -3728,6 +4193,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LS90
+#
 COMP 74LS90 U
 FPLIST
 DIP?12*
@@ -3750,6 +4218,9 @@ UNIT PWR
 5 VCC PI T
 10 GND PI B
 END
+#
+# 74LS91
+#
 COMP 74LS91 U
 FPLIST
 DIP?14*
@@ -3768,10 +4239,13 @@ UNIT PWR
 5 VCC PI T
 10 GND PI B
 END
+#
+# 74LS92
+#
 COMP 74LS92 U
 FPLIST
 DIP?14*
-DESC Divide by 12 counter
+DESC Divide by 12 Counter
 KEYW TTL CNT CNT4
 UNIT 
 14 CP0 ~CI L
@@ -3787,10 +4261,13 @@ UNIT PWR
 5 VCC PI T
 10 GND PI B
 END
+#
+# 74LS93
+#
 COMP 74LS93 U
 FPLIST
 DIP?14*
-DESC Divide by 2 & 8 counter
+DESC Divide by 2 & 8 Counter
 KEYW TTL CNT CNT4
 UNIT 
 14 CP0 ~CI L
@@ -3806,6 +4283,9 @@ UNIT PWR
 5 VCC PI T
 10 GND PI B
 END
+#
+# 74LS95
+#
 COMP 74LS95 U
 FPLIST
 DIP?14*
@@ -3831,6 +4311,9 @@ UNIT PWR
 7 GND PI B
 14 VCC PI T
 END
+#
+# 74LV14
+#
 COMP 74LV14 U
 FPLIST
 DIP?14*
@@ -3858,10 +4341,13 @@ UNIT PWR
 7 GND PI B
 14 3.3V PI T
 END
+#
+# MM74C923
+#
 COMP MM74C923 U
 FPLIST
 DIP?20*
-DESC 20-key encoder
+DESC 20-key Encoder
 KEYW encoder
 UNIT 
 1 Y1 I L
