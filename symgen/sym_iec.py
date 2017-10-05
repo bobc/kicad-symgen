@@ -22,7 +22,7 @@ symbol-unit
 --
 comp 40245
 unit 
-control
+elem control
 19 G ~I L
 1 Dir ~I 
 element "1"
@@ -59,18 +59,18 @@ unit pwr
 class Group (IecBase):
 
     def __init__(self):
+        self.qualifiers = ""
+        self.type = " "
         self.label = ""
         self.id = 0
         self.pins = []
-        self.type = " "
-        self.label = ""
-        self.qualifiers = ""
 
 # aka Unit
 class IecSymbol (IecBase):
     #control = None
 
     elements = []
+    qualifiers = ""
 
     def __init__(self):
         self.icons = []
@@ -78,6 +78,7 @@ class IecSymbol (IecBase):
 
         self.unit_shape = ""
         self.template = None
+        self.combine = "auto"
 
         self.is_power_unit = False
         self.is_overlay = False
@@ -85,9 +86,18 @@ class IecSymbol (IecBase):
         self.unit_rect = Rectangle()
 
         self.vert_margin = 0
+        self.fill = NoFill
+
+        #self.width = 0
         # self.box_width = 0
         # self.y_offset = 0
         # self.y_pin_extent = 0
+
+    def set_width (self, width):
+        self.unit_rect.pos.x = -width/2
+        self.unit_rect.size.x = width
+
+
 
     def draw (self, comp, unit, variant):
         pos = Point(0,0)
@@ -101,10 +111,6 @@ class IecSymbol (IecBase):
 
 class IecElement (IecBase):
 
-#    groups = []
-#    shape = "box"
-    # todo: for now
-#    pins = []
 
     def __init__(self):
         self.pins = []

@@ -9,12 +9,12 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>data\cmos4000</WorkingDirectory>
+    <WorkingDirectory>data\74xx</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp cmos4000.txt</CommandLineArguments>
+    <CommandLineArguments>--inp 74xx.txt</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>

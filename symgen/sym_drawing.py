@@ -8,6 +8,59 @@ NoFill = 'N'
 Foreground = 'F'
 Background = 'f'
 
+# convert pin orientation from KiCad directions to symgen directions
+def kicad_to_symgen_dir (direction):
+    if direction=="R":
+        return "L"
+    elif direction=="L":
+        return "R"
+    elif direction=="U":
+        return "B"
+    elif direction=="D":
+        return "T"
+
+# convert pin orientation from symgen directions to KiCad directions
+def symgen_to_kicad_dir (direction):
+    if direction=="R":
+        return "L"
+    elif direction=="L":
+        return "R"
+    elif direction=="B":
+        return "U"
+    elif direction=="T":
+        return "D"
+
+# convert kicad to symgen
+def get_pin_type (_type, shape):
+
+    flags = ""
+    result = _type
+    if result == "W":
+        flags += "P"
+        result = "I"
+    elif result == "w":
+        flags += "P"
+        result = "O"
+
+    if "C" in shape:
+        flags += "C"
+    if "F" in shape:
+        flags += "F"
+    if "L" in shape:
+        flags += "L"
+    if "V" in shape:
+        flags += "V"
+    if "N" in shape:
+        flags += "N"
+    if "X" in shape:
+        flags += "X"
+    if "I" in shape:
+        flags = "~" + flags
+
+    result = flags + result
+
+    return result
+
 class Point:
     #x = 0
     #y = 0
@@ -24,6 +77,7 @@ class Point:
 
     def __str__(self):
         return "P(%r, %r)" % (self.x, self.y)
+    __repr__ = __str__
 
 class Rectangle:
 
@@ -53,6 +107,9 @@ class Rectangle:
     def bottom(self):
         return self.pos.y - self.size.y
 
+    def __str__(self):
+        return "R(%r, %r, %r, %r)" % (self.pos.x, self.pos.y, self.size.x, self.size.y)
+    __repr__ = __str__
 
 
 class BoundingBox(object):
@@ -60,10 +117,16 @@ class BoundingBox(object):
     pmin = Point()
     pmax = Point()
 
-    def __init__(self):
+    def __init__(self, p_min = None, p_max = None):
         self.pmin = Point()
         self.pmax = Point()
         self.valid = False
+        if p_min:
+            self.pmin.x = p_min.x
+            self.pmin.y = p_min.y
+            self.pmax.x = p_max.x
+            self.pmax.y = p_max.y
+            self.valid = True
 
     def extend (self, p):
         if self.valid:
@@ -76,6 +139,7 @@ class BoundingBox(object):
             self.pmin.y = p.y
             self.pmax.x = p.x
             self.pmax.y = p.y
+            self.valid = True
 
     def __add__(self, other):
         if other == 0:
@@ -152,6 +216,7 @@ class Pin (DrawBase):
 
         # extra stuff
         self.qualifiers = ""
+        self.align = ""
 
         super(Pin, self).__init__()
         self.key = 'X'
@@ -180,7 +245,22 @@ class Pin (DrawBase):
         return self.type in ['O','B','T','C','E']
 
     def is_input(self):
-        return self.type in ['I','B']
+        return self.type in ['I','B'] and not 'W' in self.shape.upper()
+
+    def get_string (self):
+        if self.shape == " " :
+            return "SPC %s" % (kicad_to_symgen_dir(self.orientation))
+        else:
+            s = "%s %s %s %s%s" % (self.number, self.name, get_pin_type (self.type, self.shape), kicad_to_symgen_dir(self.orientation), 
+                                 "" if self.align == "L" else self.align)
+            if self.qualifiers:
+                s += '"'+self.qualifiers+'"'
+            return s
+
+
+    def __str__(self):
+        return self.get_string()
+    __repr__ = __str__
 
 class Arc (DrawBase):
 

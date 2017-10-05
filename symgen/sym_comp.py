@@ -28,6 +28,45 @@ class StyleAttributes:
     def __init__(self):
         pass
 
+class SgItem:
+
+    def __init__(self):
+        pass
+
+class SgFile:
+
+    items = []
+    def __init__(self):
+        pass
+
+class SgDoc:
+    description = ""
+    keywords = ""
+    datasheet = ""
+
+    def __init__(self):
+        pass
+
+class SgRawline (SgItem):
+
+    value = ""
+    def __init__(self):
+        pass
+            
+class SgComponent (SgItem):
+    name = "name"
+    ref = "ref"
+
+
+    def __init__(self):
+        self.fplist = []
+        self.units = []
+        self.doc_fields = {}
+        self.user_fields = []
+
+        self.pin_length = 150
+        self.default_footprint = ""
+
 class ComponentDef:
     name = "name"
     ref = "ref"

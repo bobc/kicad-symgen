@@ -2,7 +2,102 @@
 
 from  math import *
 from schlib import *
+from str_utils import *
 from sym_drawing import *
+
+def get_chars (text):
+    list = []
+
+    while len(text)>0:
+        if text.startswith ("&"):
+            tok = before (text, ";")
+            text = after (text, ";")
+            list.append (tok+";")
+        else:
+            list.append (text[0])
+            text = text[1:]
+                
+    return list
+
+def draw_text (comp, unit, variant, pos, s, fontsize):
+
+    chars = get_chars (s)
+    for char in chars :
+        if char == "&xdtri;":
+            # white down-pointing triangle
+            # unicode U+025BD
+            poly = PolyLine ()
+            poly.unit = unit
+            poly.demorgan = variant
+            poly.pensize = 0
+            poly.points.append (Point (0,fontsize).Add (pos))
+            poly.points.append (Point (fontsize,fontsize).Add (pos))
+            poly.points.append (Point (fontsize/2,0).Add (pos))
+            poly.points.append (Point (0,fontsize).Add (pos))
+            poly.point_count = len(poly.points)
+            comp.drawOrdered.append( poly.get_element() )
+            pos.x += fontsize + 10
+        elif char == "&xrtri;":
+            # white right-pointing triangle
+            # unicode U+025B7
+            poly = PolyLine ()
+            poly.unit = unit
+            poly.demorgan = variant
+            poly.pensize = 0
+            poly.points.append (Point (0,0).Add (pos))
+            poly.points.append (Point (0,fontsize).Add (pos))
+            poly.points.append (Point (fontsize,fontsize/2).Add (pos))
+            poly.points.append (Point (0,0 ).Add (pos))
+            poly.point_count = len(poly.points)
+            comp.drawOrdered.append( poly.get_element() )
+            pos.x += fontsize + 15
+        elif char == "&circ;":
+            circle = Circle()
+            circle.center = Point (pos.x + fontsize/2, pos.y+fontsize/2)
+            circle.radius = fontsize/2
+            circle.unit = unit
+            circle.demorgan = variant
+            circle.pensize = 0
+            comp.drawOrdered.append( circle.get_element() )
+            pos.x += fontsize + 10
+        elif char == "&st;":
+            # schmitt trigger
+            # also Unicode U+238E Hysteresis symbol
+            poly = PolyLine ()
+            poly.unit = unit
+            poly.demorgan = variant
+            poly.pensize = 0
+            poly.points.append (Point (0,0).Add (pos))
+            poly.points.append (Point (30,0).Add (pos))
+            poly.points.append (Point (40,50).Add (pos))
+            poly.points.append (Point (50,50).Add (pos))
+            poly.points.append (Point (20,50).Add (pos))
+            poly.points.append (Point (10,0).Add (pos))
+            poly.point_count = len(poly.points)
+            comp.drawOrdered.append( poly.get_element() )
+            pos.x += fontsize + 10
+        else:
+            text = Text()        
+            if char.startswith ("&"):
+                if char == "&xrtri;":
+                    char = u'\u25B7'
+                    char = char.encode('utf-8')
+                elif char == "&ge;":
+                    char = u'\u2265'
+                    char = char.encode('utf-8')
+                elif char == "&amp;":
+                    char = '&'
+                else:
+                    char = '?'
+                #char = u'\ufffd'
+            text.value = char
+            text.unit = unit
+            text.demorgan = variant
+            text.pos = pos
+            text.horiz_alignment="L"
+            text.vert_alignment="B"
+            comp.drawOrdered.append (text.get_element())
+            pos.x += fontsize + 10
 
 class Gate:
 
@@ -17,6 +112,8 @@ class Gate:
 
     width = 300
     height = 300
+
+    qualifiers = ""
 
     def __init__(self, num_inputs):
         self.num_inputs = num_inputs
@@ -448,7 +545,7 @@ class NotGate (Gate):
         return Point (self.width/3-self.width/2, 0)
 
 #
-# IEC style (box) lofic symbols
+# IEC style (box) logic symbols
 #
 class IecGate (Gate):
 
@@ -510,6 +607,11 @@ class IecGate (Gate):
         elif self.type in ["not","buffer"]:
             text.value = "1"
 
+        #text.value = self.qualifiers + text.value
+        #
         comp.drawOrdered.append(text.get_element())
+
+        pos = Point(-len(get_chars(self.qualifiers)) * 50 - len(text.value.decode('utf-8'))*50/2, -25)
+        draw_text (comp, unit, variant, pos, self.qualifiers, 50)
 
            
