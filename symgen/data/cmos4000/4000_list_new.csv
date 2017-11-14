@@ -1,0 +1,180 @@
+4000	2	Dual 3-input NOR Gate + 1 NOT Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf	DIP14|SO14
+4001	4	Quad 2-input NOR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf	DIP14|SO14|TSSOP14
+4002	2	Dual 4-input NOR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf	DIP14|SO14
+4006	1	18-stage Shift Register			4000	http://pdf.datasheetcatalog.com/datasheet/philips/HEF4006BN.pdf	DIP14
+4007	2	Dual Complementary Transistor Pair + 1 NOT Gate			4000	http://pdf.datasheetcatalog.com/datasheets/105/108568_DS.pdf	DIP14|SO14|TSSOP14
+4008	1	4-bit Binary Full Adder			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4008bms.pdf	DIP16|SO16
+4009	6	Hex Inverting Buffer			4000	http://pdf.datasheetcatalog.com/datasheet_pdf/motorola/MC14009AL_to_MC14010CP.pdf	DIP16|SO16|TSSOP16
+4010	6	Hex Non-inverting Buffer			4000	http://pdf.datasheetcatalog.com/datasheet_pdf/motorola/MC14009AL_to_MC14010CP.pdf	DIP16|SO16|TSSOP16
+4011	4	Quad 2-input NAND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf	DIP14|SO14|TSSOP14
+4012	2	Dual 4-input NAND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf	DIP14|SO14|TSSOP14
+4013	2	Dual D-type Flip-flop			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4013bms.pdf	DIP14|SO14
+4014	1	8-stage Shift Register			4000	https://assets.nexperia.com/documents/data-sheet/HEF4014B.pdf	DIP16|SO16|TSSOP16
+4015	2	Dual 4-stage Shift Register			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4015bms.pdf	DIP16|SO16|TSSOP16
+4016	4	Quad Bilateral Switch			4000	https://assets.nexperia.com/documents/data-sheet/HEF4016B_CNV.pdf	DIP14|SO14|TSSOP14
+4017	1	Decade Counter with 10 Decoded Outputs (5-stage Johnson Counter )			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4017bms-22bms.pdf	DIP16|SO16|TSSOP16
+4018	1	Presettable Divide-by-N Counter			4000	http://pdf.datasheetcatalog.com/datasheets/166/78007_DS.pdf	DIP16|SO16|TSSOP16
+4019	4	Quad AND/OR Select Gate			4000	http://pdf.datasheetcatalog.com/datasheet2/1/02fx2315a3c3hrqrhxrtr4hj4wpy.pdf	DIP16|SO16|TSSOP16
+4020	1	14-stage Binary Ripple Counter			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4020bms-24bms-40bms.pdf	DIP16|SO16|TSSOP16
+4021	1	8-stage Shift Register			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4014bms-21bms.pdf	DIP16|SO16|TSSOP16
+4022	1	Octal Counter with 8 Decoded Outputs (4-stage Johnson Counter)			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4017bms-22bms.pdf	DIP16|SO16|TSSOP16
+4023	3	Triple 3-input NAND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4011bms-12bms-23bms.pdf	DIP14|SO14|TSSOP14
+4024	1	7-stage Binary Ripple Counter			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4020bms-24bms-40bms.pdf	DIP14|SO14|TSSOP14
+4025	3	Triple 3-input NOR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4000bms-01bms-02bms-25bms.pdf	DIP14|SO14|TSSOP14
+4026	1	Decade Counter with Decoded 7-segment Display Outputs and Display Enable			4000	http://pdf.datasheetcatalog.com/datasheets/320/84955_DS.pdf	DIP16|SO16|TSSOP16
+4027	2	Dual J-K Master-slave Flip-flop			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4027bms.pdf	DIP16|SO16|TSSOP16
+4028	1	BCD to Decimal (1-of-10) Decoder			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4028bms.pdf	DIP16|SO16|TSSOP16
+4029	1	Presettable Up/down Counter, Binary or BCD-decade			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4029bms.pdf	DIP16|SO16|TSSOP16
+4030	4	Quad XOR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4030bms.pdf	DIP14|SO14|TSSOP14
+4031	1	64-stage Shift Register			4000	http://pdf.datasheetcatalog.com/datasheets/105/108989_DS.pdf	DIP16|TSSOP16
+4032	3	Triple Serial Adder			4000	http://pdf.datasheetcatalog.com/datasheet/motorola/MC14032BCP.pdf	DIP16|PLCC20
+4033	1	Decade Counter with Decoded 7-segment Display Outputs and Ripple Blanking			4000	http://pdf.datasheetcatalog.com/datasheets/134/108993_DS.pdf	DIP16|SO16|TSSOP16
+4034	1	8-stage Bidirectional Parallel/serial Input/output Register			4000	http://pdf.datasheetcatalog.com/datasheet_pdf/intersil/CD4034BMS.pdf	DIP24|SO24
+4035	1	4-stage Parallel-in/parallel-out Shift Register			4000	http://pdf.datasheetcatalog.com/datasheet/philips/HEF4035BT.pdf	DIP16|SO16|TSSOP16
+4038	3	Triple Serial Adder			4000	http://pdf.datasheetcatalog.com/datasheet/SGSThomsonMicroelectronics/mXusxxw.pdf	DIP16|PLCC20
+4040	1	12-stage Binary Ripple Counter			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4020bms-24bms-40bms.pdf	DIP16|SO16|TSSOP16
+4041	4	Quad True/complement Buffer			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4041ubms.pdf	DIP14|SO14|TSSOP14
+4042	4	Quad D-type Latch			4000	http://pdf.datasheetcatalog.com/datasheet/philips/HEF4042BF.pdf	DIP16|SO16|TSSOP16
+4043	4	Quad NOR R/S Latch with Tri-state Outputs			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4043bms-44bms.pdf	DIP16|SO16|TSSOP16
+4044	4	Quad NAND R/S Latch with Tri-state Outputs			4000	http://pdf.datasheetcatalog.com/datasheets/120/109065_DS.pdf	DIP16|SO16|TSSOP16
+4045	1	21-stage Counter			4000	http://www.ti.com/general/docs/lit/getliterature.tsp?genericPartNumber=cd4045b&fileType=pdf	DIP16|SO16|TSSOP16
+4046	1	Phase-locked Loop with VCO			4000	https://assets.nexperia.com/documents/data-sheet/HEF4046B.pdf	DIP16|SO16|TSSOP16
+4047	1	Monostable / Astable Multivibrator			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4047bms.pdf	DIP14|SO14|TSSOP14
+4048	1	Multifunctional Expandable 8-input Gate with Tri-state Output			4000	http://pdf.datasheetcatalog.com/datasheets/150/109091_DS.pdf	DIP16|SO16|TSSOP16
+4049	6	Hex Buffer /converter (inverting)			4000	http://www.intersil.com/content/dam/intersil/documents/cd40/cd4049ubms.pdf	DIP16|SO16|TSSOP16
+4050	6	Hex Buffer /converter (non-inverting)			4000	http://www.intersil.com/content/dam/intersil/documents/cd40/cd4050bms.pdf	DIP16|SO16|TSSOP16
+4051	1	8-channel Analog Multiplexer/ Demultiplexer			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf	DIP16|SO16|TSSOP16
+4052	2	Dual 4-channel Analog Multiplexer/demultiplexer			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf	DIP16|SO16|TSSOP16
+4053	3	Triple 2-channel Analog Multiplexer/demultiplexer			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4051bms-52bms-53bms.pdf	DIP16|SO16|TSSOP16
+4054	1	4-segment LCD Driver			4000	http://pdf.datasheetcatalog.com/datasheet2/2/05u5ss8lpwqool3gjxxgytu2okwy.pdf	DIP16|SO16|TSSOP16
+4055	1	"BCD to 7-segment Decoder/LCD Driver with ""display-frequency"" Output"			4000	http://pdf.datasheetcatalog.com/datasheets/400/85042_DS.pdf	DIP16|SO16|TSSOP16
+4056	1	BCD to 7-segment Decoder/LCD Driver with Strobed-latch Function			4000	http://pdf.datasheetcatalog.com/datasheets/400/85042_DS.pdf	DIP16|SO16|TSSOP16
+4059	1	Programmable Divide-by-N Counter			4000	https://assets.nexperia.com/documents/data-sheet/HEF4059B_CNV.pdf	DIP24|SO24
+4060	1	14-stage Binary Ripple Counter and Oscillator			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4060bms.pdf	DIP16|SO16|TSSOP16
+4062	1	Logic Dual 3 Majority Gate			4000
+4063	1	4-bit Digital Comparator			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4063bms.pdf	DIP16|SO16
+4066	4	"Quad Analog Switch (low ""ON"" Resistance)"			4000	http://www.intersil.com/content/dam/intersil/documents/cd40/cd4066bms.pdf	DIP14|SO14|TSSOP14
+4067	1	16-channel Analog Multiplexer/demultiplexer (1-of-16 Switch)			4000	http://pdf.datasheetcatalog.com/datasheets/120/109382_DS.pdf	DIP24|SO24|TSSOP24
+4068	1	8-input NAND Gate			4000	http://pdf.datasheetcatalog.com/datasheets/70/109237_DS.pdf	DIP14|SO14|TSSOP14
+4069	6	Hex Inverter			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4069ubms.pdf	DIP14|SO14|TSSOP14
+4070	4	Quad 2-input XOR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4070bms-77bms.pdf	DIP14|SO14|TSSOP14
+4071	4	Quad 2-input OR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf	DIP14|SO14|TSSOP14
+4072	2	Dual 4-input OR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf	DIP14|SO14|TSSOP14
+4073	3	Triple 3-input AND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf	DIP14|SO14|TSSOP14
+4075	3	Triple 3-input OR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4071bms-72bms-75bms.pdf	DIP14|SO14|TSSOP14
+4076	4	Quad D-type Register with Tri-state Outputs			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4076bms.pdf	DIP16|SO16|TSSOP16
+4077	4	Quad 2-input XNOR Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4076bms.pdf	DIP14|SO14|TSSOP14
+4078	1	8-input NOR / OR Gate			4000	http://pdf.datasheetcatalog.com/datasheets/70/109237_DS.pdf	DIP14|SO14|TSSOP14
+4081	4	Quad 2-input AND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf	DIP14|SO14|TSSOP14
+4082	2	Dual 4-input AND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4073bms-81bms-82bms.pdf	DIP14|SO14|TSSOP14
+4085	2	Dual 2-wide, 2-input AND/OR Invert (AOI)			4000	http://pdf.datasheetcatalog.com/datasheets/90/109346_DS.pdf	DIP14|SO14|TSSOP14
+4086	1	Expandable 4-wide, 2-input AND/OR Invert (AOI)			4000	http://pdf.datasheetcatalog.com/datasheet/philips/HEF4086B.pdf	DIP14|SO14
+4089	1	Binary Rate Multiplier			4000	http://pdf.datasheetcatalog.com/datasheets/105/109353_DS.pdf	DIP16|SO16|TSSOP16
+4093	4	Quad 2-input Schmitt Trigger NAND Gate			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4093bms.pdf	DIP14|SO14|TSSOP14
+4094	1	8-stage Shift-and-store bus			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4094bms.pdf	DIP16|SO16|TSSOP16
+4095	1	Gated J-K Flip-flop (non-inverting)			4000	http://pdf.datasheetcatalog.com/datasheets/105/109379_DS.pdf	DIP14|SO14|PLCC20
+4096	1	Gated J-K Flip-flop (inverting and Non-inverting)			4000	http://pdf.datasheetcatalog.com/datasheets/105/109379_DS.pdf	DIP14|SO14|PLCC20
+4097	1	Differential 8-channel Analog Multiplexer/demultiplexer			4000	http://pdf.datasheetcatalog.com/datasheets/120/109382_DS.pdf	DIP24|SO24|TSSOP24
+4098	2	Dual One-shot Monostable			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4098bms.pdf	DIP16|SO16|TSSOP16
+4099	1	8-bit Addressable Latch			4000	http://www.intersil.com/content/dam/Intersil/documents/cd40/cd4099bms.pdf	DIP16|SO16|TSSOP16
+4104	4	Quad Low-to-high Voltage Translator with Tri-state Outputs			4000	https://assets.nexperia.com/documents/data-sheet/HEF4104B.pdf	SO16
+4106	6	Hex Schmitt Trigger			4000	https://assets.nexperia.com/documents/data-sheet/HEF40106B.pdf	SO14|TSSOP14
+4160	1	Decade Counter with Asynchronous Clear			4000
+4161	1	4-bit Binary Counter with Asynchronous Clear			4000
+4162	1	Decade Counter with Synchronous Clear			4000
+4163	1	4-bit Binary Counter with Synchronous Clear			4000
+4174	6	Hex D-type Flip-Flop			4000	http://www.onsemi.com/pub/Collateral/MC14174B-D.PDF	DIP16|SO16
+4175	4	Quad D-type Flip-flop			4000	http://www.onsemi.com/pub/Collateral/MC14175B-D.PDF	SO16
+4192	1	Presettable Up-down Counter			4000
+4490	6	Hex Contact Bounce Eliminator			4000	http://www.onsemi.com/pub/Collateral/MC14490-D.PDF	DIP16|SO16
+4500	1	Industrial Control Unit			4000
+4502	6	Hex Inverting Buffer (tri-state)			4000	http://pdf.datasheetcatalog.com/datasheets/90/109492_DS.pdf	DIP16|SO16|TSSOP16
+4503	6	Hex Non-inverting Buffer with Tri-state Outputs			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4503bms.pdf	DIP16|SO16|TSSOP16
+4504	6	Hex Voltage Level Shifter for TTL-to-CMOS or CMOS-to-CMOS Operation			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4504bms.pdf	DIP16|SO16|TSSOP16
+4505	1	64-bit, 1-bit per Word Random Access Memory (RAM)			4000	http://pdf.datasheetcatalog.com/datasheet/philips/HEF4505BD.pdf	DIP14
+4507	4	Quad 2-input XOR Gate			4000		DIP14|SO14|TSSOP14
+4508	2	Dual 4-bit Latch with Tri-state Outputs			4000	http://pdf.datasheetcatalog.com/datasheets/90/109516_DS.pdf	DIP24|SO24|TSSOP24
+4510	1	Presettable 4-bit BCD Up/down Counter			4000	http://pdf.datasheetcatalog.com/datasheets/150/109581_DS.pdf	DIP16|SO16|TSSOP16
+4511	1	BCD to 7-segment Latch/decoder/driver			4000	http://pdf.datasheetcatalog.com/datasheets/135/109536_DS.pdf	DIP16|SO16
+4512	1	8-input Multiplexer (data Selector) with Tri-state Output			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4512bms.pdf	DIP16|SO16|TSSOP16
+4513	1	BCD to 7-segment Latch/decoder/driver (4511 Plus Ripple Blanking)			4000	http://pdf.datasheetcatalog.com/datasheet2/6/0e9ilputc7k58dst6qquf7pi6yyy.pdf	DIP18
+4514	1	1-of-16 Decoder/demultiplexer Active HIGH Output			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4514bms-15bms.pdf	DIP24|SO24
+4515	1	1-of-16 Decoder/demultiplexer Active LOW Output			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4514bms-15bms.pdf	DIP24|SO24
+4516	1	Presettable 4-bit Binary Up/down Counter			4000	http://pdf.datasheetcatalog.com/datasheets/150/109581_DS.pdf	DIP16|SO16|TSSOP16
+4517	2	Dual 64-stage Shift Register			4000	http://pdf.datasheetcatalog.com/datasheets/120/109582_DS.pdf	DIP16
+4518	2	Dual BCD up Counter			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4518bms-20bms.pdf	DIP16|SO16|TSSOP16
+4519	4	Quad 2-input Multiplexer (data Selector)			4000	http://pdf.datasheetcatalog.com/datasheet/philips/HEF4519BN.pdf	DIP16|SO16
+4520	2	Dual 4-bit Binary up Counter			4000	http://www.intersil.com/content/dam/Intersil/documents/cd45/cd4518bms-20bms.pdf	DIP16|SO16|TSSOP16
+4521	1	24-stage Frequency Divider			4000	https://assets.nexperia.com/documents/data-sheet/HEF4521B.pdf
+4522	1	Programmable BCD Divide-by-N Counter			4000	http://www.ti.com/lit/gpn/cd4522b
+4526	1	Programmable 4-bit Binary Down Counter			4000	https://assets.nexperia.com/documents/data-sheet/HEF4526B.pdf
+4527	1	BCD Rate Multiplier			4000	http://www.ti.com/lit/gpn/cd4527b
+4528	2	Dual Retriggerable Monostable Multivibrator with Reset			4000	https://assets.nexperia.com/documents/data-sheet/HEF4528B.pdf
+4529	2	Dual 4-channel Analog Data Selector/multiplexer			4000
+4530	2	Dual 5-input Majority Logical Gate			4000
+4531	1	12-bit Parity Tree			4000
+4532	1	8-bit Priority Encoder			4000	http://www.onsemi.com/pub/Collateral/MC14532B-D.PDF
+4536	1	Programmable Timer			4000	http://www.onsemi.com/pub/Collateral/MC14536B-D.PDF
+4538	2	Dual Retriggerable Precision Monostable Multivibrator			4000	https://assets.nexperia.com/documents/data-sheet/HEF4538B.pdf
+4539	2	Dual 4-input Multiplexer			4000
+4541	1	Programmable Timer			4000	https://assets.nexperia.com/documents/data-sheet/HEF4541B.pdf
+4543	1	BCD to 7-segment Latch/decoder/driver with Phase Input			4000	https://assets.nexperia.com/documents/data-sheet/HEF4543B.pdf
+4549	1	Successive Approximation Registers			4000	http://www.onsemi.com/pub/Collateral/MC14549B-D.PDF
+4551	4	Quad 2-channel Analog Multiplexer/demultiplexer			4000	http://www.onsemi.com/pub/Collateral/MC14551B-D.PDF
+4553	1	3-digit BCD Counter			4000
+4555	2	Dual 1-of-4 Decoder/demultiplexer Active HIGH Output			4000	https://assets.nexperia.com/documents/data-sheet/HEF4555B.pdf
+4556	2	Dual 1-of-4 Decoder/demultiplexer Active LOW Output			4000	http://www.onsemi.com/pub/Collateral/MC14555B-D.PDF
+4557	1	1-to-64 bit Variable Length Shift Register			4000	https://assets.nexperia.com/documents/data-sheet/HEF4557B.pdf
+4558	1	BCD to 7-segment Decoder (enable, RBI and Provides Active–high Output)			4000
+4559	1	Successive Approximation Registers			4000	http://www.onsemi.com/pub/Collateral/MC14549B-D.PDF
+4560	1	NBCD Adder			4000
+4562	1	128–bit Static Shift Register			4000
+4566	1	Industrial Time-base Generator			4000
+4569	1	Programmable Divide-By-N, Dual 4-Bit Binary/BCD Down Counter			4000	http://www.onsemi.com/pub/Collateral/MC14569B-D.PDF
+4572	6	Hex Gate: Quad NOT , Single NAND , Single NOR			4000	http://www.onsemi.com/pub/Collateral/MC14572UB-D.PDF
+4583	2	Dual Schmitt Trigger			4000
+4584	6	Hex Inverting Schmitt Trigger			4000	http://www.onsemi.com/pub/Collateral/MC14584B-D.PDF
+4585	1	4-bit Digital Comparator			4000	https://assets.nexperia.com/documents/data-sheet/HEF4585B.pdf
+4724	1	8-bit Addressable Latch			4000	http://www.ti.com/lit/gpn/cd4724b
+4750	1	Frequency Synthesizer			4000
+4751	1	Universal Divider			4000
+4794	1	8-stage Shift-and-store Register LED Driver			4000	https://assets.nexperia.com/documents/data-sheet/HEF4794B.pdf
+4894	1	12-stage Shift-and-store Register LED Driver			4000	https://assets.nexperia.com/documents/data-sheet/HEF4894B.pdf
+4938	2	Dual Retriggerable Precision Monostable Multivibrator with Reset			4000	https://assets.nexperia.com/documents/data-sheet/HEF4938B.pdf
+4952	1	8-channel Analog Multiplexer/demultiplexer			4000	https://assets.nexperia.com/documents/data-sheet/HEF4952B.pdf
+40098	6	Hex 3-state Inverting Buffer			4000	https://assets.nexperia.com/documents/data-sheet/HEF40098B.pdf
+40100	1	32-bit Left/right Shift Register			4000
+40101	1	9-bit Parity Generator/checker			4000
+40102	1	Presettable 2-decade BCD Down Counter			4000	http://www.ti.com/lit/gpn/cd40102b
+40103	1	Presettable 8-bit Binary Down Counter			4000	http://www.ti.com/lit/gpn/cd40103b
+40104	1	4-bit Bidirectional Parallel-in/parallel-out Shift Register (tri-state)			4000
+40105	1	4-bit x 16 Word FIFO Register			4000	http://www.ti.com/lit/gpn/cd40105b
+40106	6	Hex Inverting Schmitt Trigger-(NOT Gates)			4000	https://assets.nexperia.com/documents/data-sheet/HEF40106B.pdf
+40107	2	Dual 2-input NAND Buffer/driver			4000	http://www.ti.com/lit/gpn/cd40107b
+40108	1	4x4-bit (tri-state) Synchronous Triple-port Register File			4000
+40109	4	Quad Level Shifter			4000	http://www.ti.com/lit/gpn/cd40109b
+40110	1	Up/down Counter Latch Decoder Driver			4000	http://www.ti.com/lit/gpn/cd40110b
+40116	1	8-bit Bidirectional CMOS-to- TTL Level Converter			4000
+40117	1	Programmable Dual 4-bit Terminator			4000	http://www.ti.com/lit/gpn/cd40117b
+40147	1	10-line to 4-line (BCD) Priority Encoder			4000	http://www.ti.com/lit/gpn/cd40147b
+40160	1	Decade Counter/asynchronous Clear			4000	http://www.ti.com/lit/gpn/cd40160b
+40161	1	Binary Counter/asynchronous Clear			4000	http://www.ti.com/lit/gpn/cd40161b
+40162	1	4-bit Synchronous Decade Counter with Load, Reset, and Ripple Carry Output			4000	http://www.ti.com/lit/gpn/cd40161b
+40163	1	4-bit Synchronous Binary Counter with Load, Reset, and Ripple Carry Output			4000	http://www.ti.com/lit/gpn/cd40161b
+40174	6	Hex D-type Flip-flop			4000	https://assets.nexperia.com/documents/data-sheet/HEF40174B.pdf
+40175	4	Quad D-type Flip-flop			4000	https://assets.nexperia.com/documents/data-sheet/HEF40175B.pdf
+40181	1	4-bit 16-function Arithmetic Logic Unit			4000
+40192	1	Presettable 4-bit Up/down BCD Counter			4000	http://www.ti.com/lit/gpn/cd40192b
+40193	1	Presettable 4-bit Up/down Binary Counter			4000	http://www.ti.com/lit/gpn/cd40193b	DIP16|SO16|TSSOP16
+40194	1	4-bit Bidirectional Universal Shift Register			4000	http://www.ti.com/lit/gpn/cd40194b
+40195	1	4-bit Universal Shift Register			4000
+40208	1	4 x 4-bit (tri-state) Synchronous Triple-port Register File			4000
+40240	1	Buffer/ Line Driver ; Inverting (tri-state)			4000
+40244	1	Buffer/line Driver; Non-inverting (tri-state)			4000	https://assets.nexperia.com/documents/data-sheet/HEF40244B_CNV.pdf
+40245	1	Octal bus Transceiver ; (tri-state) Outputs			4000
+40257	4	Quad 2-line to 1-line Data Selector/multiplexer (tri-state)			4000	http://www.ti.com/lit/gpn/cd40257b
+40373	1	Octal D-type Transparent Latch (tri-state)			4000	https://assets.nexperia.com/documents/data-sheet/HEF40373B_CNV.pdf
+40374	1	Octal D-type Flip-flop ; Positive-edge Trigger (tri-state)			4000	https://assets.nexperia.com/documents/data-sheet/HEF40374B_CNV.pdf
+40501	6	Hex Buffer /converter (non-inverting) (pinout Variant of 4050) [8]			4000		DIP16
+40511	1	BCD 7-segment Decoder, Hexadecimal, Active High [8]			4000		DIP16
+45106	1	Frequency Synthesizer			4000
