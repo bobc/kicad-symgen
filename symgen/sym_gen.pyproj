@@ -9,12 +9,12 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>data\74xx</WorkingDirectory>
+    <WorkingDirectory>data\atmel</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp 74xx.txt</CommandLineArguments>
+    <CommandLineArguments>--inp atmel_new.txt</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
@@ -31,6 +31,9 @@
     <Compile Include="common\print_color.py" />
     <Compile Include="common\rulebase.py" />
     <Compile Include="common\sexpr.py" />
+    <Compile Include="convert_library.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="str_utils.py">
       <SubType>Code</SubType>
     </Compile>
@@ -46,6 +49,9 @@
     </Compile>
     <Compile Include="sym_gen.py" />
     <Compile Include="sym_iec.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="sym_utils.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

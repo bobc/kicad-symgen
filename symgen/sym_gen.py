@@ -41,11 +41,11 @@ if not common in sys.path:
 #from os import path, environ
 import argparse
 import re
-import copy
-import time
-import hashlib
+#import copy
+#import time
+#import hashlib
 import shlex
-from enum import Enum
+#from enum import Enum
 
 from schlib import *
 from print_color import *
@@ -56,13 +56,9 @@ from sym_comp import *
 from sym_gates import *
 from sym_iec import *
 
-class SymbolStyle (Enum):
-    # ANSI/MIL MIL-STD-806, now also IEEE Standard 91-1984 "distinctive shapes" 
-    ANSI = 1
-    # IEC 60617-12, now also IEEE Standard 91-1984
-    IEC = 2
-    # DIN 40700
-    DIN = 3
+from sym_utils import *
+
+from convert_library import *
 
 class SymGen:
 
@@ -74,7 +70,6 @@ class SymGen:
     libfile = None
     docfile = None
 
-    logic_list = []
     kw = ['COMP', 'DESC', 'KEYW', 'DOC', 'ALIAS', 'UNIT', 'ELEM', 'END']
     #  ELEM, GROUP
 
@@ -90,6 +85,9 @@ class SymGen:
 
     symbol_style = SymbolStyle.ANSI
     #symbol_style = SymbolStyle.IEC
+
+    opt_pin_qualifiers = False
+
     def_logic_combine = "multi"
 
     def_pin_length = 200
@@ -98,17 +96,15 @@ class SymGen:
     def_box_pen = 10
     def_box_fill = Background # background fill
 
-    #def_logic_fill = NoFill # default
-    def_logic_fill = Background
+    def_logic_fill = NoFill # default
+    #def_logic_fill = Background
 
-    #def_name_offset = 20 # default
-    def_name_offset = 40
+    def_name_offset = 20
     def_extra_offset = 40
 
     # name offset
     # logic fill
     # tristate symbol
-    
 
     components = []
 
@@ -158,146 +154,15 @@ class SymGen:
 
 
 
-    def convert_to_string (self, elem):
-        item=elem[1]
-        keys_list = Component._DRAW_KEYS[elem[0]] # e.g 'A' -> keys of all properties of arc
-        line = elem[0] + ' ' # 'arcs' -> 'A'
-        for k in keys_list:
-            if k == 'points':
-                for i in item['points']:
-                    line += '{0} '.format(i)
-            else:
-                line += item[k] + ' '
-
-        line = line.rstrip()
-        return line
-
-    def create_drawing_object (self, elem):
-        key = elem[0]
-        params = elem[1]
-        s = self.convert_to_string (elem)
-        if key == 'S':
-            drawing = Rect (s)
-        elif key == 'C':
-            drawing = Circle(s)
-        elif key == 'P':
-            drawing = PolyLine(s)
-        elif key == 'A':
-            drawing = Arc(s)
-        else:
-            drawing = None
-
-        return drawing
-
-
-
-    def read_ref_list(self, filename):
-
-        data = []
-        inf=open(filename)
-        for line in inf:
-            tokens = line.strip().split('\t')
-            desc = LogicDesc (tokens)
-            data.append (desc)
-
-        return data
-
-    def process_ref_list(self, filename, out_filename):
-
-        inf = open(filename)
-        outf = open(out_filename, "w")
-
-        for line in inf:
-            tokens = line.strip().split('\t')
-            tokens[2] = self.capitalise (tokens[2])
-            s = '\t'.join (tokens)
-            outf.write (s + '\n')
-
-        outf.close()
-        inf.close()
 
     def process_list(self):
 
-        self.process_ref_list ("../74xx/7400_logic_ref.txt", "../74xx/7400_logic_ref_new.txt")
+        process_ref_list ("../74xx/7400_logic_ref.txt", "../74xx/7400_logic_ref_new.txt")
 
-        self.process_ref_list ("../cmos4000/4000_list.csv", "../cmos4000/4000_list_new.csv")
-
-    def get_descriptor (self, name):
-        if self.logic_list:
-            for desc in self.logic_list:
-                if name == desc.id:
-                    return desc
-        return None
+        process_ref_list ("../cmos4000/4000_list.csv", "../cmos4000/4000_list_new.csv")
 
 
-    def is_positive_power (self, pin):
-        name = pin['name'].upper()
-        if len(name)>3 :
-            name = name[0:3]
-        if pin['name'].upper() in ["3.3V", "5V"] or name in ["VCC", "VDD", "V+"]:
-            return True
-
-    # other forms 5V 3.3V +5V
-    def is_power_pin (self, pin):
-        name = pin['name'].upper()
-        if len(name)>3 :
-            name = name[0:3]
-        if pin['name'].upper() in ["3.3V", "5V"] or name in ["VCC", "VDD", "V+", "GND", "VSS", "VEE", "V-"]:
-            return True
-        elif pin['electrical_type'] in "Ww":
-            return True
-        else:
-            return False
-
-    def find_comp_pins (self, comp, unit):
-        pins = []
-
-        for pin in comp.pins:
-            if pin['unit'] =='0' or  pin['unit'] == str(unit):
-                pins.append (pin)
-        return pins
-
-    # abc 74 abc nG 123
-    # abc 4nnn abc
-    # abc 14nnn abc
-    def parse_74xx_name (self, s):
-        s = s.upper()
-
-        prefix = ""
-        match = re.match ('([A-Za-z]+)', s)
-        if match:
-            prefix = match.group(1)
-            s = after (s, prefix)
-        else:
-            prefix = ""
-
-        if s.startswith("74"):
-            s = after (s, "74")
-            if "G" in s:
-                number = after (s, "G")
-                match = re.match ('([A-Za-z]+)', before(s, "G"))
-                if match:
-                    family = match.group(1)
-                else:
-                    family = ""
-                std_number = "74x" + after (s, family)
-            else:
-                # 74 
-                # HCT 240 _PWR
-                match = re.match ('([A-Za-z]+)', s)
-                if match:
-                    family = match.group(1)
-                else:
-                    family = ""
-                std_number = "74" + re.sub ("[^0-9]", "", after (s, family))
-        else:
-            family = "4000"
-            std_number = re.sub ("[^0-9]", "", s)
-
-        return family, std_number
             
-    def iso_fmt_date_time (self, _time):
-        return time.strftime("%Y-%m-%d %H:%M:%S", _time)
 
     def strip_quotes (self, tok):
         if tok.startswith('"') and tok.endswith('"'):
@@ -348,492 +213,8 @@ class SymGen:
             sym_lib.addComponent (templ_comp)
             sym_lib.save()
 
-    def get_checksum (self, comp, unit, variant):
 
-        data=''
-        items=[]
-        for elem in comp.drawOrdered:
-            if elem[0] in ['A','C','P','T']:
-                items.append (elem)
 
-        items.sort()
-        for elem in items:
-            item=elem[1]
-            keys_list = Component._DRAW_KEYS[elem[0]]   # 'A' -> keys of all properties of arc
-            line = elem[0] + ' '                        # 'arcs' -> 'A'
-            for k in keys_list:
-                if k == 'points':
-                    for i in item['points']:
-                        line += '{0} '.format(i)
-                else:
-                    line += item[k] + ' '
-            data += line
-        try:
-            md5 = hashlib.md5(data.encode('utf-8'))
-        except UnicodeDecodeError:
-            md5 = hashlib.md5(data)
-            
-        checksum = md5.hexdigest()
-        return checksum
-
-    def get_bounds (self, comp, unit):
-        bbs=[]
-        for elem in comp.drawOrdered:
-            key = elem[0]
-            params = elem[1]
-
-            if key in ['P','S','C','A']:
-                if int(params['unit']) == unit and int(params['convert']) <= 1:
-                    drawing = self.create_drawing_object ([key, params])
-                    bbs.append (drawing.get_bounds())
-
-        if len(bbs)==0:    
-            return BoundingBox()
-        else:
-            return sum(bbs)
-
-    # check for short words? : of at to for in by 
-    def capitalise (self, s):
-        words = s.split()
-        result = ""
-        is_first = True
-        for word in words:
-            if word.isupper():
-                result += word + " "
-            elif is_first or word in ["hex"] or ( word[0].isalpha and len(word)>3 and not word in ["with"] ):
-                result += word[0].upper() + word[1:] + " "
-            else:
-                result += word + " "
-            is_first = False
-        return result.strip()
-
-    def dump_lib (self, lib_filename, dump_path, ref_list_filename):
-
-        print "Reading %s" % (lib_filename)
-        lib = SchLib(lib_filename)
-
-        keywords = {}
-
-        #out_path, out_filename = os.path.split (dump_path)
-        out_path = dump_path
-        out_filename = os.path.basename (lib_filename)
-        out_filename = os.path.splitext (out_filename)[0]
-
-        dump_filename = os.path.join (out_path, out_filename + "_dump.txt")
-
-        template_filename = os.path.join (out_path, out_filename + "_template.lib")
-        template_doc_filename = os.path.join (out_path, out_filename + "_template.dcm")
-
-        if ref_list_filename:
-            print "Reading ref list %s" % (ref_list_filename)
-            self.logic_list = self.read_ref_list(ref_list_filename)
-
-        print "Extracting library %s" % (dump_filename)
-
-        #
-        self.create_empty_lib (template_filename)
-        template_lib = SchLib(template_filename)
-        docfile = Documentation (template_doc_filename)
-
-        #
-        def_width = 600
-
-        outf = open (dump_filename,'w')
-
-        outf.write ("#\n")
-        outf.write ("# Generated by sym_gen.py on %s\n" % (self.iso_fmt_date_time (time.localtime())))
-        outf.write ("# Source lib: %s\n" % (lib_filename))
-        outf.write ("#\n")
-
-        outf.write ("#\n")
-        outf.write ("# Global Defaults\n")
-        outf.write ("#\n")
-        outf.write ("%%lib %s.lib\n" % out_filename)
-        outf.write ("%pinlen 200\n")
-        outf.write ("%width 600\n")
-        outf.write ("%fill back\n")
-        outf.write ("%line 10\n")
-        outf.write ("%%iconlib %s\n" % os.path.basename(template_filename))
-        outf.write ("%%style %s\n" % self.symbol_style.name)
-        outf.write ("#\n")
-
-
-        # temp
-        #self.gen_comp (template_lib, docfile, "or", "U")
-        ##
-
-        for comp in lib.components:
-
-            # look for hidden pins
-            #hidden = False
-            #for pin in comp.pins:
-            #    if pin['pin_type'] == "N":
-            #        hidden = True
-            #        break
-            #hidden = True
-
-
-            # include all components
-            
-            if True:
-                unique_pins = {}
-                max_pin_number = 0
-                for pin in comp.pins:
-                    unique_pins [pin['num']] = "1"
-                    if int(pin['num']) > max_pin_number: 
-                        max_pin_number = int(pin['num'])
-
-                num_units = int(comp.definition['unit_count'])
-
-                type=""
-                # look up on ref list
-                #family = re.match ('[AZaz]', comp.name)
-                family,std_number = self.parse_74xx_name (comp.name)
-
-                if not family:
-                    family = "Standard"
-
-                desc = self.get_descriptor(std_number)
-                #if self.symbol_style == SymbolStyle.ANSI:
-                if desc:
-                    if " AND " in desc.description:
-                        type = "AND"
-                    elif " NAND " in desc.description:
-                        type = "NAND"
-                    elif " OR " in desc.description:
-                        type = "OR"
-                    elif " NOR " in desc.description:
-                        type = "NOR"
-                    elif "XOR" in desc.description:
-                        type = "XOR"
-                    elif "XNOR" in desc.description:
-                        type = "XNOR"
-                    elif "invert" in desc.description and not "non-invert" in desc.description: # inverter or inverting
-                        type = "NOT"
-                    elif "buffer" in desc.description:  # check num units, num inputs
-                        type = "BUF"
-                    else:
-                        print "info: %s unknown type: %s" % (comp.name, desc.description)
-                        self.num_errors += 1
-
-                # todo: demorgan options?
-                # power pins, unit = 0?
-                # need to sort by y coord, detect gaps
-                print comp.name
-
-                outf.write ("#\n")
-                outf.write ("# %s\n" % (comp.name))
-                outf.write ("#\n")
-                outf.write ("COMP %s %s\n" % (comp.name, comp.reference))
-
-                # 
-                j = 2
-                for field in comp.fields[2:]:
-                    if field['fieldname']:
-                        if field['name'] and field['name'] != '""':
-                            outf.write ("FIELD %s %s\n" % (field['fieldname'], field['name']))
-                    else:
-                        if field['name'] != '""':
-                            if j==2:
-                                outf.write ("FIELD $FOOTPRINT %s\n" % (field['name']))
-                            else:
-                                outf.write ("FIELD $DATASHEET%d %s\n" % (j, field['name']))
-                            j += 1
-
-
-                outf.write ("FPLIST\n")
-                if len(comp.fplist) == 0:
-                    if not max_pin_number in [4,14,16,20,24]:
-                        print "warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number)
-                        self.num_errors += 1
-                    outf.write ("DIP?%d*\n" % max_pin_number)
-                else:
-                    for fp in comp.fplist:
-                        outf.write ("%s\n" % fp)
-
-                # doc fields
-                f_desc = None
-                f_doc = None  
-                f_keyw = None
-
-                if comp.documentation:
-                    descr = comp.documentation['description']
-                    if descr:
-                        f_desc = descr
-                    elif desc:
-                        f_desc = desc.description
-
-                    f_keyw = comp.documentation['keywords']
-                    if f_keyw:
-                        for kw in f_keyw.split():
-                            keywords [kw] = 1
-
-                    ## todo remove invalid keywords, replace with ones from ref list
-
-                    f_doc = comp.documentation['datasheet']
-                    if f_doc is None:
-                        if desc and desc.get_datasheet (family):
-                            f_doc = desc.get_datasheet (family)
-                elif desc:
-                    f_desc = desc.description
-                    
-                    if len(type) > 0:
-                        f_keyw = type
-                        keywords [type] = 1
-
-                    if desc.get_datasheet (family):
-                        f_doc = desc.get_datasheet (family)
-
-                #
-                if f_desc:
-                    outf.write ("DESC %s\n" % self.capitalise(f_desc))
-                else:
-                    print "info: missing DESC %s"  % (comp.name)
-                if f_keyw:
-                    outf.write ("KEYW %s\n" % f_keyw)
-                else:
-                    print "info: missing KEYW %s"  % (comp.name)
-                if f_doc:
-                    outf.write ("DOC %s\n" % f_doc)
-                else:
-                    print "info: missing DOC %s"  % (comp.name)
-
-                # process aliases
-                if len(comp.aliases) > 0:
-                    # todo use desc?
-                    for alias in comp.aliases.keys():
-                        f_desc = None
-                        f_doc = None  
-                        f_keyw = None
-
-                        outf.write ("ALIAS %s\n" % alias)
-                        alias_doc = comp.aliases[alias]
-                        
-                        if alias_doc:
-                            f_desc = alias_doc['description']
-
-                            f_keyw = alias_doc['keywords']
-                            if f_keyw:
-                                for kw in f_keyw.split():
-                                    keywords [kw] = 1
-
-                            f_doc = alias_doc['datasheet']
-                        #
-                        if f_desc:
-                            outf.write ("DESC %s\n" % self.capitalise(f_desc))
-                        else:
-                            print "info: missing DESC %s"  % (alias)
-                        if f_keyw:
-                            outf.write ("KEYW %s\n" % f_keyw)
-                        else:
-                            print "info: missing KEYW %s"  % (alias)
-                        if f_doc:
-                            outf.write ("DOC %s\n" % f_doc)
-                        else:
-                            print "info: missing DOC %s"  % (alias)
-
-                #
-                for pin in comp.pins:
-                    pin['direction'] = kicad_to_symgen_dir (pin['direction'])
-
-                #
-                comments = []
-                comments.append ("#\n")
-                comments.append ("# " + comp.name + "\n")
-                comments.append ("#\n")
-
-                component_data = []
-                component_data.append("DEF "+comp.name + " "+comp.reference+" 0 40 Y Y 1 L N")      # units are not interchangeable
-                component_data.append("F0 \"U\" 0 0 50 H V C CNN")
-                component_data.append("F1 \"74469\" 0 -200 50 H V C CNN")
-                component_data.append("F2 \"\" 0 0 50 H I C CNN")
-                component_data.append("F3 \"\" 0 0 50 H I C CNN")
-                component_data.append("DRAW")
-                component_data.append("ENDDRAW")
-                component_data.append("ENDDEF")
-
-                templ_comp = Component(component_data, comments, docfile)
-                templ_comp.fields [0]['reference'] = comp.reference
-                templ_comp.fields [1]['name'] = comp.name
-                templ_comp.definition['reference'] = comp.reference
-                templ_comp.definition['name'] = comp.name
-
-                # get the graphics for this comp
-                # TODO: unit, variant
-
-                count = 0
-                for d in comp.drawOrdered:
-                    if d[0] in ['A','C','P','T','S']:
-                        count += 1
-
-                if comp.name=="4009":
-                    print "ehhlo"
-
-                unit_template = None
-                if count > 1:
-                    bb = self.get_bounds (comp, 0)
-
-                    if bb.pmax.y != bb.height /2 :
-                        offset_y = bb.height /2 - bb.pmax.y
-                        offset_y = self.align_to_grid (offset_y+100, 100)
-                    else:   
-                        offset_y = 0
-
-                    self.copy_icon (templ_comp, comp, 0, Point(0, offset_y))
-
-                    # compare to template comps
-                    this_sum = self.get_checksum (templ_comp, 0, 0)
-
-                    # print "this sum "+ this_sum
-                    found = False
-                    for xcomp in template_lib.components:
-                        lib_sum = self.get_checksum (xcomp, 0, 0)
-                        # print "  lib sum "+ lib_sum
-                        if lib_sum == this_sum:
-                            found = True
-                            print "same as " + xcomp.name
-                            unit_template = xcomp.name
-                            break
-                    if not found:
-                        # add if different
-                        template_lib.addComponent (templ_comp)
-                        unit_template = comp.name
-
-                #
-                # units
-                bb = BoundingBox()
-
-                bb = bb + self.get_bounds (comp, 0)
-
-                # check pins
-                for pin in comp.pins:
-                    if pin['name'] != '~' and pin['name'].startswith('~') and 'I' in pin['pin_type']:
-                        pin['name'] = after (pin['name'], "~")
-                        print "info: double inversion %s %s %s"  % (comp.name, pin['num'], pin['name'])
-
-                # 1..1
-                # 1..2
-                for unit in range (1, num_units+1):
-                    
-                    bb = bb + self.get_bounds (comp, unit)
-                    #print "unit %d width %d" % (unit, bb.width)
-
-                    unit_pins = self.find_comp_pins (comp, unit)
-                    if unit_pins:
-
-                        pins = []
-                        for pin in unit_pins:
-                            # debug
-                            if pin['unit']==str(0) and num_units>1 and not self.is_power_pin (pin):
-                                print "info: common pin %s %s %s"  % (comp.name, pin['num'], pin['name'])
-
-                            if pin['convert'] in ['0','1'] and not self.is_power_pin(pin):
-                                pins.append (pin)
-
-                        if pins:
-                            line = "UNIT"
-                            if type:
-                                line += " " + type
-                            else:
-                                if bb.width>0 and bb.width != def_width:
-                                    line += " WIDTH %d" % (bb.width)
-                                if unit_template:
-                                    line += " TEMPLATE %s" % (unit_template)
-                            line += '\n'
-
-                            outf.write (line)
-
-                            if type == "BUF":
-                                print "ehhlo"
-
-                            # sort by y pos
-                            for passnum in range(len(pins)-1,0,-1):
-                                for i in range(passnum):
-                                    if int(pins[i]['posy']) < int(pins[i+1]['posy']):
-                                        temp = pins[i]
-                                        pins[i] = pins[i+1]
-                                        pins[i+1] = temp
-
-                            max_y = -99999
-                            for pin in pins:
-                                if pin['direction'] in ['L','R']:
-                                    if int(pin['posy']) > max_y:
-                                        max_y = int(pin['posy'])
-
-                            # look for horiz pins
-                            for _dir in ['L','R']:
-                                cur_y = max_y
-                                for pin in pins:
-                                    if pin['direction'] == _dir:
-                                        py = int(pin['posy'])    
-                                        while cur_y > py + 100:
-                                            outf.write ("SPC %s\n" % _dir)
-                                            cur_y -= 100
-                                        outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction']))
-                                        cur_y = py
-
-                            # sort by x pos
-                            for passnum in range(len(pins)-1,0,-1):
-                                for i in range(passnum):
-                                    if int(pins[i]['posx']) < int(pins[i+1]['posx']):
-                                        temp = pins[i]
-                                        pins[i] = pins[i+1]
-                                        pins[i+1] = temp
-
-                            # look for vert pins
-                            for _dir in ['T','B']:
-                                first = True
-                                for pin in pins:
-                                    if pin['direction'] == _dir:
-                                        if first:
-                                            cur_x = int(pin['posx'])
-                                            first = False
-                                        px = int(pin['posx'])    
-                                        while cur_x < px:
-                                            outf.write ("SPC %s\n" % _dir)
-                                            cur_x += 100
-                                        outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction']))
-                                        cur_x = px
-
-                # now look for power pins
-                pins = []
-                pin_map = {}
-                for pin in comp.pins:
-                    if self.is_power_pin(pin) and not pin['num'] in pin_map:
-                        pins.append(pin)
-                        pin_map [pin['num']] = 1
-
-                # sort by pin number
-                for passnum in range(len(pins)-1,0,-1):
-                    for i in range(passnum):
-                        if int(pins[i]['num']) > int(pins[i+1]['num']):
-                            temp = pins[i]
-                            pins[i] = pins[i+1]
-                            pins[i+1] = temp
-
-                outf.write ("UNIT PWR\n")
-                for pin in pins:
-                    if self.is_positive_power (pin):
-                        pin['direction'] = "T"
-                    else:
-                        pin['direction'] = "B"
-                    # type may be power out?
-                    # upper case name?
-                    outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'].upper(),"PI",pin['direction']))
-
-                outf.write ("END\n")
-
-        outf.close()
-
-        kw_filename = os.path.join (out_path, out_filename + "_key.txt")
-
-        outf = open (kw_filename,'w')
-        for kw in sorted(keywords):
-            outf.write (kw + "\n")
-        outf.close()
-
-        #
-        template_lib.save ()
 
     def get_next_line(self):
 
@@ -853,7 +234,8 @@ class SymGen:
         pins = []
 
         for pin in pin_list:
-            if pin.orientation == direction and pin.visible and (type is None or pin.type == type):
+            # if pin.orientation == direction and pin.visible and (type is None or pin.type == type):
+            if pin.orientation == direction and (type is None or pin.type == type):
                 pins.append (pin)
         return pins
 
@@ -1110,8 +492,6 @@ class SymGen:
 
 
     ##
-    def align_to_grid (self, val, grid_size):
-        return int (val/grid_size) * grid_size
 #
 #
 #
@@ -1143,6 +523,8 @@ class SymGen:
             sgdoc.description = self.comp_description
             sgdoc.keywords = self.comp_keywords
             sgdoc.datasheet = self.comp_datasheet
+        else:
+            tname = sgcomp.name
 
         #
         #self.comp_description = None
@@ -1151,72 +533,7 @@ class SymGen:
 
         return tname, sgdoc
 
-    def get_fill (self, fill, style):
-        if fill != Background:
-            return fill 
-        else:
-            if style:
-                return style.fill
-            else:
-                return fill
 
-    def copy_icon (self, comp, comp_icon, unit, pos, variant=0, src_unit=0, src_variant=1, style = None):
-    
-        # TODO: source unit
-        # pensize, fill?
-
-        for p in comp_icon.draw['arcs']:
-            # TODO apply offset pos
-            item = dict(p)
-            if item['convert'] == str(src_variant) or item['convert'] == '0':
-                item ['unit'] = str(unit)
-                item ['convert'] = str(variant)
-                item ['posy'] = str(int(item ['posy']) + pos.y)
-                item ['starty'] = str(int(item ['starty']) + pos.y)
-                item ['endy'] = str(int(item ['endy']) + pos.y)
-                item['fill'] = self.get_fill (item['fill'], style)
-                comp.drawOrdered.append (['A', item])
-    
-        for p in comp_icon.draw['circles']:
-            item = copy.deepcopy(p)
-            if item['convert'] == str(src_variant) or item['convert'] == '0':
-                item ['unit'] = str(unit)
-                item ['convert'] = str(variant)
-                item ['posy'] = str(int(item ['posy']) + pos.y)
-                item['fill'] = self.get_fill (item['fill'], style)
-                comp.drawOrdered.append (['C', item])
-
-        for p in comp_icon.draw['polylines']:
-            item = dict(p)
-            if item['convert'] == str(src_variant) or item['convert'] == '0':
-                poly = PolyLine (self.convert_to_string(['P',p]))
-                poly.unit = unit
-                poly.demorgan = variant
-                poly.fill = self.get_fill (item['fill'], style)
-                for pt in poly.points:
-                    pt.x += pos.x    
-                    pt.y += pos.y    
-                comp.drawOrdered.append (poly.get_element())
-
-        for p in comp_icon.draw['rectangles']:
-            # TODO apply offset pos
-            item = dict(p)
-            if item['convert'] == str(src_variant) or item['convert'] == '0':
-                rect = Rect()
-                rect.unit = unit
-                rect.demorgan = variant
-                rect.fill = self.get_fill (item['fill'], style)
-                rect.p1 = Point(int(item['startx']), int(item['starty'])).Add(pos)
-                rect.p2 = Point(int(item['endx']), int(item['endy'])).Add(pos)
-                comp.drawOrdered.append (rect.get_element())
-
-        for p in comp_icon.draw['texts']:
-            item = copy.deepcopy(p)
-            if item['convert'] == str(src_variant) or item['convert'] == '0':
-                item ['unit'] = str(unit)
-                item ['convert'] = str(variant)
-                item ['posy'] = str(int(item ['posy']) + pos.y)
-                comp.drawOrdered.append (['T',item])
 
     def parse_fill (self, token):
         if token in ["F", "f", "N"]:
@@ -1283,6 +600,7 @@ class SymGen:
                 self.symbol_style = SymbolStyle.ANSI
             elif tok == "IEC":
                 self.symbol_style = SymbolStyle.IEC
+                self.opt_pin_qualifiers = True
             elif tok == "DIN":
                 self.symbol_style = SymbolStyle.DIN
             else:
@@ -1303,23 +621,6 @@ class SymGen:
 
         self.get_next_line()
 
-    def create_empty_lib (self, filename):
-
-        basename = os.path.splitext (filename)[0]
-
-        infile = open (basename+".lib", 'w')
-        infile.write ("EESchema-LIBRARY Version 2.3\n")
-        infile.write ("#encoding utf-8\n")
-        infile.write ("#\n")
-        infile.write ("#End Library\n")
-        infile.close()
-
-        infile = open (basename+".dcm", 'w')
-        infile.write ("EESchema-DOCLIB  Version 2.0\n")
-        infile.write ("#\n")
-        infile.write ("#\n")
-        infile.write ("#End Doc Library\n")
-        infile.close()
 
 
     def create_gate (self, unit_shape, num_inputs, num_outputs, demorgan):
@@ -1381,7 +682,7 @@ class SymGen:
                     if pin.orientation in ['L','R']:
                         bb_horiz.extend (pin.pos)
 
-        y_offset = self.align_to_grid (unit.unit_rect.size.y / 2, 50)
+        y_offset = align_to_grid (unit.unit_rect.size.y / 2, 50)
 
         if len(left_pins) + len(right_pins) > 0 :
             # align to horiz pins
@@ -1637,7 +938,7 @@ class SymGen:
             else:
                 field_text = after(self.line, tokens[1]).strip()
                 
-                line = 'F%d %s 0 0 50 H I C CNN "%s"' % (len(comp.fields), field_text, tokens[1])
+                line = 'F%d %s 0 0 50 H I C CNN "%s"' % (len(sgcomp.user_fields), field_text, tokens[1])
                 s = shlex.shlex(line)
                 s.whitespace_split = True
                 s.commenters = ''
@@ -1749,11 +1050,14 @@ class SymGen:
                     self.pin_pos_top.y    = self.last_unit.unit_rect.top()
                     self.pin_pos_bottom.y = self.last_unit.unit_rect.bottom()
 
-                    for pin in unit.elements[0].pins:
-                        if pin.orientation == 'D':
-                            self.last_unit.elements[0].pins.append (pin)
-                        elif pin.orientation == 'U':
-                            self.last_unit.elements[-1].pins.append (pin)
+                    if unit.elements:
+                        for pin in unit.elements[0].pins:
+                            if pin.orientation == 'D':
+                                self.last_unit.elements[0].pins.append (pin)
+                            elif pin.orientation == 'U':
+                                self.last_unit.elements[-1].pins.append (pin)
+                    else:
+                        print "error: no elements ? %s" % sgcomp.name
                 else:
                     unit.set_width (400)
                     #self.box_height = self.max_height
@@ -1890,6 +1194,8 @@ class SymGen:
         self.pin_pos_top.x = 0
         self.pin_pos_bottom.x = 0
 
+        self.label_style = "floating"
+
 
         if unit.unit_shape == "box" or unit.unit_shape == "none":
 
@@ -1938,6 +1244,9 @@ class SymGen:
             for pin in element.pins:
                 if pin.type != " ":
                     unit_pins.append (pin)
+
+
+            self.label_style = "fixed"
 
             self.ref_pos.x = 0
             self.ref_pos.y = 50
@@ -2041,7 +1350,7 @@ class SymGen:
                             style = StyleAttributes()
                             style.fill = unit.fill
                             style.pensize = self.box_pen
-                            self.copy_icon (comp, comp_icon, self.unit_num, gatedef.get_center(), style=style)
+                            copy_icon (comp, comp_icon, self.unit_num, gatedef.get_center(), style=style)
                         else:
                             print "error: unknown icon %s " % icon_name 
                             self.num_errors += 1
@@ -2054,7 +1363,7 @@ class SymGen:
                         pin.demorgan = variant + demorgan
             
                         if unit.unit_shape == "buffer" and j==1:
-                            dy = self.align_to_grid(abs(inputs_pos[j].y)+99, 100)
+                            dy = align_to_grid(abs(inputs_pos[j].y)+99, 100)
                             dy = dy - abs(inputs_pos[j].y)
                             pin.length += dy
                             pin.pos.x = inputs_pos[j].x 
@@ -2070,7 +1379,7 @@ class SymGen:
                         #pins.append (pin)
                         comp.drawOrdered.append( pin.get_element () )
                         # pin text
-                        if pin.qualifiers:
+                        if pin.qualifiers and self.opt_pin_qualifiers:
                             self.draw_pin_text (comp, self.unit_num, variant, pin, pin.qualifiers)
 
                 j = 0
@@ -2092,7 +1401,7 @@ class SymGen:
                         comp.drawOrdered.append( pin.get_element () )
 
                         # pin text
-                        if pin.qualifiers:
+                        if pin.qualifiers and self.opt_pin_qualifiers:
                             self.draw_pin_text (comp, self.unit_num, variant, pin, pin.qualifiers)
 
                 # 
@@ -2349,7 +1658,7 @@ class SymGen:
                     else:
                         style.fill = xunit.fill
                     style.pensize = self.box_pen
-                    self.copy_icon (comp, comp_icon, unit, Point(0, y_pos -k * 150 + icons_y_extent/2), style=style)
+                    copy_icon (comp, comp_icon, unit, Point(0, y_pos -k * 150 + icons_y_extent/2), style=style)
                     k += 1
                 else:
                     print "error: unknown icon %s " % icon_name
@@ -2360,7 +1669,7 @@ class SymGen:
             style = StyleAttributes()
             #style.fill = xunit.fill
             if comp_icon:
-                self.copy_icon (comp, comp_icon, unit, Point(0, 0), style=style)
+                copy_icon (comp, comp_icon, unit, Point(0, 0), style=style)
 
         #
         #if self.label_style == "floating":
@@ -2494,7 +1803,7 @@ class SymGen:
                 pin.pos.y = self.pin_pos_right.y
                 self.pin_pos_right.y -= 100
 
-                if pin.type == "T":
+                if pin.type == "T"  and self.opt_pin_qualifiers:
                     self.draw_pin_text (comp, unit_num, variant, pin, "&xdtri;")
             elif pin.orientation == 'D':
                 pin.pos.x = self.pin_pos_top.x
@@ -2508,7 +1817,7 @@ class SymGen:
                 #pin.pos.y = self.unit_rect.bottom() - pin.length
                 self.pin_pos_bottom.x += 100
 
-            if pin.qualifiers:
+            if pin.qualifiers and self.opt_pin_qualifiers:
                 self.draw_pin_text (comp, unit_num, variant, pin, pin.qualifiers)
 
             pin.unit = unit_num
@@ -2527,11 +1836,17 @@ class SymGen:
             for pin in pins:
                 if pin.type !=" " :
                     if pin.orientation == 'R':
-                        pin.pos = left_pins[l_pin].pos
-                        l_pin += 1
+                        if l_pin < len(left_pins):
+                            pin.pos = left_pins[l_pin].pos
+                            l_pin += 1
+                        else:
+                            print "error %s" % pin.number
                     elif pin.orientation == 'L':
-                        pin.pos = right_pins[r_pin].pos
-                        r_pin += 1
+                        if r_pin < len(right_pins):
+                            pin.pos = right_pins[r_pin].pos
+                            r_pin += 1
+                        else:
+                            print "error %s" % pin.number
 
         # align pins (right)
         right_pins = self.find_pins (pins, "L")
@@ -2545,11 +1860,35 @@ class SymGen:
                 top_y = top_y - height / 2
 
                 dy = top_y - right_pins[0].pos.y
-                dy = self.align_to_grid (dy, 50)
+                dy = align_to_grid (dy, 50)
                 j = 0
                 for pin in pins:
                     if pin.orientation == 'L':
                         pin.pos.y += dy  # top_y - j * 100
+                        j += 1
+
+        # align pins (bottom)
+        _pins = self.find_pins (pins, "U")
+        if len(_pins)>0:
+            if _pins[0].align == "C":
+                # need to force alignment to 100 mil grid?
+                width = len(_pins) * 100 
+                j = 0
+                for pin in pins:
+                    if pin.orientation == 'U':
+                        pin.pos.x = -width/2 + j * 100 + 100
+                        j += 1
+
+        # align pins (top)
+        _pins = self.find_pins (pins, "D")
+        if len(_pins)>0:
+            if _pins[0].align == "C":
+                # need to force alignment to 100 mil grid?
+                width = len(_pins) * 100
+                j = 0
+                for pin in pins:
+                    if pin.orientation == 'D':
+                        pin.pos.x = -width/2 + j * 100 + 100
                         j += 1
 
         for pin in pins:
@@ -2571,7 +1910,7 @@ class SymGen:
             params = elem[1]
             if params['unit'] == str(unit):
                 if elem[0] == "P":
-                    poly = PolyLine (self.convert_to_string(elem))
+                    poly = PolyLine (convert_to_string(elem))
                     for p in poly.points:
                         p.x += offset.x
                         p.y += offset.y
@@ -2641,8 +1980,8 @@ class SymGen:
                 outf.write ("FIELD $FOOTPRINT \"%s\"\n" % (comp.default_footprint))
 
             if comp.user_fields:
-                for field in user_fields:
-                     outf.write ("FIELD %s \"%s\"\n" % (field['fieldname'], field['name']))
+                for field in comp.user_fields:
+                    outf.write ("FIELD %s \"%s\"\n" % (field['fieldname'], field['name']))
 
             if comp.fplist:
                 outf.write ("FPLIST\n" )
@@ -2652,7 +1991,7 @@ class SymGen:
 
             sgdoc = comp.doc_fields[comp.name]
             if sgdoc.description:
-                outf.write ("DESC %s\n" % self.capitalise(sgdoc.description))
+                outf.write ("DESC %s\n" % capitalise(sgdoc.description))
             if sgdoc.keywords:
                 outf.write ("KEYW %s\n" % (sgdoc.keywords))
             if sgdoc.datasheet:
@@ -2665,7 +2004,7 @@ class SymGen:
                     outf.write ("ALIAS %s\n" % (key))
 
                     if sgdoc.description:
-                        outf.write ("DESC %s\n" % self.capitalise(sgdoc.description))
+                        outf.write ("DESC %s\n" % capitalise(sgdoc.description))
                     if sgdoc.keywords:
                         outf.write ("KEYW %s\n" % (sgdoc.keywords))
                     if sgdoc.datasheet:
@@ -2844,7 +2183,11 @@ if args.dump:
 
     lib_filename = args.lib
     dump_path = ""
-    symgen.dump_lib (lib_filename, dump_path, args.ref)
+
+    convert = ConvertLibrary()
+    ## convert.symbol_style = SymbolStyle.PHYSICAL
+    convert.dump_lib (lib_filename, dump_path, args.ref)
+
 else:
     # --inp 74xx.txt
     if not args.inp:
