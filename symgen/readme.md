@@ -23,4 +23,4 @@ See data folder for examples.
 
 # Todos
 
-None.
+* update documentation to reflect latest code
