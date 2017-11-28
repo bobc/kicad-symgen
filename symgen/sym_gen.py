@@ -239,6 +239,16 @@ class SymGen:
                 pins.append (pin)
         return pins
 
+    def find_pins_with_label (self, pin_list, direction, type=None):
+        pins = []
+
+        for pin in pin_list:
+            # if pin.orientation == direction and pin.visible and (type is None or pin.type == type):
+            if pin.shape!=" " and pin.name!="~" and pin.orientation == direction and (type is None or pin.type == type) and len(pin.name)!=0:
+                pins.append (pin)
+        return pins
+
+
     def read_file (self, filename):
 
         inf = open (filename, "r")
@@ -1468,8 +1478,8 @@ class SymGen:
         left_pins = self.find_pins (element.pins, "R")
         right_pins = self.find_pins (element.pins, "L")
 
-        top_pins = self.find_pins (element.pins, "D")
-        bottom_pins = self.find_pins (element.pins, "U")
+        top_pins = self.find_pins_with_label (element.pins, "D")
+        bottom_pins = self.find_pins_with_label (element.pins, "U")
 
         xunit.unit_rect.pos.x = -xunit.unit_rect.size.x / 2
         xunit.unit_rect.size.x = xunit.unit_rect.size.x
