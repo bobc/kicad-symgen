@@ -1475,6 +1475,8 @@ class SymGen:
 
     def draw_element (self, sgcomp, xunit, element, comp, unit, variant):
 
+        fontsize = 50
+
         left_pins = self.find_pins (element.pins, "R")
         right_pins = self.find_pins (element.pins, "L")
 
@@ -1515,14 +1517,18 @@ class SymGen:
         min_size = 0
 
         top_margin = 0
-        if len(top_pins) > 0:
-            min_size += 200
+        if len(top_pins) > 0 or (element.shape == "control" and element.label):
+            if len(top_pins) > 0:
+                min_size += 200
 
             if len(left_pins)+len(right_pins) != 0:
                 if sgcomp.pin_length == 150:
                     top_margin = 0
                 else:
                     top_margin = 50                    
+
+            if element.shape == "control" and element.label:
+                top_margin = 100
 
         bottom_margin = 0
         if len(bottom_pins) > 0:
@@ -1574,10 +1580,17 @@ class SymGen:
             comp.drawOrdered.append( poly.get_element() )
 
         if element.label:
-            fontsize = 50
-            pos = Point (0, self.cur_pos.y - box_size.y/2).Sub (Point(fontsize/2, fontsize/2))
-            
-            draw_text (comp, unit, variant, pos, element.label, fontsize)
+           
+            if element.shape == "control":
+                pos = Point (0, self.cur_pos.y - fontsize - 25)
+                align_horiz = AlignCenter
+                align_vert  = AlignBottom
+            else:
+                pos = Point (0, self.cur_pos.y - box_size.y/2).Sub (Point(fontsize/2, fontsize/2))
+                align_horiz = AlignLeft
+                align_vert  = AlignBottom
+
+            draw_text (comp, unit, variant, pos, element.label, fontsize, align_horiz, align_vert)
 
 
 
@@ -1634,20 +1647,27 @@ class SymGen:
                 type_text = ""
 
             if type_text:
-                draw_text (comp, unit, variant, pos, type_text, 50)
+                draw_text (comp, unit, variant, pos, type_text, fontsize)
                 offset = 50
             else:
                 offset = 10
 
             if group.qualifiers:
-                pos.x = group_pos.x + group_size.x - len(get_chars(group.qualifiers)) * 50 - 25
+                if group.pins[0].orientation == "R":
+                    pos.x = group_pos.x + group_size.x - TextLength(group.qualifiers, fontsize) - 25
+                else:
+                    pos.x = box_size.x/2 - group_size.x + 25
+
                 pos.y = group_pos.y - group_size.y/2 - 25
-                draw_text (comp, unit, variant, pos, group.qualifiers, 50)
+                draw_text (comp, unit, variant, pos, group.qualifiers, fontsize)
             
             if group.label:
-                pos.x = group_pos.x + group_size.x + offset
+                if group.pins[0].orientation == "R":
+                    pos.x = group_pos.x + group_size.x + offset
+                else:
+                    pos.x = box_size.x/2 - group_size.x - offset - TextLength(group.qualifiers, fontsize)
                 pos.y = group_pos.y - group_size.y/2 - 25
-                draw_text (comp, unit, variant, pos, group.label, 50)
+                draw_text (comp, unit, variant, pos, group.label, fontsize)
 
         # add icons
         if self.icon_lib and len(xunit.icons)>0:

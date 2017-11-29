@@ -8,6 +8,13 @@ NoFill = 'N'
 Foreground = 'F'
 Background = 'f'
 
+AlignLeft = "L"
+AlignCenter = "C"
+AlignRight = "R"
+
+AlignTop = "T"
+AlignBottom = "B"
+
 # convert pin orientation from KiCad directions to symgen directions
 def kicad_to_symgen_dir (direction):
     if direction=="R":
@@ -60,6 +67,9 @@ def get_pin_type (_type, shape):
     result = flags + result
 
     return result
+
+def TextLength (s, fontsize):
+    return fontsize * len(get_chars(s))
 
 class Point:
     #x = 0

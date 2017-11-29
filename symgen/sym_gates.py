@@ -19,65 +19,79 @@ def get_chars (text):
                 
     return list
 
-def draw_text (comp, unit, variant, pos, s, fontsize):
+def draw_text (comp, unit, variant, pos, s, fontsize, align_horiz = AlignLeft, align_vert = AlignBottom):
 
     chars = get_chars (s)
+    s = ""
     for char in chars :
-        if char == "&xdtri;":
-            # white down-pointing triangle
-            # unicode U+025BD
-            poly = PolyLine ()
-            poly.unit = unit
-            poly.demorgan = variant
-            poly.pensize = 0
-            poly.points.append (Point (0,fontsize).Add (pos))
-            poly.points.append (Point (fontsize,fontsize).Add (pos))
-            poly.points.append (Point (fontsize/2,0).Add (pos))
-            poly.points.append (Point (0,fontsize).Add (pos))
-            poly.point_count = len(poly.points)
-            comp.drawOrdered.append( poly.get_element() )
-            pos.x += fontsize + 10
-        elif char == "&xrtri;":
-            # white right-pointing triangle
-            # unicode U+025B7
-            poly = PolyLine ()
-            poly.unit = unit
-            poly.demorgan = variant
-            poly.pensize = 0
-            poly.points.append (Point (0,0).Add (pos))
-            poly.points.append (Point (0,fontsize).Add (pos))
-            poly.points.append (Point (fontsize,fontsize/2).Add (pos))
-            poly.points.append (Point (0,0 ).Add (pos))
-            poly.point_count = len(poly.points)
-            comp.drawOrdered.append( poly.get_element() )
-            pos.x += fontsize + 15
-        elif char == "&circ;":
-            circle = Circle()
-            circle.center = Point (pos.x + fontsize/2, pos.y+fontsize/2)
-            circle.radius = fontsize/2
-            circle.unit = unit
-            circle.demorgan = variant
-            circle.pensize = 0
-            comp.drawOrdered.append( circle.get_element() )
-            pos.x += fontsize + 10
-        elif char == "&st;":
-            # schmitt trigger
-            # also Unicode U+238E Hysteresis symbol
-            poly = PolyLine ()
-            poly.unit = unit
-            poly.demorgan = variant
-            poly.pensize = 0
-            poly.points.append (Point (0,0).Add (pos))
-            poly.points.append (Point (30,0).Add (pos))
-            poly.points.append (Point (40,50).Add (pos))
-            poly.points.append (Point (50,50).Add (pos))
-            poly.points.append (Point (20,50).Add (pos))
-            poly.points.append (Point (10,0).Add (pos))
-            poly.point_count = len(poly.points)
-            comp.drawOrdered.append( poly.get_element() )
-            pos.x += fontsize + 10
+        if char in ["&xdtri;", "&xrtri;", "&circ;", "&st;"]:
+            #
+            if s != "":
+                text = Text()        
+                text.value = s
+                text.unit = unit
+                text.demorgan = variant
+                text.pos = pos
+                text.horiz_alignment = align_horiz
+                text.vert_alignment = align_vert
+                comp.drawOrdered.append (text.get_element())
+                pos.x += fontsize * len(s)
+                s = ""
+
+            if char == "&xdtri;":
+                # white down-pointing triangle
+                # unicode U+025BD
+                poly = PolyLine ()
+                poly.unit = unit
+                poly.demorgan = variant
+                poly.pensize = 0
+                poly.points.append (Point (0,fontsize).Add (pos))
+                poly.points.append (Point (fontsize,fontsize).Add (pos))
+                poly.points.append (Point (fontsize/2,0).Add (pos))
+                poly.points.append (Point (0,fontsize).Add (pos))
+                poly.point_count = len(poly.points)
+                comp.drawOrdered.append( poly.get_element() )
+                pos.x += fontsize + 10
+            elif char == "&xrtri;":
+                # white right-pointing triangle
+                # unicode U+025B7
+                poly = PolyLine ()
+                poly.unit = unit
+                poly.demorgan = variant
+                poly.pensize = 0
+                poly.points.append (Point (0,0).Add (pos))
+                poly.points.append (Point (0,fontsize).Add (pos))
+                poly.points.append (Point (fontsize,fontsize/2).Add (pos))
+                poly.points.append (Point (0,0 ).Add (pos))
+                poly.point_count = len(poly.points)
+                comp.drawOrdered.append( poly.get_element() )
+                pos.x += fontsize + 15
+            elif char == "&circ;":
+                circle = Circle()
+                circle.center = Point (pos.x + fontsize/2, pos.y+fontsize/2)
+                circle.radius = fontsize/2
+                circle.unit = unit
+                circle.demorgan = variant
+                circle.pensize = 0
+                comp.drawOrdered.append( circle.get_element() )
+                pos.x += fontsize + 10
+            elif char == "&st;":
+                # schmitt trigger
+                # also Unicode U+238E Hysteresis symbol
+                poly = PolyLine ()
+                poly.unit = unit
+                poly.demorgan = variant
+                poly.pensize = 0
+                poly.points.append (Point (0,0).Add (pos))
+                poly.points.append (Point (30,0).Add (pos))
+                poly.points.append (Point (40,50).Add (pos))
+                poly.points.append (Point (50,50).Add (pos))
+                poly.points.append (Point (20,50).Add (pos))
+                poly.points.append (Point (10,0).Add (pos))
+                poly.point_count = len(poly.points)
+                comp.drawOrdered.append( poly.get_element() )
+                pos.x += fontsize + 10
         else:
-            text = Text()        
             if char.startswith ("&"):
                 if char == "&xrtri;":
                     char = u'\u25B7'
@@ -90,14 +104,19 @@ def draw_text (comp, unit, variant, pos, s, fontsize):
                 else:
                     char = '?'
                 #char = u'\ufffd'
-            text.value = char
-            text.unit = unit
-            text.demorgan = variant
-            text.pos = pos
-            text.horiz_alignment="L"
-            text.vert_alignment="B"
-            comp.drawOrdered.append (text.get_element())
-            pos.x += fontsize + 10
+
+            s += char
+    #
+    if s!= "":
+        text = Text()        
+        text.value = s
+        text.unit = unit
+        text.demorgan = variant
+        text.pos = pos
+        text.horiz_alignment = align_horiz
+        text.vert_alignment = align_vert
+        comp.drawOrdered.append (text.get_element())
+        pos.x += fontsize + 10
 
 class Gate:
 
