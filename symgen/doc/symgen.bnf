@@ -1,0 +1,204 @@
+/*
+  blank lines and white space (tab, spc) between tokens are ignored
+  lines starting # are comments and ignored
+*/
+
+%token NAME       /* a valid name */
+%token REF        /* a valid component reference */
+%token NUMBER     /* integer containing digits [0-9]+ */
+%token STRING     /* sequence of characters excluding white space */
+
+%token QUOTED_STRING     /* sequence of characters quoted with ", may contain HTML entities e.g. &gt; */
+
+%token TEXT       /* any text terminated by newline */
+
+
+%token PC_LIB    = '%lib'
+%token PC_PINLEN = '%pinlen'
+%token PC_WIDTH  = '%width'
+%token PC_FILL   = '%fill'
+%token PC_LINE   = '%line'
+%token PC_ICONLIB= '%iconlib'
+%token PC_STYLE  = '%style'
+%token PC_SELECT  = '%select'
+
+%token IEC    = 'IEC'
+%token ANSI   = 'ANSI'
+
+%token BACK   = 'BACK'
+%token FORE   = 'FORE'
+%token NONE   = 'NONE'
+
+%token COMP   = 'COMP'
+%token FPLIST = 'FPLIST'
+%token ALIAS  = 'ALIAS'
+%token DESC   = 'DESC'
+%token KEYW   = 'KEYW'
+%token DOC    = 'DOC'
+%token END    = 'END'
+
+%token UNIT     = 'UNIT'
+%token WIDTH    = 'WIDTH'   /* May be abbreviated to W */
+%token LABEL    = 'LABEL'
+%token TEMPLATE = 'TEMP'
+%token ICON     = 'ICON'
+
+%token ELEMENT = 'ELEM'
+%token CONTROL = 'CONTROL'
+
+%token GROUP      = 'GROUP'
+%token END_GROUP  = 'END-GROUP'
+
+%token PWR      = 'PWR'
+%token SEPerate = 'SEP'
+%token COMBined = 'COMB'
+%token NOT    = 'NOT'
+%token BUF    = 'BUF'
+%token AND    = 'AND'
+%token OR     = 'OR'
+%token NAND   = 'NAND'
+%token NOR    = 'NOR'
+%token XOR    = 'XOR'
+%token XNOR   = 'XNOR'
+
+%token SPC   = 'SPC'
+%token FROM  = 'FROM'
+
+%token GRP_NO_LABEL = '-'
+%token GRP_CLOCK    = 'C'   /* clock    */
+%token GRP_INVERTED = '~'   /* inverted */
+
+
+%%
+
+input     : [ directive | component ]* ;
+
+directive : PC_LIB NAME                   /* output library name */
+          | PC_PINLEN NUMBER              /* pin length in mils */
+          | PC_WIDTH NUMBER               /* box width in mils */
+          | PC_FILL [FORE | BACK | NONE]  /* body fill color: foreground, background, none */
+          | PC_LINE NUMBER                /* default pen size in mils */
+          | PC_ICONLIB NAME               /* name of icon library e.g template.lib */
+          | PC_STYLE [IEC | ANSI]
+          ;
+
+component : COMP NAME REF
+
+            directive *
+
+            [ FPLIST
+              footprint_spec *
+            |]
+
+            [ DESC description |]
+            [ KEYW keywords |]
+            [ DOC  url |]
+
+            [ ALIAS NAME
+              [ DESC description |]
+              [ KEYW keywords |]
+              [ DOC  url |]
+            |]
+
+            unit_def *
+
+            END
+          ;
+
+footprint_spec : STRING ;
+
+description   : TEXT ;
+keywords      : TEXT ;
+url           : TEXT ;
+
+unit_def  : UNIT [unit_type|] [WIDTH NUMBER|] [LABEL QUOTED_STRING|] [TEMPLATE NAME|] [ICON NAME NAME* |]
+            element_def *
+          ;
+
+element_def : [ELEMENT [CONTROL|] [LABEL QUOTED_STRING|] |]
+              pins *
+            ;
+
+/* NB pins in group must have same position property */
+
+pins      : pin_def
+          | GROUP qualifiers group_type group_label
+            pin_def *
+            END_GROUP
+          ;
+
+qualifiers : QUOTED_STRING ;
+
+group_label : QUOTED_STRING ;
+
+group_type  : GRP_NO_LABEL
+            | GRP_CLOCK
+            | GRP_INVERTED
+            ;
+
+unit_type : PWR [ SEPerate | COMBined |]
+          | NONE
+          | NOT | BUF | AND | OR | NAND | NOR | XOR | XNOR
+          ;
+
+/* NB : no spaces allowed between flags and pin_type */
+
+pin_def   : NUMBER NAME [ flag pin_type
+                            [position
+                              [pin_label
+                                [qualifiers|]
+                              |]
+                            |]
+                        |]
+
+          | SPC position
+
+          | PC_SELECT column_name* FROM filename
+          ;
+
+column_name : STRING ;
+filename    : QUOTED_STRING ;
+
+/* Flags generally affect the graphic display, except for "power" which makes the
+ electrical type power input or output depending on pin_type.
+ Some flags can be combined:
+ - not visible
+ - clock
+*/
+
+flag      : STRING ;
+/*      "N"       # not visible
+     |  "P"       # for power
+     |  "~"       # for inverted  (circle)
+     |  "C"       # for clock
+     |  "F"       # falling edge clock
+     |  "L"       # active low input
+     |  "V"       # active low output
+     |  "X"       # non-logic
+*/
+
+/* pin_type is electrical type. The pin_type does not affect the graphic display
+   except for "no connect", which adds a cross at end of pin.
+*/
+
+pin_type  : STRING ;
+/*         "I"         # input
+         | "O"         # output
+         | "B"         # bidirectional
+         | "T"         # tristate
+         | "P"         # passive
+         | "C"         # open collector
+         | "E"         # open emitter
+         | "U"         # unspecified
+         | "N"         # no connect
+*/
+
+/*  position with respect to unit: left, right, top, bottom:
+      "L" | "R" | "T" | "B"
+
+    second letter is alignment
+      "C"   center
+*/
+position  : STRING ;
+
+pin_label : QUOTED_STRING;
