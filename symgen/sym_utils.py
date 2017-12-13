@@ -20,6 +20,12 @@ class SymbolStyle (Enum):
     #
     PHYSICAL = 4
 
+class PowerStyle (Enum):
+    # A box
+    BOX = 1
+    # No box
+    LINES = 2
+                    
 
 
 def create_empty_lib (filename):
@@ -234,18 +240,24 @@ def copy_icon (comp, comp_icon, unit, pos, variant=0, src_unit=0, src_variant=1,
 
 
 def is_positive_power (pin):
-    name = pin['name'].upper()
-    if len(name)>3 :
-        name = name[0:3]
-    if pin['name'].upper() in ["3.3V", "5V"] or name in ["VCC", "VDD", "V+"]:
+    norm_name = pin['name'].upper()
+    name = norm_name
+    if len(name) > 3 :
+        name = name[-3:]
+    if (norm_name in ["3.3V", "5V", "VCAP"] or name in ["VCC", "VDD", "V+"] 
+        or norm_name.endswith ("VDD") 
+        ):
         return True
 
 # other forms 5V 3.3V +5V
 def is_power_pin (pin):
-    name = pin['name'].upper()
-    if len(name)>3 :
-        name = name[0:3]
-    if pin['name'].upper() in ["3.3V", "5V"] or name in ["VCC", "VDD", "V+", "GND", "VSS", "VEE", "V-"]:
+    norm_name = pin['name'].upper()
+    name = norm_name
+    if len(name) > 3 :
+        name = name[-3:]
+    if ( norm_name in ["3.3V", "5V", "VCAP"] or name in ["VCC", "VDD", "V+", "GND", "VSS", "VEE", "V-"] 
+        or norm_name.endswith ("VDD") 
+        ):
         return True
     elif pin['electrical_type'] in "Ww":
         return True

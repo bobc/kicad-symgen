@@ -57,6 +57,7 @@ class SgComponent (SgItem):
     name = "name"
     ref = "ref"
 
+    pin_length = 150
 
     def __init__(self):
         self.fplist = []
@@ -66,6 +67,8 @@ class SgComponent (SgItem):
 
         self.pin_length = 150
         self.default_footprint = ""
+
+        self.pin_names_inside = False
 
 class ComponentDef:
     name = "name"
@@ -126,10 +129,10 @@ class LogicDesc:
                     if tokens[j] != "None":
                         if len(tokens)-j >= 2:
                             self.technologies [tokens[j].strip()] = tokens[j+1].strip()
-                            j += 2
+                            j += 1
                         else:
                             self.packages = tokens[j].strip()
-                            j += 1
+                    j += 1
 
     def get_datasheet (self, family):
         if family in self.technologies:

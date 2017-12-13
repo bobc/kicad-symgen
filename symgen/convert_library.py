@@ -128,6 +128,7 @@ class ConvertLibrary:
 
         #
         def_width = 600
+        def_pin_len = 200
 
         outf = open (dump_filename,'w')
 
@@ -173,6 +174,7 @@ class ConvertLibrary:
                     unique_pins [pin['num']] = "1"
                     if int(pin['num']) > max_pin_number: 
                         max_pin_number = int(pin['num'])
+                    pin_len = int (pin['length'])
 
                 num_units = int(comp.definition['unit_count'])
 
@@ -216,6 +218,9 @@ class ConvertLibrary:
                 outf.write ("# %s\n" % (comp.name))
                 outf.write ("#\n")
                 outf.write ("COMP %s %s\n" % (comp.name, comp.reference))
+
+                if pin_len != def_pin_len:
+                    outf.write ("%%pinlen %d\n" % (pin_len))
 
                 # 
                 footprint = ""

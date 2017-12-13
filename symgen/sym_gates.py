@@ -5,19 +5,6 @@ from schlib import *
 from str_utils import *
 from sym_drawing import *
 
-def get_chars (text):
-    list = []
-
-    while len(text)>0:
-        if text.startswith ("&"):
-            tok = before (text, ";")
-            text = after (text, ";")
-            list.append (tok+";")
-        else:
-            list.append (text[0])
-            text = text[1:]
-                
-    return list
 
 def draw_text (comp, unit, variant, pos, s, fontsize, align_horiz = AlignLeft, align_vert = AlignBottom):
 

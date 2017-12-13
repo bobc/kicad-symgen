@@ -9,12 +9,12 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>data\atmel</WorkingDirectory>
+    <WorkingDirectory>data\DSP_Microchip_DSPIC33</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp atmel_new.txt</CommandLineArguments>
+    <CommandLineArguments>--inp DSP_Microchip_DSPIC33.txt</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>

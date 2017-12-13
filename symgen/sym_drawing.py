@@ -2,6 +2,7 @@
 
 from enum import Enum
 from schlib import *
+from str_utils import *
 
 
 NoFill = 'N'
@@ -67,6 +68,20 @@ def get_pin_type (_type, shape):
     result = flags + result
 
     return result
+
+def get_chars (text):
+    list = []
+
+    while len(text)>0:
+        if text.startswith ("&"):
+            tok = before (text, ";")
+            text = after (text, ";")
+            list.append (tok+";")
+        else:
+            list.append (text[0])
+            text = text[1:]
+                
+    return list
 
 def TextLength (s, fontsize):
     return fontsize * len(get_chars(s))
