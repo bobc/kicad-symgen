@@ -32,6 +32,7 @@
 """
 
 import os, sys
+import fnmatch
 
 # kicad lib utils
 common = os.path.abspath(os.path.join(sys.path[0], 'common'))
@@ -80,6 +81,8 @@ class SymGen:
     file = None
     line = None
 
+    footprints = None
+
     # some global settings
     opt_combine_power_for_single_units = True
     opt_power_unit_style = PowerStyle.BOX
@@ -87,7 +90,6 @@ class SymGen:
 
     symbol_style = SymbolStyle.ANSI
     #symbol_style = SymbolStyle.IEC
-
 
     opt_pin_qualifiers = False
 
@@ -443,6 +445,7 @@ class SymGen:
                 if pin_type in ["I", "O", "T", "C", "P", "B", "W","w", "N"]:
                     pin.type = pin_type
                 else:
+                    print line
                     print "error: unknown pin type: " + pin_type
                     self.num_errors += 1
                 pin.shape = flags
@@ -638,7 +641,7 @@ class SymGen:
 
     def create_gate (self, unit_shape, num_inputs, num_outputs, demorgan):
         if self.symbol_style == SymbolStyle.ANSI:
-            if demorgan == 0:
+            if demorgan == 1:
                 if unit_shape in ["and", "nand"]:
                     gatedef = AndGate (num_inputs)
                 elif unit_shape in ["or", "nor"]:
@@ -660,7 +663,7 @@ class SymGen:
         elif self.symbol_style == SymbolStyle.IEC:
             gatedef = IecGate (num_inputs)
             gatedef.num_outputs = num_outputs
-            if demorgan == 0:
+            if demorgan == 1:
                 gatedef.type = unit_shape
             else:
                 if unit_shape in ["and", "nand"]:
@@ -1159,6 +1162,30 @@ class SymGen:
             comp.fields [2]['visibility'] = "I"
             comp.fields [2]['name'] = sgcomp.default_footprint
 
+        # check footprints
+        if self.footprints:
+            found = False
+            if sgcomp.default_footprint:
+                if not sgcomp.default_footprint.strip ('"') in self.footprints:
+                    print "error: (%s) footprint not found: %s" % (sgcomp.name, sgcomp.default_footprint)
+                    self.num_errors += 1
+
+            if sgcomp.fplist:
+                for filter in sgcomp.fplist:
+                    fp = filter.replace ("?", ".")
+                    fp = fp.replace ("*", ".*")
+                    regex = re.compile(fp)
+                    match = [m.group(0) for l in self.footprints for m in [regex.search(l)] if m]
+
+                    if not match:
+                        print "error: (%s) no matches for filter: %s" % (sgcomp.name, filter)
+                        self.num_errors += 1
+
+        if len(sgcomp.fplist) == 1 and not sgcomp.default_footprint:
+            print "error: (%s) footprint field should contain default footprint" % comp.name
+            self.num_errors += 1
+
+        #
         if sgcomp.user_fields:
             for f in sgcomp.user_fields:
                 comp.fields.append (f)
@@ -1244,10 +1271,10 @@ class SymGen:
                         break
                         
                 # 
-                for variant in range (0, self.units_have_variant+1):
+                for variant in range (1, 1+self.units_have_variant+1):
                     self.pin_pos_top.x = 0
                     self.pin_pos_bottom.x = 0
-                    elem_height = self.draw_element (sgcomp, unit, element, comp, self.unit_num, variant + 1) # self.units_have_variant
+                    elem_height = self.draw_element (sgcomp, unit, element, comp, self.unit_num, variant) # self.units_have_variant
 
                 self.cur_pos.y -= elem_height
 
@@ -1317,33 +1344,35 @@ class SymGen:
                 demorgan = 1
                 self.units_have_variant = 1
             else:
-                demorgan = 1
+                demorgan = 0
             
-            # demorgan    0    1
+            # demorgan    variant 
+            #        0    1
             
-            # variant     0    [ 0 (all) ]
-            #                  1 (first)
-            #                  2 (second)
+            #        1    [ 0 (common) ]
+            #               1 (first)
+            #               2 (second)
 
-            for variant in range (0, demorgan+1):
+            for variant in range (1, 1+demorgan+1):
 
                 gatedef = self.create_gate (unit.unit_shape, num_inputs, num_outputs, variant)
 
                 #
                 gatedef.fill = unit.fill
                 gatedef.qualifiers = unit.qualifiers
-                gatedef.add_gate_graphic (comp, self.unit_num, variant + demorgan)
+                gatedef.add_gate_graphic (comp, self.unit_num, variant)
             
                 inputs_pos = gatedef.get_input_positions()
                 outputs_pos = gatedef.get_output_positions()
         
-                if variant==0:
+                if variant==1:
+                    # normal variant
                     input_shape = " "
                     output_shape = " "
                     if unit.unit_shape in ['nand', 'nor', 'xnor', 'not']:
                         output_shape = "I"
                 else:
-                    # de morgan
+                    # de morgan equivalent
                     input_shape = "I"
                     output_shape = "I"
                     if unit.unit_shape in ['nand', 'nor', 'not']:
@@ -1405,7 +1434,7 @@ class SymGen:
                     if pin.is_input() and j<len(inputs_pos):
                         pin.length = sgcomp.pin_length + gatedef.offsets[j]
                         pin.unit = self.unit_num
-                        pin.demorgan = variant + demorgan
+                        pin.demorgan = variant
             
                         if unit.unit_shape == "buffer" and j==1:
                             dy = align_to_grid(abs(inputs_pos[j].y)+99, 100)
@@ -1425,14 +1454,14 @@ class SymGen:
                         comp.drawOrdered.append( pin.get_element () )
                         # pin text
                         if pin.qualifiers and self.opt_pin_qualifiers:
-                            self.draw_pin_text (comp, self.unit_num, variant, pin, pin.qualifiers)
+                            self.draw_pin_text (comp, self.unit_num, variant, pin, pin.qualifiers) # -1 ?
 
                 j = 0
                 for pin in unit_pins:
                     if pin.is_output():
                         pin.length = sgcomp.pin_length
                         pin.unit = self.unit_num
-                        pin.demorgan = variant + demorgan
+                        pin.demorgan = variant
                         pin.orientation = "L"
                         if j==0:
                             pin.shape = output_shape
@@ -1447,10 +1476,10 @@ class SymGen:
 
                         # pin text
                         if pin.qualifiers and self.opt_pin_qualifiers:
-                            self.draw_pin_text (comp, self.unit_num, variant, pin, pin.qualifiers)
+                            self.draw_pin_text (comp, self.unit_num, variant, pin, pin.qualifiers) # -1 ?
 
                 # 
-                self.draw_pins (unit, other_pins, comp, self.unit_num, variant + demorgan)
+                self.draw_pins (unit, other_pins, comp, self.unit_num, variant)
 
 
             ##
@@ -1791,6 +1820,8 @@ class SymGen:
     def get_template_pins (self, name):
         pins = []
 
+        numeric_pins = True
+
         comp = self.icon_lib.getComponentByName(name)
 
         if comp:
@@ -1807,13 +1838,17 @@ class SymGen:
 
                 pins.append (pin)
 
-            # sort by num
-            for passnum in range(len(pins)-1,0,-1):
-                for i in range(passnum):
-                    if int(pins[i].number) > int(pins[i+1].number) :
-                        temp = pins[i]
-                        pins[i] = pins[i+1]
-                        pins[i+1] = temp
+                if not pin.number.isdigit():
+                    numeric_pins = False
+
+            if numeric_pins:
+                # sort by num
+                for passnum in range(len(pins)-1,0,-1):
+                    for i in range(passnum):
+                        if int(pins[i].number) > int(pins[i+1].number) :
+                            temp = pins[i]
+                            pins[i] = pins[i+1]
+                            pins[i+1] = temp
 
         return pins
 
@@ -2133,8 +2168,23 @@ class SymGen:
 
         outf.close ()
 
+    def load_footprints (self, sourcedir):
+
+        self.footprints = []
+
+        for root, dirnames, filenames in os.walk(sourcedir):
+            for filename in fnmatch.filter(filenames, '*.kicad_mod'):
+                dir = os.path.split (root) [-1]
+                dir = before (dir, ".")
+                self.footprints.append(dir + ":" +before(filename, '.kicad_mod'))
 
     def parse_input_file (self, inp_filename):
+
+
+        #TODO: option
+        # "c:\github\kicad-footprints")
+        if footprints_folder:
+            self.load_footprints (footprints_folder) 
 
         self.file = open (inp_filename, 'r')
         self.get_next_line()
@@ -2221,6 +2271,7 @@ parser = argparse.ArgumentParser(description="Generate component library")
 
 parser.add_argument("--inp", help="symgen script file")
 parser.add_argument("--lib", help="KiCad .lib file")
+parser.add_argument("--fp_dir", help="folder containing valid footprints")
 parser.add_argument("--ref", help="7400 logic reference list")
 parser.add_argument("-d", "--dump", help="Dump an existing library", action='store_true')
 parser.add_argument("-v", "--verbose", help="Enable verbose output", action="store_true")
@@ -2257,6 +2308,7 @@ else:
         ExitError("error: symgen script file not supplied (need --inp)")
 
     file = args.inp
+    footprints_folder = args.fp_dir
 
     symgen.parse_input_file (file)
 

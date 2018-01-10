@@ -9,12 +9,12 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>data\DSP_Microchip_DSPIC33</WorkingDirectory>
+    <WorkingDirectory>C:\git_bobc\stm32-librarygen\stm32-librarygen</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp DSP_Microchip_DSPIC33.txt</CommandLineArguments>
+    <CommandLineArguments>--inp mcu_stm32_stm32f0.txt --fp_dir c:\github\kicad-footprints</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>

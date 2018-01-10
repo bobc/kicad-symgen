@@ -178,7 +178,7 @@ def get_fill (fill, style):
         else:
             return fill
 
-def copy_icon (comp, comp_icon, unit, pos, variant=0, src_unit=0, src_variant=1, style = None):
+def copy_icon (comp, comp_icon, unit, pos, variant=1, src_unit=0, src_variant=1, style = None):
     
     # TODO: source unit
     # pensize, fill?
@@ -271,3 +271,9 @@ def find_comp_pins (comp, unit):
         if pin['unit'] =='0' or  pin['unit'] == str(unit):
             pins.append (pin)
     return pins
+
+def numeric_pins (pins):
+    for pin in pins:
+        if not pin.number.isdigit():
+            return False
+    return True

@@ -1,3 +1,5 @@
+import re
+
 # handy methods from https://www.dotnetperls.com/between-before-after-python
 def before(value, a):
     # Find first part and return slice before it.
@@ -16,3 +18,13 @@ def after(value, a):
     if adjusted_pos_a >= len(value): 
         return ""
     return value[adjusted_pos_a:]
+
+
+
+def is_digits (str):
+
+    match = re.search("\D", str)
+    if not match:
+        return True
+    else:
+        return False

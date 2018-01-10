@@ -103,6 +103,8 @@ class ConvertLibrary:
         print "Reading %s" % (lib_filename)
         lib = SchLib(lib_filename)
 
+        opt_force_pinlen = False
+
         keywords = {}
 
         #out_path, out_filename = os.path.split (dump_path)
@@ -110,7 +112,7 @@ class ConvertLibrary:
         out_filename = os.path.basename (lib_filename)
         out_filename = os.path.splitext (out_filename)[0]
 
-        dump_filename = os.path.join (out_path, out_filename + "_dump.txt")
+        dump_filename = os.path.join (out_path, out_filename + ".txt")
 
         template_filename = os.path.join (out_path, out_filename + "_template.lib")
         template_doc_filename = os.path.join (out_path, out_filename + "_template.dcm")
@@ -128,7 +130,7 @@ class ConvertLibrary:
 
         #
         def_width = 600
-        def_pin_len = 200
+        def_pin_len = 100
 
         outf = open (dump_filename,'w')
 
@@ -141,8 +143,8 @@ class ConvertLibrary:
         outf.write ("# Global Defaults\n")
         outf.write ("#\n")
         outf.write ("%%lib %s.lib\n" % out_filename)
-        outf.write ("%pinlen 200\n")
-        outf.write ("%width 600\n")
+        outf.write ("%%pinlen %d\n" % def_pin_len)
+        outf.write ("%%width %d\n" % def_width)
         outf.write ("%fill back\n")
         outf.write ("%line 10\n")
         outf.write ("%%iconlib %s\n" % os.path.basename(template_filename))
@@ -169,11 +171,18 @@ class ConvertLibrary:
             
             if True:
                 unique_pins = {}
+
                 max_pin_number = 0
                 for pin in comp.pins:
                     unique_pins [pin['num']] = "1"
-                    if int(pin['num']) > max_pin_number: 
-                        max_pin_number = int(pin['num'])
+
+                    if max_pin_number != -1:
+                        if pin['num'].isdigit():
+                            if int(pin['num']) > max_pin_number: 
+                                max_pin_number = int(pin['num'])
+                        else:
+                            max_pin_number = -1
+
                     pin_len = int (pin['length'])
 
                 num_units = int(comp.definition['unit_count'])
@@ -219,7 +228,7 @@ class ConvertLibrary:
                 outf.write ("#\n")
                 outf.write ("COMP %s %s\n" % (comp.name, comp.reference))
 
-                if pin_len != def_pin_len:
+                if not opt_force_pinlen and pin_len != def_pin_len:
                     outf.write ("%%pinlen %d\n" % (pin_len))
 
                 # 
@@ -241,13 +250,14 @@ class ConvertLibrary:
 
                 outf.write ("FPLIST\n")
                 if len(comp.fplist) == 0:
-                    if max_pin_number != len(unique_pins):
-                        print "warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number)
-                        self.num_errors += 1
+                    if max_pin_number != -1: 
+                        if max_pin_number != len(unique_pins):
+                            print "warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number)
+                            self.num_errors += 1
 
-                    elif not max_pin_number in [4,6,8,14,16,20,24,28,32,44,48,64,80,100]:
-                        print "warning: %s invalid num pins? num=%d" % (comp.name, len(unique_pins))
-                        self.num_errors += 1
+                        elif not max_pin_number in [4,6,8,14,16,20,24,28,32,44,48,64,80,100]:
+                            print "warning: %s invalid num pins? num=%d" % (comp.name, len(unique_pins))
+                            self.num_errors += 1
 
                     outf.write ("DIP?%d*\n" % max_pin_number)
                 else:
@@ -413,6 +423,11 @@ class ConvertLibrary:
                     if pin['name'] != '~' and pin['name'].startswith('~') and 'I' in pin['pin_type']:
                         pin['name'] = after (pin['name'], "~")
                         print "info: double inversion %s %s %s"  % (comp.name, pin['num'], pin['name'])
+
+                    if 'I' in pin['pin_type']:
+                        pin['pin_type'] = pin['pin_type'].replace("I","")
+                        if not pin['name'].startswith('~'):
+                            pin['name'] = "~" + pin['name']
 
                 if (footprint.find("DIP") != -1 or footprint.find("DIL") != -1 or
                     footprint.find("SOIC") != -1 or
@@ -602,12 +617,13 @@ class ConvertLibrary:
                             pin_map [pin['num']] = 1
 
                     # sort by pin number
-                    for passnum in range(len(pins)-1,0,-1):
-                        for i in range(passnum):
-                            if int(pins[i]['num']) > int(pins[i+1]['num']):
-                                temp = pins[i]
-                                pins[i] = pins[i+1]
-                                pins[i+1] = temp
+                    if max_pin_number!=-1:
+                        for passnum in range(len(pins)-1,0,-1):
+                            for i in range(passnum):
+                                if int(pins[i]['num']) > int(pins[i+1]['num']):
+                                    temp = pins[i]
+                                    pins[i] = pins[i+1]
+                                    pins[i+1] = temp
 
                     outf.write ("UNIT PWR\n")
                     for pin in pins:
