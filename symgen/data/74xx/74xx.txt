@@ -2,7 +2,7 @@
 #
 # Global Defaults
 #
-%lib 74xx
+%lib Logic_74xx
 %pinlen 200
 %width 600
 %fill back
@@ -200,6 +200,38 @@ SPC R
 UNIT PWR
 8 GND PI B
 16 VCC PI T
+END
+#
+# 74HC7014
+#
+COMP 74HC7014 U
+FIELD $FOOTPRINT "Package_SOIC:SOIC-14_3.9x8.7mm_P1.27mm"
+FPLIST
+SOIC*3.9x8.7mm*Pitch1.27mm*
+DESC Hex Non-inverting Buffer with Precision Schmitt Trigger Inputs, SOIC-14
+KEYW Hex non-inverting Schmitt buffer 
+DOC https://assets.nexperia.com/documents/data-sheet/74HC7014.pdf 
+UNIT BUF ICON icon_schmitt
+1 ~ I L
+2 ~ O R
+UNIT BUF ICON icon_schmitt
+3 ~ I L
+4 ~ O R
+UNIT BUF ICON icon_schmitt
+5 ~ I L
+6 ~ O R
+UNIT BUF ICON icon_schmitt
+9 ~ I L
+8 ~ O R
+UNIT BUF ICON icon_schmitt
+11 ~ I L
+10 ~ O R
+UNIT BUF ICON icon_schmitt
+13 ~ I L
+12 ~ O R
+UNIT PWR
+7 GND PI B
+14 VCC PI T
 END
 #
 # 74HCT04
@@ -452,7 +484,7 @@ COMP 74LS05 U
 FPLIST
 DIP?14*
 #
-DESC Hex Inverter Buffers, Open Collecter
+DESC Hex Inverter Buffers, Open Collector
 KEYW TTL not inv OpenCol
 DOC http://www.ti.com/lit/gpn/sn74ls05
 #
@@ -460,7 +492,10 @@ ALIAS 74LS06
 DESC Hex Inverter Buffers / Drivers with High-voltage Outputs
 KEYW TTL not inv OpenCol
 DOC http://www.ti.com/lit/gpn/sn74ls06
-#
+ALIAS 74LS06N
+DESC Inverter Open Collector
+KEYW TTL not inv OpenCol
+DOC http://www.ti.com/lit/gpn/sn74LS06N
 UNIT NOT
 1 ~ I L
 2 ~ ~C R
@@ -620,7 +655,7 @@ FPLIST
 DIP?14*
 DESC Triple 3-input AND Gates
 KEYW TTL And3
-DOC http://www.ti.com/lit/gpn/sn74ls109a
+DOC http://www.ti.com/lit/gpn/sn74LS11
 UNIT AND
 1 ~ I L
 2 ~ I L
@@ -1079,7 +1114,7 @@ FPLIST
 DIP?16*
 DESC Decoder 3 to 8 Active low Outputs
 KEYW TTL DECOD DECOD8
-DOC http://www.ti.com/litv/sdls014
+DOC http://www.ti.com/lit/gpn/sn74ls138
 UNIT 
 1 A0 I L
 2 A1 I L
@@ -1168,7 +1203,7 @@ FPLIST
 DIP?16*
 DESC Priority Encoder, 10 to 4
 KEYW TTL ENCOD
-DOC http://www.ti.com/lit/gpn/sn74ls148
+DOC http://www.ti.com/lit/gpn/sn74LS147
 UNIT 
 11 E1 ~I L
 12 E2 ~I L
@@ -1975,6 +2010,7 @@ FPLIST
 DIP?12*
 DESC Dual 4-input NAND
 KEYW TTL Nand4
+DOC http://www.ti.com/lit/gpn/sn74LS20
 ALIAS 74LS22
 DESC Dual 4-input NAND Open Collector
 KEYW TTL Nand4 OpenColl
@@ -2005,6 +2041,7 @@ FPLIST
 DIP?12*
 DESC Dual 4-input AND
 KEYW TTL And4
+DOC http://www.ti.com/lit/gpn/sn74LS21
 UNIT AND
 1 ~ I L
 2 ~ I L
@@ -2029,6 +2066,7 @@ FPLIST
 DIP?16*
 DESC Dual Monostable
 KEYW TTL Monostable
+DOC http://www.ti.com/lit/gpn/sn74LS221
 UNIT 
 1 ~A I L
 2 B I L
@@ -2095,9 +2133,11 @@ FPLIST
 DIP?20*
 DESC 8-bit Bus Buffer 3-State Outputs
 KEYW TTL Buffer BUS 3State
+DOC http://www.ti.com/lit/gpn/sn74LS241
 ALIAS 74LS244
 DESC 8-bit Bus Buffer 3-State Outputs
 KEYW TTL Buffer BUS 3State
+DOC http://www.ti.com/lit/gpn/sn74LS244
 UNIT ICON icon_schmitt 
 2 I0a I L
 4 I1a I L
@@ -2154,6 +2194,7 @@ FPLIST
 DIP?12*
 DESC 4-bit Bus Tranceiver
 KEYW TTL Buffer 3State BUS BIDI
+DOC http://www.ti.com/lit/gpn/sn74LS243
 UNIT 
 3 A0 I L
 4 A1 I L
@@ -2178,9 +2219,11 @@ FPLIST
 DIP?20*
 DESC Octal BUS Transceivers, 3-State Outputs
 KEYW TTL BUS 3State
+DOC http://www.ti.com/lit/gpn/sn74LS245
 ALIAS 74HC245
 DESC Octal BUS Transceivers, 3-State Outputs
 KEYW HCMOS BUS 3State
+DOC http://www.ti.com/lit/gpn/sn74HC245
 UNIT ICON icon_schmitt 
 2 A0 T L
 3 A1 T L
@@ -2213,6 +2256,7 @@ FPLIST
 DIP?16*
 DESC BCD to 7 Segments Decoder Open Collector Active Low
 KEYW TTL DECOD
+DOC http://www.ti.com/lit/gpn/sn74LS247
 ALIAS 74LS246
 DESC BCD to 7-segment Decoder Open Collector Active Low
 KEYW TTL DECOD
@@ -2281,6 +2325,7 @@ FPLIST
 DIP?16*
 DESC Multiplexer 8 to 1, 3-state Outputs
 KEYW TTL MUX MUX8 3State
+DOC http://www.ti.com/lit/gpn/sn74LS251
 UNIT 
 4 I0 I L
 3 I1 I L
@@ -2310,6 +2355,7 @@ FPLIST
 DIP?16*
 DESC Dual Multiplexer 4 to 1, 3-State Outputs
 KEYW TTL MUX MUX4 3State
+DOC http://www.ti.com/lit/gpn/sn74LS253
 UNIT 
 6 I0a I L
 5 I1a I L
@@ -2481,9 +2527,11 @@ FPLIST
 DIP?14*
 DESC Quad 2-input NAND Open Collector
 KEYW TTL Nand2 OpenCol
+DOC http://www.ti.com/lit/gpn/sn74LS26
 ALIAS 74LS38
 DESC Quad Buffer 2-input NAND Open Collector
 KEYW TTL Nand2 OpenCol Buffer
+DOC http://www.ti.com/lit/gpn/sn74LS38
 UNIT NAND
 1 ~ I L
 SPC L
@@ -2516,6 +2564,7 @@ FPLIST
 DIP?14*
 DESC Triple 3-input NOR
 KEYW TTL Nor3
+DOC http://www.ti.com/lit/gpn/sn74LS27
 UNIT NOR
 1 ~ I L
 2 ~ I L
@@ -2543,6 +2592,7 @@ FPLIST
 DIP?20*
 DESC 8-bit D Flip-Flop, Reset
 KEYW TTL DFF DFF8
+DOC http://www.ti.com/lit/gpn/sn74LS273
 UNIT 
 3 D0 I L
 4 D1 I L
@@ -2575,6 +2625,7 @@ FPLIST
 DIP?14*
 DESC Parity Generator/Checker
 KEYW TTL ALU Arith
+DOC http://www.ti.com/lit/gpn/sn74LS280
 UNIT 
 8 A I L
 9 B I L
@@ -2600,6 +2651,7 @@ FPLIST
 DIP?16*
 DESC 4-bit Full Adder
 KEYW TTL ADD Arith ALU
+DOC http://www.ti.com/lit/gpn/sn74LS283
 UNIT 
 7 C0 I L
 SPC L
@@ -2633,6 +2685,7 @@ KEYW TTL CNT CNT4
 ALIAS 74LS293
 DESC 4-bit Binary Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74LS293
 UNIT 
 10 Cp0 ~CI L
 11 Cp1 ~CI L
@@ -2687,6 +2740,7 @@ FPLIST
 DIP?16*
 DESC Quad 2 to 1 Multiplexer with Storage
 KEYW TTL MUX MUX2
+DOC http://www.ti.com/lit/gpn/sn74LS298
 UNIT 
 3 I0a I L
 2 I1a I L
@@ -2718,6 +2772,7 @@ FPLIST
 DIP?20*
 DESC 8-bit Universal Shift/storage Register
 KEYW TTL REG SR SR8
+DOC http://www.ti.com/lit/gpn/sn74LS299
 UNIT 
 11 Ds0 I L
 18 Ds7 I L
@@ -2754,6 +2809,7 @@ FPLIST
 DIP?14*
 DESC 8-input NAND
 KEYW TTL Nand8
+DOC http://www.ti.com/lit/gpn/sn74LS30
 UNIT NAND
 1 ~ I L
 2 ~ I L
@@ -2776,6 +2832,7 @@ FPLIST
 DIP?14*
 DESC Quad 2-input OR
 KEYW TTL Or2
+DOC http://www.ti.com/lit/gpn/sn74LS32
 UNIT OR
 1 ~ I L
 SPC L
@@ -2877,6 +2934,7 @@ FPLIST
 DIP?14*
 DESC Quad 2-input NOR, Open Collector
 KEYW TTL Nor2 OpenColl
+DOC http://www.ti.com/lit/gpn/sn74LS33
 UNIT NOR
 2 ~ I L
 SPC L
@@ -2909,6 +2967,7 @@ FPLIST
 DIP?16*
 DESC 8 to 3 Lines Priority Encoder
 KEYW TTL ENCOD Arith
+DOC http://www.ti.com/lit/gpn/sn74LS348
 UNIT 
 5 EI ~I L
 10 0 ~I L
@@ -3124,6 +3183,7 @@ FPLIST
 DIP?20*
 DESC 8-bit Latch, 3-state Outputs
 KEYW TTL REG DFF DFF8 LATCH
+DOC http://www.ti.com/lit/gpn/sn74LS373
 UNIT 
 3 D0 I L
 4 D1 I L
@@ -3156,6 +3216,7 @@ FPLIST
 DIP?20*
 DESC 8-bit Register, 3-state Outputs
 KEYW TTL DFF DFF8 REG 3State
+DOC http://www.ti.com/lit/gpn/sn74LS374
 UNIT 
 3 D0 I L
 4 D1 I L
@@ -3188,6 +3249,7 @@ FPLIST
 DIP?16*
 DESC 4-bit Latch
 KEYW TTL DFF DFF4 Latch
+DOC http://www.ti.com/lit/gpn/sn74LS375
 UNIT 
 1 D0 I L
 SPC L
@@ -3219,6 +3281,7 @@ FPLIST
 DIP?20*
 DESC 8-bit Register
 KEYW TTL REG DFF DFF8
+DOC http://www.ti.com/lit/gpn/sn74LS377
 UNIT 
 3 D0 I L
 4 D1 I L
@@ -3251,6 +3314,7 @@ FPLIST
 DIP?16*
 DESC 6-bit Register
 KEYW TTL REG DFF DFF6
+DOC http://www.ti.com/lit/gpn/sn74LS378
 UNIT 
 3 D0 I L
 4 D1 I L
@@ -3374,6 +3438,7 @@ FPLIST
 DIP?16*
 DESC Dual BCD 4-bit Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74LS390
 UNIT 
 1 ~CP0 CI L
 4 ~CP1 CI L
@@ -3496,6 +3561,7 @@ FPLIST
 DIP?16*
 DESC Quad 2 to 1 Line Multiplexer with Storage
 KEYW TTL MUX MUX2
+DOC http://www.ti.com/lit/gpn/sn74LS399
 UNIT 
 3 I0a I L
 4 I1a I L
@@ -3528,6 +3594,7 @@ FPLIST
 DIP?16*
 DESC 4 to 10 Line Decoder
 KEYW TTL DECOD DECOD10
+DOC http://www.ti.com/lit/gpn/sn74LS42
 UNIT 
 15 A0 I L
 14 A1 I L
@@ -3555,6 +3622,7 @@ FPLIST
 DIP?16*
 DESC BCD to 7-segment Driver, Open Collector, 30V Outputs
 KEYW TTL DECOD DECOD7 OpenCol
+DOC http://www.ti.com/lit/gpn/sn74LS47
 ALIAS 74LS46
 DESC BCD to 7-segment Driver, Open Collector, 15V Outputs
 KEYW TTL DECOD DECOD7 OpenCol
@@ -3704,6 +3772,7 @@ FPLIST
 DIP?20*
 DESC 8-bit Buffer/Line Driver Inverter, 3-state Outputs
 KEYW BUFFER BUS TTL 3State
+DOC http://www.ti.com/lit/gpn/sn74LS540
 UNIT ICON icon_inverter icon_schmitt 
 2 A0 I L
 3 A1 I L
@@ -3736,7 +3805,11 @@ FPLIST
 DIP?20*
 DESC 8-bit Buffer/Line Driver 3-state Outputs
 KEYW TTL BUFFER 3State BUS
+DOC http://www.ti.com/lit/gpn/sn74LS541
 ALIAS 74HCT541
+DESC 8-bit Buffer/Line Driver 3-state Outputs
+KEYW TTL BUFFER 3State BUS
+DOC http://www.ti.com/lit/gpn/sn74HCT541
 UNIT ICON icon_buffer icon_schmitt  
 2 A0 I L
 3 A1 I L
@@ -3828,6 +3901,9 @@ DIP?20*
 DESC 8-bit Register, 3-state Outputs
 KEYW TTL REG DFF DFF8 3State
 ALIAS 74HCT574
+DESC 8-bit Register, 3-state Outputs
+KEYW TTL REG DFF DFF8 3State
+DOC http://www.ti.com/lit/gpn/sn74HCT574
 UNIT 
 2 D0 I L
 3 D1 I L
@@ -3860,6 +3936,7 @@ FPLIST
 DIP?16*
 DESC Dual Voltage-controlled Oscillator, Enable Control, Range Control
 KEYW VCO
+DOC http://www.ti.com/lit/gpn/sn74LS629
 UNIT 
 6 EN ~I L
 SPC L
@@ -3896,6 +3973,7 @@ FPLIST
 DIP?20*
 DESC 8-bit Comparator
 KEYW TTL DECOD Arith
+DOC http://www.ti.com/lit/gpn/sn74LS688
 UNIT 
 2 P0 I L
 4 P1 I L
@@ -3992,6 +4070,7 @@ FPLIST
 DIP?16*
 DESC 4-bit Latch
 KEYW TTL DFF Latch
+DOC http://www.ti.com/lit/gpn/sn74LS75
 UNIT 
 2 D0 I L
 3 D1 I L
@@ -4136,6 +4215,7 @@ FPLIST
 DIP?16*
 DESC 4-bit Comparator
 KEYW TTL COMP ARITH
+DOC http://www.ti.com/lit/gpn/sn74LS85
 UNIT 
 1 B3 I L
 14 B2 I L
@@ -4169,6 +4249,9 @@ DESC Quad 2-input XOR
 KEYW TTL XOR2
 DOC 74xx/74ls86.pdf
 ALIAS 74HC86
+DESC Quad 2-input XOR
+KEYW TTL XOR2
+DOC http://www.ti.com/lit/gpn/sn74HC86
 UNIT XOR
 1 ~ I L
 SPC L
@@ -4201,6 +4284,7 @@ FPLIST
 DIP?12*
 DESC BCD Counter ( div 2 & div 5 )
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74LS90
 UNIT 
 14 CP0 ~CI L
 1 CP1..3 ~CI L
@@ -4247,6 +4331,7 @@ FPLIST
 DIP?14*
 DESC Divide by 12 Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74LS92
 UNIT 
 14 CP0 ~CI L
 1 CP1..3 ~CI L
@@ -4269,6 +4354,7 @@ FPLIST
 DIP?14*
 DESC Divide by 2 & 8 Counter
 KEYW TTL CNT CNT4
+DOC http://www.ti.com/lit/gpn/sn74LS93
 UNIT 
 14 CP0 ~CI L
 1 CP1..3 ~CI L

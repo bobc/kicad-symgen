@@ -53,6 +53,12 @@ K TTL SR 3State
 F http://www.ti.com/lit/gpn/sn74ls595
 $ENDCMP
 #
+$CMP 74HC7014
+D Hex Non-inverting Buffer with Precision Schmitt Trigger Inputs, SOIC-14
+K Hex non-inverting Schmitt buffer
+F https://assets.nexperia.com/documents/data-sheet/74HC7014.pdf
+$ENDCMP
+#
 $CMP 74HC04
 D Hex Inverter
 K HCMOS not inverter
@@ -155,8 +161,14 @@ K TTL not inv
 F http://www.ti.com/lit/gpn/sn74ls04
 $ENDCMP
 #
+$CMP 74LS06N
+D Inverter Open Collector
+K TTL not inv OpenCol
+F http://www.ti.com/lit/gpn/sn74LS06N
+$ENDCMP
+#
 $CMP 74LS05
-D Hex Inverter Buffers, Open Collecter
+D Hex Inverter Buffers, Open Collector
 K TTL not inv OpenCol
 F http://www.ti.com/lit/gpn/sn74ls05
 $ENDCMP
@@ -200,7 +212,7 @@ $ENDCMP
 $CMP 74LS11
 D Triple 3-input AND Gates
 K TTL And3
-F http://www.ti.com/lit/gpn/sn74ls109a
+F http://www.ti.com/lit/gpn/sn74LS11
 $ENDCMP
 #
 $CMP 74LS112
@@ -302,7 +314,7 @@ $ENDCMP
 $CMP 74LS138
 D Decoder 3 to 8 Active low Outputs
 K TTL DECOD DECOD8
-F http://www.ti.com/litv/sdls014
+F http://www.ti.com/lit/gpn/sn74ls138
 $ENDCMP
 #
 $CMP 74LS139
@@ -320,7 +332,7 @@ $ENDCMP
 $CMP 74LS147
 D Priority Encoder, 10 to 4
 K TTL ENCOD
-F http://www.ti.com/lit/gpn/sn74ls148
+F http://www.ti.com/lit/gpn/sn74LS147
 $ENDCMP
 #
 $CMP 74LS148
@@ -525,16 +537,19 @@ $ENDCMP
 $CMP 74LS20
 D Dual 4-input NAND
 K TTL Nand4
+F http://www.ti.com/lit/gpn/sn74LS20
 $ENDCMP
 #
 $CMP 74LS21
 D Dual 4-input AND
 K TTL And4
+F http://www.ti.com/lit/gpn/sn74LS21
 $ENDCMP
 #
 $CMP 74LS221
 D Dual Monostable
 K TTL Monostable
+F http://www.ti.com/lit/gpn/sn74LS221
 $ENDCMP
 #
 $CMP 74LS240
@@ -545,11 +560,13 @@ $ENDCMP
 $CMP 74LS241
 D 8-bit Bus Buffer 3-State Outputs
 K TTL Buffer BUS 3State
+F http://www.ti.com/lit/gpn/sn74LS241
 $ENDCMP
 #
 $CMP 74LS244
 D 8-bit Bus Buffer 3-State Outputs
 K TTL Buffer BUS 3State
+F http://www.ti.com/lit/gpn/sn74LS244
 $ENDCMP
 #
 $CMP 74LS242
@@ -560,21 +577,25 @@ $ENDCMP
 $CMP 74LS243
 D 4-bit Bus Tranceiver
 K TTL Buffer 3State BUS BIDI
+F http://www.ti.com/lit/gpn/sn74LS243
 $ENDCMP
 #
 $CMP 74HC245
 D Octal BUS Transceivers, 3-State Outputs
 K HCMOS BUS 3State
+F http://www.ti.com/lit/gpn/sn74HC245
 $ENDCMP
 #
 $CMP 74LS245
 D Octal BUS Transceivers, 3-State Outputs
 K TTL BUS 3State
+F http://www.ti.com/lit/gpn/sn74LS245
 $ENDCMP
 #
 $CMP 74LS247
 D BCD to 7 Segments Decoder Open Collector Active Low
 K TTL DECOD
+F http://www.ti.com/lit/gpn/sn74LS247
 $ENDCMP
 #
 $CMP 74LS246
@@ -595,11 +616,13 @@ $ENDCMP
 $CMP 74LS251
 D Multiplexer 8 to 1, 3-state Outputs
 K TTL MUX MUX8 3State
+F http://www.ti.com/lit/gpn/sn74LS251
 $ENDCMP
 #
 $CMP 74LS253
 D Dual Multiplexer 4 to 1, 3-State Outputs
 K TTL MUX MUX4 3State
+F http://www.ti.com/lit/gpn/sn74LS253
 $ENDCMP
 #
 $CMP 74LS256
@@ -625,31 +648,37 @@ $ENDCMP
 $CMP 74LS26
 D Quad 2-input NAND Open Collector
 K TTL Nand2 OpenCol
+F http://www.ti.com/lit/gpn/sn74LS26
 $ENDCMP
 #
 $CMP 74LS38
 D Quad Buffer 2-input NAND Open Collector
 K TTL Nand2 OpenCol Buffer
+F http://www.ti.com/lit/gpn/sn74LS38
 $ENDCMP
 #
 $CMP 74LS27
 D Triple 3-input NOR
 K TTL Nor3
+F http://www.ti.com/lit/gpn/sn74LS27
 $ENDCMP
 #
 $CMP 74LS273
 D 8-bit D Flip-Flop, Reset
 K TTL DFF DFF8
+F http://www.ti.com/lit/gpn/sn74LS273
 $ENDCMP
 #
 $CMP 74LS280
 D Parity Generator/Checker
 K TTL ALU Arith
+F http://www.ti.com/lit/gpn/sn74LS280
 $ENDCMP
 #
 $CMP 74LS283
 D 4-bit Full Adder
 K TTL ADD Arith ALU
+F http://www.ti.com/lit/gpn/sn74LS283
 $ENDCMP
 #
 $CMP 74LS290
@@ -660,6 +689,7 @@ $ENDCMP
 $CMP 74LS293
 D 4-bit Binary Counter
 K TTL CNT CNT4
+F http://www.ti.com/lit/gpn/sn74LS293
 $ENDCMP
 #
 $CMP 74LS295
@@ -670,21 +700,25 @@ $ENDCMP
 $CMP 74LS298
 D Quad 2 to 1 Multiplexer with Storage
 K TTL MUX MUX2
+F http://www.ti.com/lit/gpn/sn74LS298
 $ENDCMP
 #
 $CMP 74LS299
 D 8-bit Universal Shift/storage Register
 K TTL REG SR SR8
+F http://www.ti.com/lit/gpn/sn74LS299
 $ENDCMP
 #
 $CMP 74LS30
 D 8-input NAND
 K TTL Nand8
+F http://www.ti.com/lit/gpn/sn74LS30
 $ENDCMP
 #
 $CMP 74LS32
 D Quad 2-input OR
 K TTL Or2
+F http://www.ti.com/lit/gpn/sn74LS32
 $ENDCMP
 #
 $CMP 74LS322
@@ -700,11 +734,13 @@ $ENDCMP
 $CMP 74LS33
 D Quad 2-input NOR, Open Collector
 K TTL Nor2 OpenColl
+F http://www.ti.com/lit/gpn/sn74LS33
 $ENDCMP
 #
 $CMP 74LS348
 D 8 to 3 Lines Priority Encoder
 K TTL ENCOD Arith
+F http://www.ti.com/lit/gpn/sn74LS348
 $ENDCMP
 #
 $CMP 74LS352
@@ -740,26 +776,31 @@ $ENDCMP
 $CMP 74LS373
 D 8-bit Latch, 3-state Outputs
 K TTL REG DFF DFF8 LATCH
+F http://www.ti.com/lit/gpn/sn74LS373
 $ENDCMP
 #
 $CMP 74LS374
 D 8-bit Register, 3-state Outputs
 K TTL DFF DFF8 REG 3State
+F http://www.ti.com/lit/gpn/sn74LS374
 $ENDCMP
 #
 $CMP 74LS375
 D 4-bit Latch
 K TTL DFF DFF4 Latch
+F http://www.ti.com/lit/gpn/sn74LS375
 $ENDCMP
 #
 $CMP 74LS377
 D 8-bit Register
 K TTL REG DFF DFF8
+F http://www.ti.com/lit/gpn/sn74LS377
 $ENDCMP
 #
 $CMP 74LS378
 D 6-bit Register
 K TTL REG DFF DFF6
+F http://www.ti.com/lit/gpn/sn74LS378
 $ENDCMP
 #
 $CMP 74LS379
@@ -780,6 +821,7 @@ $ENDCMP
 $CMP 74LS390
 D Dual BCD 4-bit Counter
 K TTL CNT CNT4
+F http://www.ti.com/lit/gpn/sn74LS390
 $ENDCMP
 #
 $CMP 74LS393
@@ -801,11 +843,13 @@ $ENDCMP
 $CMP 74LS399
 D Quad 2 to 1 Line Multiplexer with Storage
 K TTL MUX MUX2
+F http://www.ti.com/lit/gpn/sn74LS399
 $ENDCMP
 #
 $CMP 74LS42
 D 4 to 10 Line Decoder
 K TTL DECOD DECOD10
+F http://www.ti.com/lit/gpn/sn74LS42
 $ENDCMP
 #
 $CMP 74LS46
@@ -816,6 +860,7 @@ $ENDCMP
 $CMP 74LS47
 D BCD to 7-segment Driver, Open Collector, 30V Outputs
 K TTL DECOD DECOD7 OpenCol
+F http://www.ti.com/lit/gpn/sn74LS47
 $ENDCMP
 #
 $CMP 74LS48
@@ -843,16 +888,19 @@ $ENDCMP
 $CMP 74LS540
 D 8-bit Buffer/Line Driver Inverter, 3-state Outputs
 K BUFFER BUS TTL 3State
+F http://www.ti.com/lit/gpn/sn74LS540
 $ENDCMP
 #
 $CMP 74LS541
 D 8-bit Buffer/Line Driver 3-state Outputs
 K TTL BUFFER 3State BUS
+F http://www.ti.com/lit/gpn/sn74LS541
 $ENDCMP
 #
 $CMP 74HCT541
 D 8-bit Buffer/Line Driver 3-state Outputs
 K TTL BUFFER 3State BUS
+F http://www.ti.com/lit/gpn/sn74HCT541
 $ENDCMP
 #
 $CMP 74LS55
@@ -874,16 +922,19 @@ $ENDCMP
 $CMP 74HCT574
 D 8-bit Register, 3-state Outputs
 K TTL REG DFF DFF8 3State
+F http://www.ti.com/lit/gpn/sn74HCT574
 $ENDCMP
 #
 $CMP 74LS629
 D Dual Voltage-controlled Oscillator, Enable Control, Range Control
 K VCO
+F http://www.ti.com/lit/gpn/sn74LS629
 $ENDCMP
 #
 $CMP 74LS688
 D 8-bit Comparator
 K TTL DECOD Arith
+F http://www.ti.com/lit/gpn/sn74LS688
 $ENDCMP
 #
 $CMP 74LS73
@@ -906,6 +957,7 @@ $ENDCMP
 $CMP 74LS75
 D 4-bit Latch
 K TTL DFF Latch
+F http://www.ti.com/lit/gpn/sn74LS75
 $ENDCMP
 #
 $CMP 74LS76
@@ -931,11 +983,13 @@ $ENDCMP
 $CMP 74LS85
 D 4-bit Comparator
 K TTL COMP ARITH
+F http://www.ti.com/lit/gpn/sn74LS85
 $ENDCMP
 #
 $CMP 74HC86
 D Quad 2-input XOR
 K TTL XOR2
+F http://www.ti.com/lit/gpn/sn74HC86
 $ENDCMP
 #
 $CMP 74LS86
@@ -947,6 +1001,7 @@ $ENDCMP
 $CMP 74LS90
 D BCD Counter ( div 2 & div 5 )
 K TTL CNT CNT4
+F http://www.ti.com/lit/gpn/sn74LS90
 $ENDCMP
 #
 $CMP 74LS91
@@ -957,11 +1012,13 @@ $ENDCMP
 $CMP 74LS92
 D Divide by 12 Counter
 K TTL CNT CNT4
+F http://www.ti.com/lit/gpn/sn74LS92
 $ENDCMP
 #
 $CMP 74LS93
 D Divide by 2 & 8 Counter
 K TTL CNT CNT4
+F http://www.ti.com/lit/gpn/sn74LS93
 $ENDCMP
 #
 $CMP 74LS95
