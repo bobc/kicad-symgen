@@ -1,85 +1,109 @@
 # blank lines and white space (tab, spc) are ignored
 # lines starting # are comments and ignored
 
-input = ( directive | component )* 
-        
+input = ( directive | component )*
+
 # a directive outside a component definition applies to all subsequent components
 # a directive inside a component definition applies to only that component
-        
+
 directive = "%lib" name           # output library name
             | "%pinlen" number    # len in mils
             | "%width" number     # width in mils
-            | "%fill" back        # body filL: fore, back, none
+            | "%fill" back        # body fill: fore, back, none
             | "%line" number      # default pen size in mils
-            | "%iconlib" name     # name of icon library e.g template.lib   
-            | "style" "IEC" | "ANSI"
+            | "%iconlib" name     # name of icon library e.g template.lib
+            | "%style" "IEC" | "ANSI"
 
 component = "COMP" NAME REF
 
             directive *
- 
+
             [ "FPLIST"
             footprint_spec
             ]
-            
+
             [ "DESC" ]
             [ "KEYW" ]
             [ "DOC"  ]
-            
+
             [ "ALIAS" name
               [ "DESC" ]
               [ "KEYW" ]
               [ "DOC"  ]
             ]
-            
+
             unit *
-            
+
             "END"
 
-unit = "UNIT" [type] [WIDTH number] [TEMP name] [ICON name+ ]
-
+unit = "UNIT" [unit_type] [Width number] [LABEL string] [TEMPlate name] [ICON name+ ]
         element *
-        
-element = [ELEMent [CONTROL] [LABEL string] ]           
-          pin_def *
-       
-       
-type =  PWR [ SEPerate | COMBined ]
+
+element = [ELEMent [CONTROL] [LABEL string] ]
+          pins *
+
+
+# NB pins in group must have same position property
+
+pins = pin_def
+     | GROUP qualifiers group_type label
+       pin_def*
+       END-GROUP
+
+qualifiers = string
+
+group_type = "-"
+           | "C"   # clock
+           | "~"   # inverted
+
+label = string
+
+unit_type =  PWR [ SEPerate | COMBined ]
         | NONE
         | NOT | BUF | AND | OR | NAND | NOR | XOR | XNOR
 
-pin_def = NUMBER NAME [type [position [label]]]       # todo: [align] ?
+
+# NB : no spaces allowed between flags and type
+
+pin_def = NUMBER NAME [ flag* pin_type [position [label [qualifiers]]]]       # todo: [align] ?
 
           | "SPC" position
-          
+
           | %SELECT column_name+ "FROM" filename
 
+# flags generally affect the graphic display, except for "power" which makes the
+# electrical type power input or output depending on pin_type.
+# some flags can be combined:
+# - not visible
+# - clock
 
-# flags* type
-# flags
-#   ~ for inverted
-#   P for power
-#   C for clock
-#   F falling edge
-#   L active low input
-#   V active low output
-#   N not visible
-#   X non-logic
 
-type =  "I"           # input 
-        | "O"         # output
-        | "B"         # bidirectional
-        | "T"         # tristate
-        | "P"         # no connect
-        | "C"         # no connect
-        | "E"         # no connect
-        | "U"         # unspecified
-        | "N"         # no connect
-        
-position = "L" | "R" | "T" | "B"        # position with respect to unit: left, right, top, bottom         
+flag =  "N"       # not visible
+     |  "P"       # for power
+     |  "~"       # for inverted  (circle)
+     |  "C"       # for clock
+     |  "F"       # falling edge clock
+     |  "L"       # active low input
+     |  "V"       # active low output
+     |  "X"       # non-logic
 
-NAME = valid pin name. If name starts with "~", the pin shape is set to inverted style if applicable 
+
+# pin_type is electrical type. The pin_type does not affect the graphic display
+# exccept for "no connect", which adds a cross at end of pin.
+
+pin_type = "I"         # input
+         | "O"         # output
+         | "B"         # bidirectional
+         | "T"         # tristate
+         | "P"         # passive
+         | "C"         # open collector
+         | "E"         # open emitter
+         | "U"         # unspecified
+         | "N"         # no connect
+
+position = "L" | "R" | "T" | "B"        # position with respect to unit: left, right, top, bottom
+
+NAME = valid pin name. If name starts with "~", the pin shape is set to inverted style if applicable
 
 NUMBER = valid pin number, [0-9]*
 
-  
