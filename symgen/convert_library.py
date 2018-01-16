@@ -26,8 +26,22 @@ from schlib import *
 from sym_utils import *
 
 
+def alphanum (s):
+    convert = lambda text: float(text) if text.isdigit() else text
+    alphanum = [ convert(c) for c in re.split('([-+]?[0-9]*\.?[0-9]*)', s) ]
+    return alphanum
 
+def sort_num(pin):
+    return int (pin['num'])
 
+def sort_name_num(pin):
+    return pin['name'], alphanum (pin['num'])
+
+def sort_human(l):
+  convert = lambda text: float(text) if text.isdigit() else text
+  alphanum = lambda key: [ convert(c) for c in re.split('([-+]?[0-9]*\.?[0-9]*)', key) ]
+  l.sort( key=alphanum )
+  return l
 
 class ConvertLibrary:
 
@@ -97,6 +111,13 @@ class ConvertLibrary:
         pin['pin_type'] = "N"
         pin['electrical_type'] = "N"
         return pin
+
+    def filter_pins (self, pins, direction):
+        l = []
+        for pin in pins:
+            if pin['direction'] == direction:
+                l.append (pin)
+        return l
 
     def dump_lib (self, lib_filename, dump_path, ref_list_filename):
 
@@ -185,6 +206,14 @@ class ConvertLibrary:
 
                     pin_len = int (pin['length'])
 
+                
+                if len(comp.pins) < 100:
+                    pin_len = 150
+                elif len(comp.pins) < 1000:
+                    pin_len = 200
+                else:
+                    pin_len = 250
+
                 num_units = int(comp.definition['unit_count'])
 
                 type=""
@@ -223,10 +252,20 @@ class ConvertLibrary:
                 # need to sort by y coord, detect gaps
                 print comp.name
 
+                # remove illegal chars
+                clean_name = comp.name
+                clean_name = clean_name.replace ( "/", "_")
+
+                if clean_name != comp.name:
+                    print "warning: %s contains illegal chars, converted to %s" % (comp.name, clean_name)
+
                 outf.write ("#\n")
-                outf.write ("# %s\n" % (comp.name))
+                outf.write ("# %s\n" % (clean_name))
                 outf.write ("#\n")
-                outf.write ("COMP %s %s\n" % (comp.name, comp.reference))
+                outf.write ("COMP %s %s\n" % (clean_name, comp.reference))
+
+                # auto select?
+                pin_len = min (pin_len, 300)
 
                 if not opt_force_pinlen and pin_len != def_pin_len:
                     outf.write ("%%pinlen %d\n" % (pin_len))
@@ -248,19 +287,19 @@ class ConvertLibrary:
                             j += 1
 
 
-                outf.write ("FPLIST\n")
                 if len(comp.fplist) == 0:
                     if max_pin_number != -1: 
                         if max_pin_number != len(unique_pins):
                             print "warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number)
                             self.num_errors += 1
 
-                        elif not max_pin_number in [4,6,8,14,16,20,24,28,32,44,48,64,80,100]:
+                        elif not max_pin_number in [4,6,8,14,16,20,24,28,32,40,44,48,64,68,80,84,100,144]:
                             print "warning: %s invalid num pins? num=%d" % (comp.name, len(unique_pins))
                             self.num_errors += 1
 
-                    outf.write ("DIP?%d*\n" % max_pin_number)
+                    #outf.write ("DIP?%d*\n" % max_pin_number)
                 else:
+                    outf.write ("FPLIST\n")
                     for fp in comp.fplist:
                         outf.write ("%s\n" % fp)
 
@@ -376,7 +415,7 @@ class ConvertLibrary:
 
                 count = 0
                 for d in comp.drawOrdered:
-                    if d[0] in ['A','C','P','T','S']:
+                    if d[0] in ['A','C','P','T','S'] and d[1]['unit'] <= '1':
                         count += 1
 
                 if comp.name=="4009":
@@ -439,8 +478,6 @@ class ConvertLibrary:
                     package = None
 
                 if self.symbol_style == SymbolStyle.PHYSICAL and package:
-
-
                     max_len = 0
                     pins = []
                     for pin in comp.pins:
@@ -453,21 +490,16 @@ class ConvertLibrary:
 
                     bb = bb + get_bounds (comp, 1)
 
-                    # sort by pin
-                    for passnum in range(len(pins)-1,0,-1):
-                        for i in range(passnum):
-                            if int(pins[i]['num']) > int(pins[i+1]['num']):
-                                temp = pins[i]
-                                pins[i] = pins[i+1]
-                                pins[i+1] = temp
+                    # sort by pin number
+                    pins = sorted (pins, key=sort_num)
 
-                    line = "UNIT"
                     width = max_len * 2
                     #width = bb.width
 
                     if package == "quad":
                         width = (max_pin_number/4 + 2) * 100
 
+                    line = "UNIT"
                     if width > 0 and width != def_width:
                         line += " WIDTH %d" % (width)
                     if unit_template:
@@ -544,28 +576,25 @@ class ConvertLibrary:
                                     pins.append (pin)
 
                             if pins:
-                                line = "UNIT"
-                                if type:
-                                    line += " " + type
-                                else:
-                                    if bb.width>0 and bb.width != def_width:
-                                        line += " WIDTH %d" % (bb.width)
-                                    if unit_template:
-                                        line += " TEMPLATE %s" % (unit_template)
-                                line += '\n'
 
-                                outf.write (line)
+                                #line = "UNIT"
+                                #if type:
+                                #    line += " " + type
+                                #else:
+                                #    if bb.width>0 and bb.width != def_width:
+                                #        line += " WIDTH %d" % (bb.width)
+                                #    if unit_template:
+                                #        line += " TEMPLATE %s" % (unit_template)
+                                #line += '\n'
+                                # outf.write (line)
 
                                 if type == "BUF":
                                     print "ehhlo"
 
+                                pins_def = ""
+
                                 # sort by y pos
-                                for passnum in range(len(pins)-1,0,-1):
-                                    for i in range(passnum):
-                                        if int(pins[i]['posy']) < int(pins[i+1]['posy']):
-                                            temp = pins[i]
-                                            pins[i] = pins[i+1]
-                                            pins[i+1] = temp
+                                pins = sorted (pins, key=lambda x: int(x['posy']), reverse=True)
 
                                 max_y = -99999
                                 for pin in pins:
@@ -580,9 +609,9 @@ class ConvertLibrary:
                                         if pin['direction'] == _dir:
                                             py = int(pin['posy'])    
                                             while cur_y > py + 100:
-                                                outf.write ("SPC %s\n" % _dir)
+                                                pins_def += "SPC %s\n" % _dir
                                                 cur_y -= 100
-                                            outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction']))
+                                            pins_def += "%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction'])
                                             cur_y = py
 
                                 # sort by x pos
@@ -603,34 +632,68 @@ class ConvertLibrary:
                                                 first = False
                                             px = int(pin['posx'])    
                                             while cur_x < px:
-                                                outf.write ("SPC %s\n" % _dir)
+                                                pins_def += "SPC %s\n" % _dir
                                                 cur_x += 100
-                                            outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction']))
+                                            pins_def += "%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction'])
                                             cur_x = px
 
+                                # adjust width
+                                width = bb.width
+                                top_pins = self.filter_pins (pins, "T")
+                                bottom_pins = self.filter_pins (pins, "B")
+                                if len(top_pins) + len(bottom_pins) != 0:
+                                    width = max (width, 50 * (max (len(top_pins), len(bottom_pins))+6) )
+
+                                width += 2 * ((width/2 + pin_len) % 100)
+                                line = "UNIT"
+                                if type:
+                                    line += " " + type
+                                else:
+                                    if width>0 and width != def_width:
+                                        line += " WIDTH %d" % (width)
+                                    if unit_template:
+                                        line += " TEMPLATE %s" % (unit_template)
+                                line += '\n'
+
+                                outf.write (line)
+                                outf.write (pins_def)
+
+                    #
                     # now look for power pins
                     pins = []
                     pin_map = {}
                     for pin in comp.pins:
                         if is_power_pin(pin) and not pin['num'] in pin_map:
+                            if is_positive_power (pin):
+                                pin['direction'] = "T"
+                            else:
+                                pin['direction'] = "B"
                             pins.append(pin)
                             pin_map [pin['num']] = 1
 
-                    # sort by pin number
-                    if max_pin_number!=-1:
-                        for passnum in range(len(pins)-1,0,-1):
-                            for i in range(passnum):
-                                if int(pins[i]['num']) > int(pins[i+1]['num']):
-                                    temp = pins[i]
-                                    pins[i] = pins[i+1]
-                                    pins[i+1] = temp
+                    # sort by pin name/number
+                    # if max_pin_number!=-1:
+                    pins = sorted (pins, key=sort_name_num)
+                        # pins = sort_human(pins)
 
-                    outf.write ("UNIT PWR\n")
+                    top_pins = self.filter_pins (pins, "T")
+                    bottom_pins = self.filter_pins (pins, "B")
+
+                    width = def_width
+                    if len(top_pins) + len(bottom_pins) != 0:
+                        width = max (width, 50 * (max (len(top_pins), len(bottom_pins))+4) )
+
+                    line = "UNIT PWR"
+                    if width > 0 and width != def_width:
+                        line += " WIDTH %d" % (width)
+                    line += '\n'
+                    outf.write (line)
+
                     for pin in pins:
                         if is_positive_power (pin):
-                            pin['direction'] = "T"
+                            pin['direction'] = "TC"
                         else:
-                            pin['direction'] = "B"
+                            pin['direction'] = "BC"
                         # type may be power out?
                         # upper case name?
                         outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'].upper(),"PI",pin['direction']))
