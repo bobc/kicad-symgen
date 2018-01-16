@@ -19,6 +19,8 @@ def draw_text (comp, unit, variant, pos, s, fontsize, align_horiz = AlignLeft, a
                 text.unit = unit
                 text.demorgan = variant
                 text.pos = pos
+                text.text_size = fontsize
+                text.bold = True if fontsize > 50 else False
                 text.horiz_alignment = align_horiz
                 text.vert_alignment = align_vert
                 comp.drawOrdered.append (text.get_element())
@@ -100,6 +102,8 @@ def draw_text (comp, unit, variant, pos, s, fontsize, align_horiz = AlignLeft, a
         text.unit = unit
         text.demorgan = variant
         text.pos = pos
+        text.text_size = fontsize
+        text.bold = True if fontsize > 50 else False
         text.horiz_alignment = align_horiz
         text.vert_alignment = align_vert
         comp.drawOrdered.append (text.get_element())

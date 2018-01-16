@@ -3,6 +3,9 @@ from collections import OrderedDict
 
 from sym_drawing import *
 
+ls_center = "center"
+ls_floating = "floating"
+
 class StyleAttributes:
 
     pensize = 10
@@ -69,6 +72,8 @@ class SgComponent (SgItem):
         self.default_footprint = ""
 
         self.pin_names_inside = False
+
+        self.label_style = ls_floating
 
 class ComponentDef:
     name = "name"

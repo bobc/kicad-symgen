@@ -9,12 +9,12 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>C:\git_bobc\stm32-librarygen\stm32-librarygen</WorkingDirectory>
+    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\xilinx</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp mcu_stm32_stm32f0.txt --fp_dir c:\github\kicad-footprints</CommandLineArguments>
+    <CommandLineArguments>--inp fpga_xilinx.txt</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
@@ -34,6 +34,7 @@
     <Compile Include="convert_library.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="file_util.py" />
     <Compile Include="str_utils.py">
       <SubType>Code</SubType>
     </Compile>

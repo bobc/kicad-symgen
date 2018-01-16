@@ -58,6 +58,7 @@ from sym_gates import *
 from sym_iec import *
 
 from sym_utils import *
+import file_util
 
 from convert_library import *
 
@@ -107,6 +108,9 @@ class SymGen:
     def_name_offset = 20
     def_extra_offset = 40
 
+    def_label_style = ls_floating
+    
+
     # name offset
     # logic fill
     # tristate symbol
@@ -139,8 +143,6 @@ class SymGen:
     cur_pos = Point()
     units_have_variant = 0 # 1 for de Morgan variants
 
-    # label_style = ""
-    
     last_shape = ""
     unit_num = 0
     max_height = 600
@@ -389,9 +391,16 @@ class SymGen:
                 group.id = group_id
                 element.groups.append(group)
 
-                group.qualifiers = self.strip_quotes(tokens[1])
-                group.type = tokens[2]
-                group.label = self.strip_quotes(tokens[3])
+                group.qualifiers = ""
+                group.type = ""
+                group.label = ""
+
+                if len(tokens) > 1:
+                    group.qualifiers = self.strip_quotes(tokens[1])
+                if len(tokens) > 2:
+                    group.type = tokens[2]
+                if len(tokens) > 3:
+                    group.label = self.strip_quotes(tokens[3])
             elif tokens[0].upper() == "END-GROUP":
                 group = None
             else:    
@@ -588,6 +597,12 @@ class SymGen:
             else:
                 self.def_box_pen = int (tokens[1])
 
+        elif tokens[0] == "%label_style":
+            if self.in_component:
+                self.label_style = tokens[1]
+            else:
+                self.def_label_style = tokens[1]
+
         elif tokens[0] == "%fill":
             fill = self.parse_fill (tokens[1])
             if fill:
@@ -712,12 +727,12 @@ class SymGen:
 
         # new unit
 
-        unit.set_width (self.box_width)
-
-        unit.unit_rect.pos.x = -self.box_width / 2
+        unit.unit_rect.pos.x = 0
         unit.unit_rect.pos.y = 0
-        unit.unit_rect.size.x = self.box_width
+        unit.unit_rect.size.x = 0
         unit.unit_rect.size.y = 0
+
+        unit.set_width (self.box_width)
 
         self.unit_num = self.unit_num + 1
 
@@ -734,7 +749,7 @@ class SymGen:
         unit.vert_margin = 200
         unit.qualifiers = self.unit_label
         #unit.pin_length = self.pin_length
-
+        
         j = 1
         while j < len(tokens):
             token = tokens[j].upper()
@@ -845,7 +860,7 @@ class SymGen:
             if unit.unit_shape in ["and", "nand", "or", "nor", "xor", "xnor", "not", "buffer"]:
                 #comp.pin_length = 150
 
-                comp.label_style = "fixed"
+                comp.label_style = ls_center
                 if self.opt_power_unit_style == PowerStyle.LINES:
                     comp.pin_names_inside = True
                 unit.fill = self.logic_fill
@@ -865,7 +880,7 @@ class SymGen:
         unit.set_width (400)
 
         if self.opt_power_unit_style == PowerStyle.BOX:
-            if sgcomp.label_style == "fixed":
+            if sgcomp.label_style == ls_center:
                 unit.unit_rect.size.y = 200    
             else:
                 unit.unit_rect.size.y = 400    
@@ -874,7 +889,7 @@ class SymGen:
             unit.elements[0].shape = "box"
             unit.fill = NoFill
         else:
-            if sgcomp.label_style == "fixed":
+            if sgcomp.label_style == ls_center:
                 # sgcomp.pin_names_inside
                 # unit.unit_rect.size.y = 200    
                 unit.unit_rect.size.y = sgcomp.units[0].unit_rect.size.y
@@ -920,6 +935,7 @@ class SymGen:
         self.box_pen = self.def_box_pen
         self.box_fill = self.def_box_fill
         self.logic_fill = self.def_logic_fill
+        self.label_style = self.def_label_style
 
         self.pin_pos_left = Point()
         self.pin_pos_left.x = -self.box_width/2
@@ -940,7 +956,6 @@ class SymGen:
         self.max_height = 0
         #self.y_offset = 0
 
-        sgcomp.label_style = "floating"
         self.unit_label = ""
 
         self.ref_pos= Point()
@@ -969,6 +984,9 @@ class SymGen:
 
         while self.line.startswith ("%"):
             self.parse_directive(sgcomp)
+
+        #
+        sgcomp.label_style = self.label_style
 
         #
         tokens = self.line.split()
@@ -1118,7 +1136,7 @@ class SymGen:
         return sgcomp
 
 
-
+    # aka draw_component
     def generate_component (self, sgcomp):
         comments = []
         comments.append ("#\n")
@@ -1152,9 +1170,15 @@ class SymGen:
 
         for key in sgcomp.doc_fields:
             sgdoc = sgcomp.doc_fields[key]
-            self.lib.documentation.components[key] = OrderedDict([('description',sgdoc.description), ('keywords',sgdoc.keywords), ('datasheet',sgdoc.datasheet)])
-            if key != sgcomp.name:
-                comp.aliases[key] = self.lib.documentation.components[key]
+            if sgdoc.description or sgdoc.datasheet or sgdoc.keywords:
+                doc_fields = OrderedDict()
+                doc_fields ['description'] = sgdoc.description
+                doc_fields ['keywords'] = sgdoc.keywords
+                doc_fields ['datasheet'] = sgdoc.datasheet
+                #self.lib.documentation.components[key] = OrderedDict([('description',sgdoc.description), ('keywords',sgdoc.keywords), ('datasheet',sgdoc.datasheet)])
+                self.lib.documentation.components[key] = doc_fields
+                if key != sgcomp.name:
+                    comp.aliases[key] = self.lib.documentation.components[key]
 
         if sgcomp.default_footprint:
             comp.fields [2]['posx'] = "0"
@@ -1238,6 +1262,8 @@ class SymGen:
 
 
     def draw_unit (self, sgcomp, comp, unit):
+        # type: (SgComponent, Component, IecSymbol) -> None
+        assert isinstance(unit, IecSymbol)
 
         #debug
         #print "unit %d %s %s" % (self.unit_num, unit.unit_shape, "power" if unit.is_power_unit else "")
@@ -1259,6 +1285,48 @@ class SymGen:
 
             if unit.is_power_unit:
                 self.set_power_unit_size (sgcomp, unit)
+
+            # set width
+            w = unit.unit_rect.size.x
+            bbs = {}
+            bbs ['L'] = BoundingBox()
+            bbs ['R'] = BoundingBox()
+            bbs ['U'] = BoundingBox()
+            bbs ['D'] = BoundingBox()
+
+            count={}
+            count ['L'] = 0
+            count ['R'] = 0
+            count ['U'] = 0
+            count ['D'] = 0
+
+            for element in unit.elements:
+                for pin in element.pins:
+                    bb = pin.get_text_bounds()
+                    bbs[pin.orientation] += bb
+                    count[pin.orientation] += 1
+
+            width = max (bbs['L'].width, bbs['R'].width) * 2 + max (count['U'], count['D']) * 100
+
+            # round to multiple of 100
+            width = int(round(width))
+            width += width % 100
+
+            # allow for pin_len
+            width += 2 * ((width/2 + sgcomp.pin_length) % 100)
+
+            unit.set_width (width)
+            self.pin_pos_left.x = -unit.unit_rect.size.x / 2
+            self.pin_pos_right.x = unit.unit_rect.size.x / 2
+
+            # update L/R pin pos
+            for element in unit.elements:
+                for pin in element.pins:
+                    assert isinstance(pin, Pin)
+                    if pin.orientation == "R":
+                        pin.pos.x = self.pin_pos_left.x - pin.length
+                    elif pin.orientation == "L":
+                        pin.pos.x = self.pin_pos_right.x + pin.length
 
             #self.cur_pos = Point(0,50)
             self.cur_pos = Point(0,0)
@@ -1485,6 +1553,7 @@ class SymGen:
             ##
             #self.pin_length = temp
 
+    draw_unit.__annotations__ = {'sgcomp': SgComponent, 'comp': Component, 'unit': IecSymbol, 'return': None}
 
     def draw_pin_text (self, comp, unit, variant, pin, text):
         
@@ -1519,7 +1588,7 @@ class SymGen:
 
     def set_label_pos(self, sgcomp, unit):
 
-        if sgcomp.label_style == "floating":
+        if sgcomp.label_style == ls_floating:
             self.max_height = max (self.max_height, unit.unit_rect.size.y)
     
             if unit.unit_shape == "box":
@@ -1536,10 +1605,34 @@ class SymGen:
             #if y < self.name_pos.y:
             self.name_pos.x = unit.unit_rect.left()
             self.name_pos.y = y
+        else:
+            self.ref_pos.x = 0
+            self.ref_pos.y = 50
+
+            self.name_pos.x = 0
+            self.name_pos.y = -50
+
+
+    def get_text_extent (self, pins, filter=None):
+        bb = BoundingBox()
+        for pin in pins:
+            bb += pin.get_text_bounds()
+
+        return bb
+
+    def get_scaled_fontsize (self, minsize, num_pins):
+        size = max(minsize, num_pins / 5 * 25 )
+        return min(size, 200)
+
+    def test_size (self):
+        for j in range (1,41):
+            print "%s %s" % (j, self.get_scaled_fontsize(50, j))
 
     def draw_element (self, sgcomp, xunit, element, comp, unit, variant):
 
         fontsize = 50
+
+        #self.test_size()
 
         left_pins = self.find_pins (element.pins, "R")
         right_pins = self.find_pins (element.pins, "L")
@@ -1559,7 +1652,7 @@ class SymGen:
         # shape, template
         min_height = 0
         
-        if sgcomp.label_style == "fixed":
+        if sgcomp.label_style == ls_center:
             min_height = 200;
 
         top_margin = 0
@@ -1569,8 +1662,9 @@ class SymGen:
             offset = 150
 
         if len(top_pins) > 0 or (element.shape == "control" and element.label):
+            extent = self.get_text_extent (top_pins)
             if len(top_pins) > 0:
-                min_height += offset  # 200
+                min_height += align_to_grid(extent.height+99,100)  # 200
 
             if len(left_pins)+len(right_pins) != 0:
                 if sgcomp.pin_length == 150:
@@ -1583,7 +1677,9 @@ class SymGen:
 
         bottom_margin = 0
         if len(bottom_pins) > 0:
-            min_height += offset # 200
+            extent = self.get_text_extent (bottom_pins)
+
+            min_height += align_to_grid(extent.height+99,100) # 200
 
             if len(left_pins)+len(right_pins) != 0:
                 if sgcomp.pin_length == 150:
@@ -1712,12 +1808,19 @@ class SymGen:
 
         #
         for group in element.groups:
-            group_pos = Point()
-            group_pos.x = -box_size.x/2
-            group_pos.y = group.pins[0].pos.y + 50
+            extent = self.get_text_extent (group.pins)
+
             group_size = Point()
-            group_size.x = 200
-            group_size.y =  len(group.pins) * 100
+            group_size.x = max (200, int(extent.width))
+            group_size.y = len(group.pins) * 100
+
+            group_pos = Point()
+            if group.pins[0].orientation == "R":
+                group_pos.x = -box_size.x/2
+            else:
+                group_pos.x = box_size.x/2 - group_size.x
+
+            group_pos.y = group.pins[0].pos.y + 50
 
             rect = Rect()
             rect.p1.x = group_pos.x
@@ -1741,7 +1844,7 @@ class SymGen:
                 type_text = ""
 
             if type_text:
-                draw_text (comp, unit, variant, pos, type_text, fontsize)
+                draw_text (comp, unit, variant, pos, type_text, fontsize )
                 offset = 50
             else:
                 offset = 10
@@ -1756,12 +1859,13 @@ class SymGen:
                 draw_text (comp, unit, variant, pos, group.qualifiers, fontsize)
             
             if group.label:
+                size = self.get_scaled_fontsize (fontsize, len(group.pins) ) 
                 if group.pins[0].orientation == "R":
                     pos.x = group_pos.x + group_size.x + offset
                 else:
-                    pos.x = box_size.x/2 - group_size.x - offset - TextLength(group.qualifiers, fontsize)
+                    pos.x = box_size.x/2 - group_size.x - offset - TextLength(group.label, size)
                 pos.y = group_pos.y - group_size.y/2 - 25
-                draw_text (comp, unit, variant, pos, group.label, fontsize)
+                draw_text (comp, unit, variant, pos, group.label, size)
 
         # add icons
         if self.icon_lib and len(xunit.icons)>0:
@@ -1869,6 +1973,10 @@ class SymGen:
                         if pos.y % 100 != 0:
                             print "error: pin not on grid: %s %s" % (params["name"], pos)
                             self.num_errors += 1
+                    elif orientation in ['L', "R"]:
+                        if pos.x % 100 != 0:
+                            print "error: pin not on grid: %s %s" % (params["name"], pos)
+                            self.num_errors += 1
         
     def draw_pins (self, unit, pins, comp, unit_num, variant):
         for pin in pins:
@@ -1927,13 +2035,13 @@ class SymGen:
                             pin.pos = left_pins[l_pin].pos
                             l_pin += 1
                         else:
-                            print "error %s" % pin.number
+                            print "warning: pin %s not found in template %s" % (pin.number, unit.template)
                     elif pin.orientation == 'L':
                         if r_pin < len(right_pins):
                             pin.pos = right_pins[r_pin].pos
                             r_pin += 1
                         else:
-                            print "error %s" % pin.number
+                            print "warning: pin %s not found in template %s" % (pin.number, unit.template)
 
         # align pins (right)
         right_pins = self.find_pins (pins, "L")
@@ -2275,11 +2383,11 @@ parser.add_argument("--fp_dir", help="folder containing valid footprints")
 parser.add_argument("--ref", help="7400 logic reference list")
 parser.add_argument("-d", "--dump", help="Dump an existing library", action='store_true')
 parser.add_argument("-v", "--verbose", help="Enable verbose output", action="store_true")
+parser.add_argument("--regen", help="Dump an existing library and regenerate from script", action='store_true')
 
 args = parser.parse_args()
 
 #
-
 #
 symgen = SymGen()
 symgen.verbose = args.verbose
@@ -2288,7 +2396,16 @@ symgen.verbose = args.verbose
 #symgen.gen_comp ("data")
 #symgen.process_list()
 
-if args.dump:
+if args.regen:
+    actions = "dump,gen"
+elif args.dump:
+    actions = "dump"
+else:
+    actions = "gen"
+
+# --regen -lib C:\git_bobc\kicad-library\library\74xx.lib 
+
+if "dump" in actions:
     # -d --lib C:\git_bobc\kicad-library\library\74xx.lib --ref ..\74xx\7400_logic_ref.txt
     # -d --lib C:\git_bobc\kicad-library\library\Logic_74xx.lib --ref ..\74xx\7400_logic_ref.txt
     # 
@@ -2298,18 +2415,26 @@ if args.dump:
     lib_filename = args.lib
     dump_path = ""
 
+    print ("Extracting library %s" % lib_filename)
     convert = ConvertLibrary()
     ## convert.symbol_style = SymbolStyle.PHYSICAL
     convert.dump_lib (lib_filename, dump_path, args.ref)
 
-else:
+if "gen" in actions:
     # --inp 74xx.txt
-    if not args.inp:
-        ExitError("error: symgen script file not supplied (need --inp)")
+    # --inp mcu_stm32_stm32f0.txt --fp_dir c:\github\kicad-footprints
 
-    file = args.inp
+    if args.regen:
+        file = os.path.basename (args.lib)
+        file = file_util.change_extension (file, ".txt")
+    else:
+        if not args.inp:
+            ExitError("error: symgen script file not supplied (need --inp)")
+        file = args.inp
+
     footprints_folder = args.fp_dir
 
+    print ("Generating library from %s" % file)
     symgen.parse_input_file (file)
 
 

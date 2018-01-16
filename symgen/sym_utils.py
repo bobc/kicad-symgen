@@ -246,6 +246,7 @@ def is_positive_power (pin):
         name = name[-3:]
     if (norm_name in ["3.3V", "5V", "VCAP"] or name in ["VCC", "VDD", "V+"] 
         or norm_name.endswith ("VDD") 
+        or norm_name.startswith ("VCC")
         ):
         return True
 
@@ -257,6 +258,8 @@ def is_power_pin (pin):
         name = name[-3:]
     if ( norm_name in ["3.3V", "5V", "VCAP"] or name in ["VCC", "VDD", "V+", "GND", "VSS", "VEE", "V-"] 
         or norm_name.endswith ("VDD") 
+        or norm_name.startswith ("VCC")
+        or norm_name.startswith ("GND")
         ):
         return True
     elif pin['electrical_type'] in "Ww":

@@ -1,5 +1,7 @@
 """This module contains classes for drawing"""
 
+import math
+
 from enum import Enum
 from schlib import *
 from str_utils import *
@@ -100,6 +102,13 @@ class Point:
     def Add (self, p):
         return Point (self.x + p.x, self.y + p.y)
 
+    def Rotate (self, angle):
+        theta = math.radians (angle)
+        x2 = self.x * math.cos(theta) + self.y * math.sin(theta)
+        y2 = self.x * math.sin(theta) + self.y * math.cos(theta)
+        return Point (x2, y2)
+
+
     def __str__(self):
         return "P(%r, %r)" % (self.x, self.y)
     __repr__ = __str__
@@ -166,6 +175,19 @@ class BoundingBox(object):
             self.pmax.y = p.y
             self.valid = True
 
+    def rotate (self, angle):
+        c1 = Point (self.pmin.x, self.pmin.y).Rotate(angle)
+        c2 = Point (self.pmin.x, self.pmax.y).Rotate(angle)
+        c3 = Point (self.pmax.x, self.pmin.y).Rotate(angle)
+        c4 = Point (self.pmax.x, self.pmax.y).Rotate(angle)
+        cs = [c1, c2, c3, c4]
+
+        self.pmin.x = round(min(i.x for i in cs))
+        self.pmax.x = round(max(i.x for i in cs))
+        self.pmin.y = round(min(i.y for i in cs))
+        self.pmax.y = round(max(i.y for i in cs))
+
+
     def __add__(self, other):
         if other == 0:
             return BoundingBox(self.pmin, self.pmax)
@@ -175,8 +197,8 @@ class BoundingBox(object):
     __radd__ = __add__
 
     def __repr__(self):
-        return "BoundingBox(%r, %r, %r, %r)" % (
-                self.pmin.x, self.pmax.x, self.pmin.y, self.pmax.y)
+        return "BoundingBox(%r,%r  %r,%r)" % (
+                self.pmin.x, self.pmin.y, self.pmax.x,  self.pmax.y)
 
     __str__ = __repr__
 
@@ -282,6 +304,28 @@ class Pin (DrawBase):
                 s += '"'+self.qualifiers+'"'
             return s
 
+
+    def get_angle (self, orientation):
+        # todo: check directions ...
+        if orientation == 'L':
+            return 0
+        elif orientation == 'U':
+            return 90
+        elif orientation == 'R':
+            return 180
+        elif orientation == 'D':
+            return 270
+
+
+    def get_text_bounds (self):
+        bb = BoundingBox(Point(),Point())
+        #
+        bb.pmin = Point (0, self.sizename/2)
+        bb.pmax = Point (len(self.name) * self.sizename, -self.sizename/2)
+
+        bb.rotate (self.get_angle (self.orientation))
+        
+        return bb
 
     def __str__(self):
         return self.get_string()
