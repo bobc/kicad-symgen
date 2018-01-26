@@ -372,11 +372,11 @@ class OrGate (Gate):
         else:
             arc = Arc()
             arc.SetParams (unit, variant, self.pensize, self.fill, Point(self.width, self.height/2).Sub(origin), Point (qx, 0).Sub(origin), 
-                Point(cp.x, self.height-cp.y).Sub(origin), radius, -ang1, -ang2)
+                           Point(cp.x, self.height-cp.y).Sub(origin), radius, -ang1, -ang2)
             comp.drawOrdered.append(arc.get_element())
             arc = Arc()
             arc.SetParams (unit, variant, self.pensize, self.fill, Point(self.width, self.height/2).Sub(origin), Point (qx, self.height).Sub(origin), 
-                cp.Sub(origin), radius, ang1, ang2)
+                           cp.Sub(origin), radius, ang1, ang2)
             comp.drawOrdered.append(arc.get_element())
 
         pts=[]
@@ -412,7 +412,7 @@ class OrGate (Gate):
         # draw arc, no fill
         arc = Arc()
         arc.SetParams (unit, variant, self.pensize, 'N', Point(0, self.height).Sub(origin), Point (0, 0).Sub(origin), 
-            cp.Sub(origin), radius, ang, -ang)
+                       cp.Sub(origin), radius, ang, -ang)
         comp.drawOrdered.append(arc.get_element())
 
         #for j in range (0, len(self.offsets)):
@@ -499,7 +499,7 @@ class XorGate (Gate):
 
         arc = Arc()
         arc.SetParams (unit, variant, self.pensize, 'N', Point(-qx1, self.height).Sub(origin), Point (-qx1, 0).Sub(origin), 
-            cp.Sub(origin), radius, ang, -ang)
+                       cp.Sub(origin), radius, ang, -ang)
         comp.drawOrdered.append(arc.get_element())
 
         # ??

@@ -44,7 +44,7 @@ def parse_sexp(sexp):
     return out[0]
     
 class SexprBuilder(object):
-    def __init__(self, key, *arg, **kwarg):
+    def __init__(self, key, *arg, **kwargs):
         
         self.key = key
         self.indent = kwargs.get('indent', 0)

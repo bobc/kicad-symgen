@@ -241,13 +241,13 @@ class Component(object):
         
     def resetDraw(self):
         self.draw = {
-                    'arcs':[],
-                    'circles':[],
-                    'polylines':[],
-                    'rectangles':[],
-                    'texts':[],
-                    'pins':[]
-                }
+            'arcs':[],
+            'circles':[],
+            'polylines':[],
+            'rectangles':[],
+            'texts':[],
+            'pins':[]
+            }
 
     def getDocumentation(self,documentation,name):
         try:
@@ -275,8 +275,8 @@ class Component(object):
 
         for pin in self.pins:
             if ((name and pin['name'] == name) or
-                (direction and pin['direction'] == direction) or
-                (electrical_type and pin['electrical_type'] == electrical_type)):
+                    (direction and pin['direction'] == direction) or
+                    (electrical_type and pin['electrical_type'] == electrical_type)):
                 pins.append(pin)
 
         return pins

@@ -42,11 +42,6 @@ class KLCRuleBase(object):
         self.description = description
         self.messageBuffer = []
 
-    def __init__(self, name, description):
-        self.name = name
-        self.description = description
-        self.messageBuffer=[]  
-
     #adds message into buffer only if such level of verbosity is wanted
     def verboseOut(self, msgVerbosity, severity, message):
         self.messageBuffer.append([message,msgVerbosity,severity])

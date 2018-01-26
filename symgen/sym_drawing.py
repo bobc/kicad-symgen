@@ -192,13 +192,13 @@ class BoundingBox(object):
         if other == 0:
             return BoundingBox(self.pmin, self.pmax)
         return BoundingBox(
-                Point (min(self.pmin.x, other.pmin.x), min(self.pmin.y, other.pmin.y)),
-                Point (max(self.pmax.x, other.pmax.x), max(self.pmax.y, other.pmax.y)) )
+            Point (min(self.pmin.x, other.pmin.x), min(self.pmin.y, other.pmin.y)),
+            Point (max(self.pmax.x, other.pmax.x), max(self.pmax.y, other.pmax.y)) )
     __radd__ = __add__
 
     def __repr__(self):
         return "BoundingBox(%r,%r  %r,%r)" % (
-                self.pmin.x, self.pmin.y, self.pmax.x,  self.pmax.y)
+            self.pmin.x, self.pmin.y, self.pmax.x,  self.pmax.y)
 
     __str__ = __repr__
 
@@ -299,7 +299,7 @@ class Pin (DrawBase):
             return "SPC %s" % (kicad_to_symgen_dir(self.orientation))
         else:
             s = "%s %s %s %s%s" % (self.number, self.name, get_pin_type (self.type, self.shape), kicad_to_symgen_dir(self.orientation), 
-                                 "" if self.align == "L" else self.align)
+                                   "" if self.align == "L" else self.align)
             if self.qualifiers:
                 s += '"'+self.qualifiers+'"'
             return s
