@@ -27,9 +27,10 @@ from sym_utils import *
 
 
 def alphanum (s):
-    convert = lambda text: float(text) if text.isdigit() else text
-    alphanum = [ convert(c) for c in re.split('([-+]?[0-9]*\.?[0-9]*)', s) ]
-    return alphanum
+    convert = lambda text: int(text) if text.isdigit() else text.rjust(3, '@')
+    #parts = [ convert(c) for c in re.split('([-+]?[0-9]*\.?[0-9]*)', s) ]
+    parts = [ convert(c) for c in re.split('([0-9]*)', s) ]
+    return parts
 
 def sort_num(pin):
     return int (pin['num'])
@@ -38,19 +39,24 @@ def sort_name_num(pin):
     return pin['name'], alphanum (pin['num'])
 
 def sort_human(l):
-  convert = lambda text: float(text) if text.isdigit() else text
-  alphanum = lambda key: [ convert(c) for c in re.split('([-+]?[0-9]*\.?[0-9]*)', key) ]
-  l.sort( key=alphanum )
-  return l
+    convert = lambda text: float(text) if text.isdigit() else text
+    alphanum = lambda key: [ convert(c) for c in re.split('([-+]?[0-9]*\.?[0-9]*)', key) ]
+    l.sort( key=alphanum )
+    return l
 
 class ConvertLibrary:
 
-    symbol_style = SymbolStyle.ANSI
-    num_errors = 0
     logic_list = []
 
     def __init__(self):
         self.num_errors = 0
+        # conversion options
+        self.symbol_style = SymbolStyle.ANSI
+        self.use_templates = False
+        self.separate_power_unit = True
+        self.squash_gaps = False
+        self.label_style = ls_floating
+        self.auto_width = False
 
 
     def get_descriptor (self, name):
@@ -115,7 +121,7 @@ class ConvertLibrary:
     def filter_pins (self, pins, direction):
         l = []
         for pin in pins:
-            if pin['direction'] == direction:
+            if pin['direction'] in direction:
                 l.append (pin)
         return l
 
@@ -145,13 +151,18 @@ class ConvertLibrary:
         print "Extracting library %s" % (dump_filename)
 
         #
-        create_empty_lib (template_filename)
-        template_lib = SchLib(template_filename)
-        docfile = Documentation (template_doc_filename)
+        if self.use_templates:
+            create_empty_lib (template_filename)
+            template_lib = SchLib(template_filename)
+            docfile = Documentation (template_doc_filename)
 
         #
-        def_width = 600
-        def_pin_len = 100
+        if self.auto_width:
+            def_width = 0
+        else:
+            def_width = 600
+
+        def_pin_len = 150
 
         outf = open (dump_filename,'w')
 
@@ -165,11 +176,14 @@ class ConvertLibrary:
         outf.write ("#\n")
         outf.write ("%%lib %s.lib\n" % out_filename)
         outf.write ("%%pinlen %d\n" % def_pin_len)
-        outf.write ("%%width %d\n" % def_width)
+        outf.write ("%%width %s\n" % ("auto" if self.auto_width else def_width ) )
         outf.write ("%fill back\n")
         outf.write ("%line 10\n")
-        outf.write ("%%iconlib %s\n" % os.path.basename(template_filename))
+        if self.use_templates:
+            outf.write ("%%iconlib %s\n" % os.path.basename(template_filename))
         outf.write ("%%style %s\n" % self.symbol_style.name)
+        if self.label_style == ls_center:
+            outf.write ("%%label_style %s\n" % self.label_style)
         outf.write ("#\n")
 
 
@@ -389,26 +403,27 @@ class ConvertLibrary:
                     pin['direction'] = kicad_to_symgen_dir (pin['direction'])
 
                 #
-                comments = []
-                comments.append ("#\n")
-                comments.append ("# " + comp.name + "\n")
-                comments.append ("#\n")
+                if self.use_templates:
+                    comments = []
+                    comments.append ("#\n")
+                    comments.append ("# " + comp.name + "\n")
+                    comments.append ("#\n")
 
-                component_data = []
-                component_data.append("DEF "+comp.name + " "+comp.reference+" 0 40 Y Y 1 L N")      # units are not interchangeable
-                component_data.append("F0 \"U\" 0 0 50 H V C CNN")
-                component_data.append("F1 \"74469\" 0 -200 50 H V C CNN")
-                component_data.append("F2 \"\" 0 0 50 H I C CNN")
-                component_data.append("F3 \"\" 0 0 50 H I C CNN")
-                component_data.append("DRAW")
-                component_data.append("ENDDRAW")
-                component_data.append("ENDDEF")
+                    component_data = []
+                    component_data.append("DEF "+comp.name + " "+comp.reference+" 0 40 Y Y 1 L N")      # units are not interchangeable
+                    component_data.append("F0 \"U\" 0 0 50 H V C CNN")
+                    component_data.append("F1 \"74469\" 0 -200 50 H V C CNN")
+                    component_data.append("F2 \"\" 0 0 50 H I C CNN")
+                    component_data.append("F3 \"\" 0 0 50 H I C CNN")
+                    component_data.append("DRAW")
+                    component_data.append("ENDDRAW")
+                    component_data.append("ENDDEF")
 
-                templ_comp = Component(component_data, comments, docfile)
-                templ_comp.fields [0]['reference'] = comp.reference
-                templ_comp.fields [1]['name'] = comp.name
-                templ_comp.definition['reference'] = comp.reference
-                templ_comp.definition['name'] = comp.name
+                    templ_comp = Component(component_data, comments, docfile)
+                    templ_comp.fields [0]['reference'] = comp.reference
+                    templ_comp.fields [1]['name'] = comp.name
+                    templ_comp.definition['reference'] = comp.reference
+                    templ_comp.definition['name'] = comp.name
 
                 # get the graphics for this comp
                 # TODO: unit, variant
@@ -418,11 +433,9 @@ class ConvertLibrary:
                     if d[0] in ['A','C','P','T','S'] and d[1]['unit'] <= '1':
                         count += 1
 
-                if comp.name=="4009":
-                    print "ehhlo"
-
                 unit_template = None
-                if count > 1:
+
+                if self.use_templates and count > 1:
                     bb = get_bounds (comp, 0)
 
                     if bb.pmax.y != bb.height /2 :
@@ -469,8 +482,8 @@ class ConvertLibrary:
                             pin['name'] = "~" + pin['name']
 
                 if (footprint.find("DIP") != -1 or footprint.find("DIL") != -1 or
-                    footprint.find("SOIC") != -1 or
-                    footprint.find("SOP") != -1) :
+                        footprint.find("SOIC") != -1 or
+                        footprint.find("SOP") != -1) :
                     package = "dip"
                 elif (footprint.find("QFP") != -1 or footprint.find("QFN") != -1) :
                     package = "quad"
@@ -572,29 +585,39 @@ class ConvertLibrary:
                                 if pin['unit']==str(0) and num_units>1 and not is_power_pin (pin):
                                     print "info: common pin %s %s %s"  % (comp.name, pin['num'], pin['name'])
 
-                                if pin['convert'] in ['0','1'] and not is_power_pin(pin):
+                                if pin['convert'] in ['0','1'] and not (self.separate_power_unit and is_power_pin(pin)):
                                     pins.append (pin)
 
                             if pins:
 
-                                #line = "UNIT"
-                                #if type:
-                                #    line += " " + type
-                                #else:
-                                #    if bb.width>0 and bb.width != def_width:
-                                #        line += " WIDTH %d" % (bb.width)
-                                #    if unit_template:
-                                #        line += " TEMPLATE %s" % (unit_template)
-                                #line += '\n'
-                                # outf.write (line)
+                                # move horiz power pins to T/B ?
 
-                                if type == "BUF":
-                                    print "ehhlo"
+                                #horiz_pins = self.filter_pins (pins, "LR")
+                                #vert_pins = self.filter_pins (pins, "TB")
+
+                                horiz_pins=[]
+                                vert_pins=[]
+                                for pin in pins:
+                                    if is_power_pin(pin):
+                                        if is_positive_power(pin):
+                                            pin['direction'] = 'T'
+                                        else:
+                                            pin['direction'] = 'B'
+                                        pin['electrical_type']= 'W'
+                                        pin['pin_type'] = ''
+                                        vert_pins.append (pin)
+                                    else:
+                                        if pin['direction'] in "TB":
+                                            vert_pins.append (pin)
+                                        else:
+                                            horiz_pins.append (pin)
+
 
                                 pins_def = ""
 
+                                # look for horiz pins
                                 # sort by y pos
-                                pins = sorted (pins, key=lambda x: int(x['posy']), reverse=True)
+                                pins = sorted (horiz_pins, key=lambda x: int(x['posy']), reverse=True)
 
                                 max_y = -99999
                                 for pin in pins:
@@ -602,27 +625,32 @@ class ConvertLibrary:
                                         if int(pin['posy']) > max_y:
                                             max_y = int(pin['posy'])
 
-                                # look for horiz pins
                                 for _dir in ['L','R']:
                                     cur_y = max_y
                                     for pin in pins:
-                                        if pin['direction'] == _dir:
+                                        if is_power_pin(pin):
+                                            if is_positive_power(pin):
+                                                pin['direction'] = 'T'
+                                            else:
+                                                pin['direction'] = 'B'
+                                            pin['electrical_type']= 'W'
+                                            pin['pin_type'] = ''
+
+                                        elif pin['direction'] == _dir:
                                             py = int(pin['posy'])    
+                                            first_space = True
                                             while cur_y > py + 100:
-                                                pins_def += "SPC %s\n" % _dir
+                                                if first_space or not self.squash_gaps:
+                                                    pins_def += "SPC %s\n" % _dir
+                                                    first_space = False
                                                 cur_y -= 100
                                             pins_def += "%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction'])
                                             cur_y = py
 
-                                # sort by x pos
-                                for passnum in range(len(pins)-1,0,-1):
-                                    for i in range(passnum):
-                                        if int(pins[i]['posx']) < int(pins[i+1]['posx']):
-                                            temp = pins[i]
-                                            pins[i] = pins[i+1]
-                                            pins[i+1] = temp
-
                                 # look for vert pins
+                                # sort by x pos
+                                pins = sorted (vert_pins, key=lambda x: int(x['posx']))
+
                                 for _dir in ['T','B']:
                                     first = True
                                     for pin in pins:
@@ -631,10 +659,19 @@ class ConvertLibrary:
                                                 cur_x = int(pin['posx'])
                                                 first = False
                                             px = int(pin['posx'])    
-                                            while cur_x < px:
-                                                pins_def += "SPC %s\n" % _dir
+                                            first_space = True
+                                            while cur_x < px - 100:
+                                                if first_space or not self.squash_gaps:
+                                                    pins_def += "SPC %s\n" % _dir
+                                                    first_space = False
                                                 cur_x += 100
-                                            pins_def += "%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction'])
+
+                                            # remove invisible attribute from power pins
+                                            if is_power_pin (pin):
+                                                pin['pin_type'] = pin['pin_type'].replace ("N", "")
+                                                pin['name'] = pin['name'].upper()
+
+                                            pins_def += "%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']), pin['direction']+'C')
                                             cur_x = px
 
                                 # adjust width
@@ -649,7 +686,7 @@ class ConvertLibrary:
                                 if type:
                                     line += " " + type
                                 else:
-                                    if width>0 and width != def_width:
+                                    if width>0 and width != def_width and def_width != 0:
                                         line += " WIDTH %d" % (width)
                                     if unit_template:
                                         line += " TEMPLATE %s" % (unit_template)
@@ -659,45 +696,47 @@ class ConvertLibrary:
                                 outf.write (pins_def)
 
                     #
-                    # now look for power pins
-                    pins = []
-                    pin_map = {}
-                    for pin in comp.pins:
-                        if is_power_pin(pin) and not pin['num'] in pin_map:
+                    if self.separate_power_unit:
+                        # now look for power pins
+                        pins = []
+                        pin_map = {}
+                        for pin in comp.pins:
+                            if is_power_pin(pin) and not pin['num'] in pin_map:
+                                if is_positive_power (pin):
+                                    pin['direction'] = "T"
+                                else:
+                                    pin['direction'] = "B"
+                                pins.append(pin)
+                                pin_map [pin['num']] = 1
+
+                        # sort by pin name/number
+                        # if max_pin_number!=-1:
+                        pins = sorted (pins, key=sort_name_num)
+                            # pins = sort_human(pins)
+
+                        top_pins = self.filter_pins (pins, "T")
+                        bottom_pins = self.filter_pins (pins, "B")
+
+                        width = def_width
+                        if len(top_pins) + len(bottom_pins) != 0:
+                            width = max (width, 50 * (max (len(top_pins), len(bottom_pins))+4) )
+
+                        line = "UNIT PWR"
+                        if width > 0 and width != def_width and def_width != 0:
+                            line += " WIDTH %d" % (width)
+                        line += '\n'
+                        outf.write (line)
+
+                        for pin in pins:
                             if is_positive_power (pin):
-                                pin['direction'] = "T"
+                                pin['direction'] = "TC"
                             else:
-                                pin['direction'] = "B"
-                            pins.append(pin)
-                            pin_map [pin['num']] = 1
+                                pin['direction'] = "BC"
+                            # type may be power out?
+                            # upper case name?
+                            outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'].upper(),"PI",pin['direction']))
 
-                    # sort by pin name/number
-                    # if max_pin_number!=-1:
-                    pins = sorted (pins, key=sort_name_num)
-                        # pins = sort_human(pins)
-
-                    top_pins = self.filter_pins (pins, "T")
-                    bottom_pins = self.filter_pins (pins, "B")
-
-                    width = def_width
-                    if len(top_pins) + len(bottom_pins) != 0:
-                        width = max (width, 50 * (max (len(top_pins), len(bottom_pins))+4) )
-
-                    line = "UNIT PWR"
-                    if width > 0 and width != def_width:
-                        line += " WIDTH %d" % (width)
-                    line += '\n'
-                    outf.write (line)
-
-                    for pin in pins:
-                        if is_positive_power (pin):
-                            pin['direction'] = "TC"
-                        else:
-                            pin['direction'] = "BC"
-                        # type may be power out?
-                        # upper case name?
-                        outf.write ("%s %s %s %s\n" % (pin['num'],pin['name'].upper(),"PI",pin['direction']))
-
+                    #
                     outf.write ("END\n")
 
         outf.close()
@@ -710,5 +749,6 @@ class ConvertLibrary:
         outf.close()
 
         #
-        template_lib.save ()
+        if self.use_templates:
+            template_lib.save ()
 
