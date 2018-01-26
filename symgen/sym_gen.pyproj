@@ -14,7 +14,7 @@
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp fpga_xilinx.txt</CommandLineArguments>
+    <CommandLineArguments>-d --lib C:\git_bobc\kicad-symbols\fpga_xilinx_artix7.lib</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
@@ -35,6 +35,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="file_util.py" />
+    <Compile Include="lib_symgen.py" />
     <Compile Include="str_utils.py">
       <SubType>Code</SubType>
     </Compile>

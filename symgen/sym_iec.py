@@ -102,7 +102,7 @@ class IecSymbol (IecBase):
     def draw (self, comp, unit, variant):
         pos = Point(0,0)
         width = 600
-        for element in elements:
+        for element in self.elements:
             height = element.draw (comp, unit, variant, pos, width)
             pos.y += height
         # return height
