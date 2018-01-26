@@ -1,0 +1,955 @@
+#
+# Memory_EEPROM.lib
+#
+#
+# Global Defaults
+#
+%lib Memory_EEPROM.lib
+%pinlen 100
+%width 600
+%fill back
+%line 10
+%style ANSI
+#
+#
+# 24AA02
+#
+COMP 24AA02 U
+FIELD $FOOTPRINT "Package_TO_SOT_SMD:SOT-23-5"
+FPLIST
+SOT?23*
+DESC I2C Serial EEPROM, 2Kb, SOT-23
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/22124D.pdf
+UNIT
+1 SCL I L
+SPC L
+3 SDA B L
+5 NC NN R
+UNIT PWR
+2 GND PI BC
+4 VCC PI TC
+END
+#
+# 24LC16
+#
+COMP 24LC16 U
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*3.9x4.9mm*
+DESC I2C Serial EEPROM, 16Kb, SOIC-8
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21703d.pdf
+ALIAS 24LC00
+DESC I2C Serial EEPROM, 128 Bits
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21178G.pdf
+ALIAS 24LC01
+DESC I2C Serial EEPROM, 1Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21711J.pdf
+ALIAS 24LC02
+DESC I2C Serial EEPROM, 2Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21709c.pdf
+ALIAS 24LC04
+DESC I2C Serial EEPROM, 4Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21708K.pdf
+ALIAS 24LC08
+DESC I2C Serial EEPROM, 8Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21710J.pdf
+ALIAS 24LC32
+DESC I2C Serial EEPROM, 32Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21072G.pdf
+ALIAS 24LC64
+DESC I2C Serial EEPROM, 64Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21189f.pdf
+ALIAS 24LC128
+DESC I2C Serial EEPROM, 128Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21191s.pdf
+ALIAS 24LC256
+DESC I2C Serial EEPROM, 256Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/devicedoc/21203m.pdf
+ALIAS 24LC512
+DESC I2C Serial EEPROM, 512Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21754M.pdf
+ALIAS 24LC1025
+DESC I2C Serial EEPROM, 1024Kb
+KEYW I2C Serial EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21941B.pdf
+UNIT
+1 A0 I L
+2 A1 I L
+3 A2 I L
+5 SDA B R
+6 SCL I R
+7 WP I R
+UNIT PWR
+4 GND PI BC
+8 VCC PI TC
+END
+#
+# 25LCxxx
+#
+COMP 25LCxxx U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+TSSOP*4.4x3mm*P0.65mm*
+#
+DESC SPI Serial EEPROM
+KEYW EEPROM memory SPI serial
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21832H.pdf
+#
+ALIAS AT25xxx
+DESC Microchip SPI Serial EEPROM
+KEYW EEPROM memory SPI serial
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8707-SEEPROM-AT25010B-020B-040B-Datasheet.pdf
+#
+ALIAS BR25Sxxx
+DESC ROHM Semiconductor SPI Serial EEPROM
+KEYW EEPROM memory SPI serial
+DOC http://www.rohm.com/web/global/products/-/product/BR25G128F-3
+#
+ALIAS CAT250xxx
+DESC ON Semiconductor SPI Serial EEPROM
+KEYW EEPROM memory SPI serial
+DOC http://www.onsemi.com/PowerSolutions/product.do?id=CAT25040
+#
+UNIT
+3 ~WP I L
+7 ~HOLD I L
+1 ~CS I L
+6 SCK I R
+5 MOSI I R
+2 MISO I R
+UNIT PWR
+4 GND PI BC
+8 VCC PI TC
+END
+#
+# 25LCxxx-DFN
+#
+COMP 25LCxxx-DFN U
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.75x1.45mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+#
+DESC SPI Serial EEPROM, DFN8
+KEYW EEPROM memory SPI serial
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/21832H.pdf
+#
+ALIAS AT25xxx-DFN
+DESC Microchip SPI Serial EEPROM, DFN8
+KEYW EEPROM memory SPI serial
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8707-SEEPROM-AT25010B-020B-040B-Datasheet.pdf
+#
+ALIAS BR25Sxxx-DFN
+DESC ROHM Semiconductor SPI Serial EEPROM, DFN8
+KEYW EEPROM memory SPI serial
+DOC http://www.rohm.com/web/global/products/-/product/BR25G128F-3
+#
+ALIAS CAT250xxx-DFN
+DESC ON Semiconductor SPI Serial EEPROM, DFN8
+KEYW EEPROM memory SPI serial
+DOC http://www.onsemi.com/PowerSolutions/product.do?id=CAT25040
+#
+UNIT
+3 ~WP I L
+7 ~HOLD I L
+1 ~CS I L
+6 SCK I R
+5 MOSI I R
+2 MISO I R
+UNIT PWR
+4 GND PI BC
+9 GND PI BC
+8 VCC PI TC
+END
+#
+# 28C256
+#
+COMP 28C256 U
+FPLIST
+DIP*W15.24mm*
+SOIC*7.5x17.9mm*P1.27mm*
+DESC Paged Parallel EEPROM 256Kb (32K x 8)
+KEYW Parallel EEPROM 256Kb
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/doc0006.pdf
+UNIT WIDTH 800
+10 A0 I L
+9 A1 I L
+8 A2 I L
+7 A3 I L
+6 A4 I L
+5 A5 I L
+4 A6 I L
+3 A7 I L
+25 A8 I L
+24 A9 I L
+21 A10 I L
+23 A11 I L
+2 A12 I L
+26 A13 I L
+1 A14 I L
+SPC L
+27 ~WE I L
+22 ~OE I L
+20 ~CS I L
+11 D0 T R
+12 D1 T R
+13 D2 T R
+15 D3 T R
+16 D4 T R
+17 D5 T R
+18 D6 T R
+19 D7 T R
+UNIT PWR
+14 GND PI B
+28 VCC PI T
+END
+#
+# 93AAxxA
+#
+COMP 93AAxxA U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+DESC Serial EEPROM, 93 Series, 1.8V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+ALIAS 93AAxxB
+DESC Serial EEPROM, 93 Series, 1.8V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+#
+UNIT WIDTH 400
+1 CS I L
+2 SCLK I L
+3 DI I R
+4 DO T R
+7 NC NN R
+6 NC NN R
+UNIT PWR
+5 GND PI B
+8 VCC PI T
+END
+#
+# 93AAxxC
+#
+COMP 93AAxxC U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+DESC Serial EEPROM, 93 Series, with ORG Pin, 1.8V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+UNIT WIDTH 400
+1 CS I L
+2 SCLK I L
+3 DI I R
+4 DO T R
+7 NC NN R
+6 ORG I R
+UNIT PWR
+5 GND PI B
+8 VCC PI T
+END
+#
+# 93CxxA
+#
+COMP 93CxxA U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+DESC Serial EEPROM, 93 Series, 5.0V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+ALIAS 93CxxB
+DESC Serial EEPROM, 93 Series, 5.0V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+UNIT WIDTH 400
+1 CS I L
+2 SCLK I L
+3 DI I R
+4 DO T R
+7 NC NN R
+6 NC NN R
+UNIT PWR
+5 GND PI B
+8 VCC PI T
+END
+#
+# 93CxxC
+#
+COMP 93CxxC U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+DESC Serial EEPROM, 93 Series, with ORG Pin, 5.0V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+UNIT WIDTH 400
+1 CS I L
+2 SCLK I L
+3 DI I R
+4 DO T R
+7 NC NN R
+6 ORG I R
+UNIT PWR
+5 GND PI B
+8 VCC PI T
+END
+#
+# 93LCxxA
+#
+COMP 93LCxxA U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+DESC Serial EEPROM, 93 Series, 2.5V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+ALIAS 93LCxxB
+DESC Serial EEPROM, 93 Series, 2.5V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+UNIT WIDTH 400
+1 CS I L
+2 SCLK I L
+3 DI I R
+4 DO T R
+7 NC NN R
+6 NC NN R
+UNIT PWR
+5 GND PI B
+8 VCC PI T
+END
+#
+# 93LCxxC
+#
+COMP 93LCxxC U
+FPLIST
+DIP*W7.62mm*
+SOIC*3.9x4.9mm*
+DESC Serial EEPROM, 93 Series, with ORG Pin, 2.5V
+KEYW EEPROM memory SPI microwire
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/20001749K.pdf
+UNIT WIDTH 400
+1 CS I L
+2 SCLK I L
+3 DI I R
+4 DO T R
+7 NC NN R
+6 ORG I R
+UNIT PWR
+5 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS01-MAHM
+#
+COMP AT24CS01-MAHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.3x1.5mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+#
+DESC I2C Serial EEPROM, 1Kb (128x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+ALIAS AT24CS02-MAHM
+DESC I2C Serial EEPROM, 2Kb (256x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS01-SSHM
+#
+COMP AT24CS01-SSHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*
+DESC I2C Serial EEPROM, 1Kb (128x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+ALIAS AT24CS02-SSHM
+DESC I2C Serial EEPROM, 2Kb (256x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS01-STUM
+#
+COMP AT24CS01-STUM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_TO_SOT_SMD:SOT-23-5"
+FPLIST
+SOT?23*
+DESC I2C Serial EEPROM, 1Kb (128x8) with Unique Serial Number, SOT-23-5
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+ALIAS AT24CS02-STUM
+DESC I2C Serial EEPROM, 2Kb (256x8) with Unique Serial Number, SOT-23-5
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+5 WP I L
+3 SDA B R
+SPC R
+1 SCL I R
+UNIT PWR
+2 GND PI B
+4 VCC PI T
+END
+#
+# AT24CS01-XHM
+#
+COMP AT24CS01-XHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSSOP-8_4.4x3mm_P0.65mm"
+FPLIST
+TSSOP*4.4x3mm*P0.65mm*
+DESC I2C Serial EEPROM, 1Kb (128x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+ALIAS AT24CS02-XHM
+DESC I2C Serial EEPROM, 2Kb (256x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8815-SEEPROM-AT24CS01-02-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS04-MAHM
+#
+COMP AT24CS04-MAHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.3x1.5mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+DESC I2C Serial EEPROM, 4Kb (512x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS04-SSHM
+#
+COMP AT24CS04-SSHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*
+DESC I2C Serial EEPROM, 4Kb (512x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS04-STUM
+#
+COMP AT24CS04-STUM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_TO_SOT_SMD:SOT-23-5"
+FPLIST
+SOT?23*
+DESC I2C Serial EEPROM, 4Kb (512x8) with Unique Serial Number, SOT-23-5
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+5 WP I L
+3 SDA B R
+SPC R
+1 SCL I R
+UNIT PWR
+2 GND PI B
+4 VCC PI T
+END
+#
+# AT24CS04-XHM
+#
+COMP AT24CS04-XHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSSOP-8_4.4x3mm_P0.65mm"
+FPLIST
+TSSOP*4.4x3mm*P0.65mm*
+DESC I2C Serial EEPROM, 4Kb (512x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS08-MAHM
+#
+COMP AT24CS08-MAHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.3x1.5mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+DESC I2C Serial EEPROM, 8Kb (1024x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS08-SSHM
+#
+COMP AT24CS08-SSHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*
+DESC I2C Serial EEPROM, 8Kb (1024x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS08-STUM
+#
+COMP AT24CS08-STUM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_TO_SOT_SMD:SOT-23-5"
+FPLIST
+SOT?23*
+DESC I2C Serial EEPROM, 8Kb (1024x8) with Unique Serial Number, SOT-23-5
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+5 WP I L
+3 SDA B R
+SPC R
+1 SCL I R
+UNIT PWR
+2 GND PI B
+4 VCC PI T
+END
+#
+# AT24CS08-XHM
+#
+COMP AT24CS08-XHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSSOP-8_4.4x3mm_P0.65mm"
+FPLIST
+TSSOP*4.4x3mm*P0.65mm*
+DESC I2C Serial EEPROM, 8Kb (1024x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8766-SEEPROM-AT24CS04-08-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS16-MAHM
+#
+COMP AT24CS16-MAHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.3x1.5mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+DESC I2C Serial EEPROM, 16Kb (2048x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8859-SEEPROM-AT24CS16-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS16-SSHM
+#
+COMP AT24CS16-SSHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*
+DESC I2C Serial EEPROM, 16Kb (2048x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8859-SEEPROM-AT24CS16-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS16-STUM
+#
+COMP AT24CS16-STUM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_TO_SOT_SMD:SOT-23-5"
+FPLIST
+SOT?23*
+DESC I2C Serial EEPROM, 16Kb (2048x8) with Unique Serial Number, SOT-23-5
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8859-SEEPROM-AT24CS16-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+5 WP I L
+3 SDA B R
+SPC R
+1 SCL I R
+UNIT PWR
+2 GND PI B
+4 VCC PI T
+END
+#
+# AT24CS16-XHM
+#
+COMP AT24CS16-XHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSSOP-8_4.4x3mm_P0.65mm"
+FPLIST
+TSSOP*4.4x3mm*P0.65mm*
+DESC I2C Serial EEPROM, 16Kb (2048x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8859-SEEPROM-AT24CS16-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS32-MAHM
+#
+COMP AT24CS32-MAHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.3x1.5mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+DESC I2C Serial EEPROM, 32Kb (4096x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8869-SEEPROM-AT24CS32-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS32-SSHM
+#
+COMP AT24CS32-SSHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*
+DESC I2C Serial EEPROM, 32Kb (4096x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8869-SEEPROM-AT24CS32-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS32-STUM
+#
+COMP AT24CS32-STUM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_TO_SOT_SMD:SOT-23-5"
+FPLIST
+SOT?23*
+DESC I2C Serial EEPROM, 32Kb (4096x8) with Unique Serial Number, SOT-23-5
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8869-SEEPROM-AT24CS32-Datasheet.pdf
+UNIT WIDTH 500
+SPC L
+SPC L
+5 WP I L
+3 SDA B R
+SPC R
+1 SCL I R
+UNIT PWR
+2 GND PI B
+4 VCC PI T
+END
+#
+# AT24CS32-XHM
+#
+COMP AT24CS32-XHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSSOP-8_4.4x3mm_P0.65mm"
+FPLIST
+TSSOP*4.4x3mm*P0.65mm*
+DESC I2C Serial EEPROM, 32Kb (4096x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8869-SEEPROM-AT24CS32-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS64-MAHM
+#
+COMP AT24CS64-MAHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-8-1EP_3x2mm_P0.5mm_EP1.3x1.5mm"
+FPLIST
+DFN*3x2mm*P0.5mm*
+DESC I2C Serial EEPROM, 64Kb (8192x8) with Unique Serial Number, UDFN8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8870-SEEPROM-AT24CS64-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS64-SSHM
+#
+COMP AT24CS64-SSHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*
+DESC I2C Serial EEPROM, 64Kb (8192x8) with Unique Serial Number, SO8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8870-SEEPROM-AT24CS64-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# AT24CS64-XHM
+#
+COMP AT24CS64-XHM U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSSOP-8_4.4x3mm_P0.65mm"
+FPLIST
+TSSOP*4.4x3mm*P0.65mm*
+DESC I2C Serial EEPROM, 64Kb (8192x8) with Unique Serial Number, TSSOP8
+KEYW I2C Serial EEPROM Nonvolatile Memory
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-8870-SEEPROM-AT24CS64-Datasheet.pdf
+UNIT WIDTH 500
+1 A0 I L
+2 A1 I L
+3 A2 I L
+SPC L
+7 WP I L
+5 SDA B R
+SPC R
+6 SCL I R
+UNIT PWR
+4 GND PI B
+8 VCC PI T
+END
+#
+# M95256-WMN6P
+#
+COMP M95256-WMN6P U
+FIELD $FOOTPRINT "Package_SOIC:SOIC-8_3.9x4.9mm_P1.27mm"
+FPLIST
+SOIC*3.9x4.9mm*P1.27mm*
+DESC SPI EEPROM, 256Kb (32K x 8), No Identification Page, 2.5 to 5.5V, SO8
+KEYW SPI EEPROM
+DOC http://www.st.com/content/ccc/resource/technical/document/datasheet/9d/75/f0/3e/76/00/4c/0b/CD00103810.pdf/files/CD00103810.pdf/jcr:content/translations/en.CD00103810.pdf
+UNIT
+3 ~W I L
+7 ~HOLD I L
+1 ~S I L
+6 C I R
+5 D I R
+2 Q O R
+UNIT PWR
+4 VSS PI B
+8 VCC PI T
+END
+#
+# TMS4C1050N
+#
+COMP TMS4C1050N U
+FIELD $FOOTPRINT "Package_DIP:DIP-16_W7.62mm"
+FPLIST
+DIP*
+DESC Field Memory, 262264 x 4 bit
+KEYW Field Memory
+DOC http://www.datasheets360.com/pdf/3640170882560205603
+UNIT WIDTH 1000
+1 WE I L
+2 RSTW I L
+3 SWCLK CI L
+SPC L
+4 D0 I L
+5 D1 I L
+6 D2 I L
+7 D3 I L
+15 RE/OE I R
+14 RSTR I R
+13 SRCLK CI R
+SPC R
+12 Q0 T R
+11 Q1 T R
+10 Q2 T R
+9 Q3 T R
+UNIT PWR
+8 GND PI B
+16 VCC PI T
+END

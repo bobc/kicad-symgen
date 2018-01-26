@@ -1,0 +1,640 @@
+#
+# Memory_Flash.lib
+#
+#
+# Global Defaults
+#
+%lib Memory_Flash.lib
+%pinlen 100
+%width 600
+%fill back
+%line 10
+%style ANSI
+#
+#
+# 28F400
+#
+COMP 28F400 U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:PSOP-44_16.9x27.17mm_P1.27mm"
+FPLIST
+PSOP*44*
+DESC Flash EEPROM 4-MBIT (256Kx16bits, 512Kx8bits) 5V, 12V Prog, Obsolete
+KEYW EEPROM FLASH 4MBit
+DOC http://download.intel.com/design/archives/flash/docs/29045101.pdf
+UNIT WIDTH 700
+11 A0 I L
+10 A1 I L
+9 A2 I L
+8 A3 I L
+7 A4 I L
+6 A5 I L
+5 A6 I L
+4 A7 I L
+42 A8 I L
+41 A9 I L
+40 A10 I L
+39 A11 I L
+38 A12 I L
+37 A13 I L
+36 A14 I L
+35 A15 I L
+34 A16 I L
+3 A17 I L
+SPC L
+SPC L
+12 ~CE I L
+14 ~OE I L
+43 ~WE I L
+44 ~PR I L
+33 ~BYTE I L
+15 D0 T R
+17 D1 T R
+19 D2 T R
+21 D3 T R
+24 D4 T R
+26 D5 T R
+28 D6 T R
+30 D7 T R
+16 D8 T R
+18 D9 T R
+20 D10 T R
+22 D11 T R
+25 D12 T R
+27 D13 T R
+29 D14 T R
+31 A-1/D15 T R
+SPC R
+SPC R
+SPC R
+SPC R
+SPC R
+SPC R
+SPC R
+SPC R
+2 DU NN R
+UNIT PWR
+1 VPP PI T
+13 GND PI B
+23 VCC PI T
+32 GND PI B
+END
+#
+# 29F010-TSOP-SP
+#
+COMP 29F010-TSOP-SP U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSOP-I-32_18.4x8mm_P0.5mm"
+FPLIST
+TSOP*32*
+DESC Flash EEPROM 1MBit, TSOP32, 5V Prog
+KEYW EEPROM FLASH 1MBit
+DOC http://datasheet.octopart.com/AM29F010B-70JF-Spansion-datasheet-8824760.pdf
+UNIT WIDTH 700
+20 A0 I L
+19 A1 I L
+18 A2 I L
+17 A3 I L
+16 A4 I L
+15 A5 I L
+14 A6 I L
+13 A7 I L
+3 A8 I L
+2 A9 I L
+31 A10 I L
+1 A11 I L
+12 A12 I L
+4 A13 I L
+5 A14 I L
+11 A15 I L
+10 A16 I L
+21 D0 T R
+22 D1 T R
+23 D2 T R
+25 D3 T R
+26 D4 T R
+27 D5 T R
+28 D6 T R
+29 D7 T R
+SPC R
+30 ~CE I R
+32 ~OE I R
+7 ~WE I R
+UNIT PWR
+8 VCC PI T
+24 GND PI B
+END
+#
+# 29W040
+#
+COMP 29W040 U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SSOP:TSOP-I-32_18.4x8mm_P0.5mm"
+FPLIST
+TSOP*32*
+DESC Flash EEPROM 4MiBit, TSOP32, 3.3V
+KEYW EEPROM FLASH 4MiBit
+DOC http://datasheet.octopart.com/AM29F040B-70JF-Cypress-Semiconductor-datasheet-8612060.pdf
+UNIT WIDTH 700
+20 A0 I L
+19 A1 I L
+18 A2 I L
+17 A3 I L
+16 A4 I L
+15 A5 I L
+14 A6 I L
+13 A7 I L
+3 A8 I L
+2 A9 I L
+31 A10 I L
+1 A11 I L
+12 A12 I L
+4 A13 I L
+5 A14 I L
+11 A15 I L
+10 A16 I L
+6 A17 I L
+9 A18 I L
+21 D0 T R
+22 D1 T R
+23 D2 T R
+25 D3 T R
+26 D4 T R
+27 D5 T R
+28 D6 T R
+29 D7 T R
+SPC R
+30 ~CE I R
+32 ~OE I R
+7 ~WE I R
+UNIT PWR
+8 VCC PI T
+24 GND PI B
+END
+#
+# AM29PDL128G
+#
+COMP AM29PDL128G U
+%pinlen 150
+FPLIST
+BGA?80*15x10mm*Layout10x8*P1mm*
+DESC 128 MiBit (8 Mi x 16-Bit/4 Mi x 32-Bit), Simultaneous Operation Flash Memory with VersatileIO™ Control
+KEYW Flash Memory
+DOC http://www.datasheetcatalog.com/datasheets_pdf/A/M/2/9/AM29PDL128G.shtml
+UNIT WIDTH 1000
+B4 A0 I L
+C4 A1 I L
+A3 A2 I L
+B3 A3 I L
+A2 A4 I L
+A1 A5 I L
+J1 A6 I L
+J2 A7 I L
+K1 A8 I L
+K2 A9 I L
+J3 A10 I L
+K3 A11 I L
+H4 A12 I L
+J5 A13 I L
+H5 A14 I L
+K6 A15 I L
+J6 A16 I L
+K7 A17 I L
+K8 A18 I L
+J7 A19 I L
+B6 A20 I L
+A6 A21 I L
+SPC L
+B7 CE# I L
+A8 OE# I L
+C5 WE# I L
+B5 WP# I L
+E4 RST# I L
+E5 ACC I L
+A7 WORD# I L
+SPC L
+SPC L
+SPC L
+SPC L
+D2 VIO I L
+D8 VIO I L
+G1 VIO I L
+G7 VIO I L
+B1 DQ0 B R
+C2 DQ1 B R
+D1 DQ2 B R
+E2 DQ3 B R
+E3 DQ4 B R
+F1 DQ5 B R
+G2 DQ6 B R
+H1 DQ7 B R
+H6 DQ8 B R
+H8 DQ9 B R
+G5 DQ10 B R
+F8 DQ11 B R
+E6 DQ12 B R
+E7 DQ13 B R
+D6 DQ14 B R
+C7 DQ15 B R
+C3 DQ16 B R
+C1 DQ17 B R
+D4 DQ18 B R
+E1 DQ19 B R
+F3 DQ20 B R
+F2 DQ21 B R
+G3 DQ22 B R
+H2 DQ23 B R
+H7 DQ24 B R
+G6 DQ25 B R
+F7 DQ26 B R
+F6 DQ27 B R
+E8 DQ28 B R
+D5 DQ29 B R
+C8 DQ30 B R
+C6 DQ31/A-1 B R
+SPC R
+A4 RY/BY# O R
+UNIT PWR
+B2 VCC PI T
+J8 VCC PI T
+D3 VSS PI BC
+H3 VSS PI B
+G4 VSS PI B
+D7 VSS PI B
+B8 VSS PI B
+G8 VSS PI B
+END
+#
+# AT45DB161-JC
+#
+COMP AT45DB161-JC U
+FIELD $FOOTPRINT "Package_LCC:PLCC-32"
+FPLIST
+PLCC?32*
+DESC 16MiBit Serial DataFlash, PLCC32, 2.7V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc0807.pdf
+UNIT WIDTH 800
+6 SI I L
+7 SO O L
+4 ~CS I L
+5 SCK I L
+28 ~RESET I R
+SPC R
+29 ~WP I R
+SPC R
+27 RDY/~BSY O R
+UNIT PWR
+1 GND PI B
+32 VCC PI T
+END
+#
+# AT45DB161-RC
+#
+COMP AT45DB161-RC U
+FIELD $FOOTPRINT "Package_SOIC:SOIC-28W_7.5x17.9mm_P1.27mm"
+FPLIST
+SOIC?28*
+DESC 16MiBit Serial DataFlash, SOIC28, 2.7V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc0807.pdf
+ALIAS AT45DB161B-RC
+DESC 16MiBit Serial DataFlash, SOIC28, 2.7V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc2224.pdf
+ALIAS AT45DB161B-RC-2.5
+DESC 16MiBit Serial DataFlash, SOIC28, 2.5V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc2224.pdf
+UNIT WIDTH 800
+6 SI I L
+7 SO O L
+4 ~CS I L
+5 SCK I L
+24 ~RESET I R
+SPC R
+25 ~WP I R
+SPC R
+23 RDY/~BSY O R
+UNIT PWR
+1 GND PI B
+28 VCC PI T
+END
+#
+# AT45DB161-TC
+#
+COMP AT45DB161-TC U
+FIELD $FOOTPRINT "TSSOP28"
+FPLIST
+TSSOP?28*
+DESC 16Mb Serial DataFlash, TSSOP28, 2.7V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc0807.pdf
+ALIAS AT45DB161B-TC
+DESC 16Mb Serial DataFlash, TSSOP28, 2.7V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc2224.pdf
+ALIAS AT45DB161B-TC-2.5
+DESC 16Mb Serial DataFlash, TSSOP28, 2.5V
+KEYW Atmel DataFlash
+DOC http://www.atmel.com/Images/doc2224.pdf
+UNIT WIDTH 800
+13 SI I L
+14 SO O L
+11 ~CS I L
+12 SCK I L
+2 ~RESET I R
+SPC R
+3 ~WP I R
+SPC R
+1 RDY/~BSY O R
+UNIT PWR
+6 VCC PI T
+7 GND PI B
+END
+#
+# M25PX32-VMP
+#
+COMP M25PX32-VMP U
+%pinlen 150
+FIELD $FOOTPRINT "Package_DFN_QFN:DFN-S-8-1EP_6x5mm_P1.27mm"
+FPLIST
+DFN*6x5mm*P1.27mm*
+DESC 32MiBit, Dual I/O, 4KiB Subsector Erase, 3V Serial Flash Memory with 75 MHz SPI Bus Interface, QFN8
+KEYW NOR Serial Flash Embedded Memory
+DOC https://www.micron.com/~/media/documents/products/data-sheet/nor-flash/serial-nor/m25px/m25px32.pdf
+UNIT WIDTH 900
+5 DQ0 B L
+6 C I L
+1 ~S I L
+3 ~W~/VPP I L
+7 ~HOLD I L
+2 DQ1 B R
+UNIT PWR
+4 VSS PI B
+8 VCC PI T
+9 PAD/VSS PI B
+END
+#
+# M25PX32-VMW
+#
+COMP M25PX32-VMW U
+%pinlen 150
+FIELD $FOOTPRINT "Package_SOIC:SOIJ-8_5.3x5.3mm_P1.27mm"
+FPLIST
+SOIJ*5.3x5.3mm*Pitch1.27mm*
+DESC 32MiBit, Dual I/O, 4KiB Subsector Erase, 3V Serial Flash Memory with 75 MHz SPI Bus Interface, SOIJ8
+KEYW NOR Serial Flash Embedded Memory
+DOC https://www.micron.com/~/media/documents/products/data-sheet/nor-flash/serial-nor/m25px/m25px32.pdf
+UNIT WIDTH 900
+5 DQ0 B L
+6 C I L
+1 ~S I L
+3 ~W~/VPP I L
+7 ~HOLD I L
+2 DQ1 B R
+UNIT PWR
+4 VSS PI B
+8 VCC PI T
+END
+#
+# M29W004
+#
+COMP M29W004 U
+%pinlen 150
+FPLIST
+TSOP*40*
+DESC Flash EEPROM 4MiBit, TSOP40, 3.3V
+KEYW EEPROM FLASH 4MiBit
+UNIT WIDTH 700
+21 A0 I L
+20 A1 I L
+19 A2 I L
+18 A3 I L
+17 A4 I L
+16 A5 I L
+15 A6 I L
+14 A7 I L
+8 A8 I L
+7 A9 I L
+36 A10 I L
+6 A11 I L
+5 A12 I L
+4 A13 I L
+3 A14 I L
+2 A15 I L
+1 A16 I L
+40 A17 I L
+13 A18 I L
+25 D0 T R
+26 D1 T R
+27 D2 T R
+28 D3 T R
+32 D4 T R
+33 D5 T R
+34 D6 T R
+35 D7 T R
+SPC R
+22 ~CE I R
+24 ~OE I R
+9 ~WE I R
+SPC R
+SPC R
+12 ~Busy O R
+10 ~Rst~/P I R
+UNIT PWR
+23 GND PI B
+30 VCC PI T
+31 VCC PI T
+39 GND PI B
+END
+#
+# M29W008
+#
+COMP M29W008 U
+%pinlen 150
+FPLIST
+TSOP*40*
+DESC Flash EEPROM 8MiBit, TSOP40, 3.3V
+KEYW EEPROM FLASH 8MiBit
+UNIT WIDTH 700
+21 A0 I L
+20 A1 I L
+19 A2 I L
+18 A3 I L
+17 A4 I L
+16 A5 I L
+15 A6 I L
+14 A7 I L
+8 A8 I L
+7 A9 I L
+36 A10 I L
+6 A11 I L
+5 A12 I L
+4 A13 I L
+3 A14 I L
+2 A15 I L
+1 A16 I L
+40 A17 I L
+13 A18 I L
+37 A19 I L
+25 D0 T R
+26 D1 T R
+27 D2 T R
+28 D3 T R
+32 D4 T R
+33 D5 T R
+34 D6 T R
+35 D7 T R
+SPC R
+22 ~CE I R
+24 ~OE I R
+9 ~WE I R
+SPC R
+SPC R
+12 ~Busy O R
+10 ~Rst~/B I R
+UNIT PWR
+23 GND PI B
+30 VCC PI T
+31 VCC PI T
+39 GND PI B
+END
+#
+# SST39SF010
+#
+COMP SST39SF010 U
+FPLIST
+DIP?32*
+DESC Silicon Storage Technology (SSF) 128k x 8 Flash EEPROM
+KEYW 128k Flash EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/25022B.pdf
+UNIT WIDTH 800
+12 A0 I L
+11 A1 I L
+10 A2 I L
+9 A3 I L
+8 A4 I L
+7 A5 I L
+6 A6 I L
+5 A7 I L
+27 A8 I L
+26 A9 I L
+23 A10 I L
+25 A11 I L
+4 A12 I L
+28 A13 I L
+29 A14 I L
+3 A15 I L
+2 A16 I L
+30 NC NN L
+1 NC NN L
+SPC L
+31 ~PGM L L
+SPC L
+22 ~CE L L
+24 ~OE L L
+13 D0 T R
+14 D1 T R
+15 D2 T R
+17 D3 T R
+18 D4 T R
+19 D5 T R
+20 D6 T R
+21 D7 T R
+UNIT PWR
+16 GND PI B
+32 VCC PI T
+END
+#
+# SST39SF020
+#
+COMP SST39SF020 U
+FPLIST
+DIP?32*
+DESC Silicon Storage Technology (SSF) 256k x 8 Flash EEPROM
+KEYW 256k Flash EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/25022B.pdf
+UNIT WIDTH 800
+12 A0 I L
+11 A1 I L
+10 A2 I L
+9 A3 I L
+8 A4 I L
+7 A5 I L
+6 A6 I L
+5 A7 I L
+27 A8 I L
+26 A9 I L
+23 A10 I L
+25 A11 I L
+4 A12 I L
+28 A13 I L
+29 A14 I L
+3 A15 I L
+2 A16 I L
+30 A17 I L
+1 NC NN L
+SPC L
+31 ~PGM L L
+SPC L
+22 ~CE L L
+24 ~OE L L
+13 D0 T R
+14 D1 T R
+15 D2 T R
+17 D3 T R
+18 D4 T R
+19 D5 T R
+20 D6 T R
+21 D7 T R
+UNIT PWR
+16 GND PI B
+32 VCC PI T
+END
+#
+# SST39SF040
+#
+COMP SST39SF040 U
+FPLIST
+DIP?32*
+DESC Silicon Storage Technology (SSF) 512k x 8 Flash EEPROM
+KEYW 512k FLash EEPROM
+DOC http://ww1.microchip.com/downloads/en/DeviceDoc/25022B.pdf
+UNIT WIDTH 800
+12 A0 I L
+11 A1 I L
+10 A2 I L
+9 A3 I L
+8 A4 I L
+7 A5 I L
+6 A6 I L
+5 A7 I L
+27 A8 I L
+26 A9 I L
+23 A10 I L
+25 A11 I L
+4 A12 I L
+28 A13 I L
+29 A14 I L
+3 A15 I L
+2 A16 I L
+30 A17 I L
+1 A18 I L
+SPC L
+31 ~PGM I L
+SPC L
+22 ~CE I L
+24 ~OE I L
+13 D0 T R
+14 D1 T R
+15 D2 T R
+17 D3 T R
+18 D4 T R
+19 D5 T R
+20 D6 T R
+21 D7 T R
+UNIT PWR
+16 GND PI B
+32 VCC PI T
+END
