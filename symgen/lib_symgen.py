@@ -62,7 +62,6 @@ from sym_utils import *
 
 class SymGen:
 
-
     exit_code = 0
     num_errors = 0
 
@@ -93,20 +92,18 @@ class SymGen:
 
     def_logic_combine = "multi"
 
-    def_pin_length = 200
-
-    def_box_width = 600
-    def_box_pen = 10
-    def_box_fill = Background # background fill
-
-    def_logic_fill = NoFill # default
-    #def_logic_fill = Background
+    #
+    #def_pin_length = 200
+    #def_box_width = 600
+    #def_box_pen = 10
+    #def_box_fill = Background # background fill
+    #def_logic_fill = NoFill # default
+    ##def_logic_fill = Background
+    #def_label_style = ls_floating
+    #def_pin_stacking = False
 
     def_name_offset = 20
     def_extra_offset = 40
-
-    def_label_style = ls_floating
-    
 
     # name offset
     # logic fill
@@ -115,13 +112,11 @@ class SymGen:
     components = []
 
     # per component settings  
-    pin_length = def_pin_length
-
-    box_width = def_box_width
-    box_pen = def_box_pen
-    box_fill = def_box_fill
-
-    logic_fill = def_logic_fill
+    #pin_length = def_pin_length
+    #box_width = def_box_width
+    #box_pen = def_box_pen
+    #box_fill = def_box_fill
+    #logic_fill = def_logic_fill
 
     #
     comp_description = None
@@ -156,6 +151,8 @@ class SymGen:
         self.footprints_folder = None
 
         self.verbose = False
+
+        self.def_settings = SgSettings()
 
 
     def process_list(self):
@@ -235,7 +232,6 @@ class SymGen:
             
     def find_pins (self, pin_list, direction, type=None):
         pins = []
-
         for pin in pin_list:
             # if pin.orientation == direction and pin.visible and (type is None or pin.type == type):
             if pin.orientation == direction and (type is None or pin.type == type):
@@ -244,13 +240,24 @@ class SymGen:
 
     def find_pins_with_label (self, pin_list, direction, type=None):
         pins = []
-
         for pin in pin_list:
             # if pin.orientation == direction and pin.visible and (type is None or pin.type == type):
             if pin.shape!=" " and pin.name!="~" and pin.orientation == direction and (type is None or pin.type == type) and len(pin.name)!=0:
                 pins.append (pin)
         return pins
 
+    def find_pins_non_stacked (self, pin_list, direction, type=None):
+        pins = []
+        for pin in pin_list:
+            if pin.orientation == direction and (type is None or pin.type == type) and not pin.can_stack:
+                pins.append (pin)
+        return pins
+
+    def find_component (self, name):
+        for comp in self.components:
+            if comp.name == name:
+                return comp
+        return None
 
     def read_file (self, filename):
 
@@ -368,7 +375,7 @@ class SymGen:
                     cur_pin_align = "C"
 
                 pin = Pin()
-                pin.length = sgcomp.pin_length
+                pin.length = sgcomp.settings.pin_length
                 pin.number = "~"
                 pin.name = "~"
                 pin.type = " "
@@ -403,7 +410,7 @@ class SymGen:
                 group = None
             else:    
                 pin = Pin()
-                pin.length = sgcomp.pin_length
+                pin.length = sgcomp.settings.pin_length
                 pin.number = tokens[0]
                 pin.name = "~"
                 #pin.unit = unit
@@ -460,42 +467,36 @@ class SymGen:
                 pin.orientation = cur_pin_dir
                 pin.align = cur_pin_align
 
-                # not NC?
-                if pin.type != "N" and "N" in pin.shape and len(pins) > 0 and pins[-1].type == pin.type:
-                    can_stack = True
-                else:
-                    can_stack = False
 
+                # no connect
                 if "N" in pin.shape:
-                    pin.length = 0
+                    #pin.length = 0
+                    pin.length = sgcomp.settings.pin_length
                     pin.visible = False
                 else:
-                    pin.length = sgcomp.pin_length
+                    pin.length = sgcomp.settings.pin_length
 
-                if pin.orientation=="L":
-                    pin.pos.x = self.pin_pos_left.x - pin.length
-                    pin.pos.y = self.pin_pos_left.y
-                    if not can_stack:
-                        self.pin_pos_left.y -= 100
-                
-                elif pin.orientation=="R":
-                    pin.pos.x = self.pin_pos_right.x + pin.length
-                    pin.pos.y = self.pin_pos_right.y
-                    if not can_stack:
-                        self.pin_pos_right.y -= 100
-                elif pin.orientation=="T":
-                    pin.pos.x = self.pin_pos_top.x
-                    pin.pos.y = self.pin_pos_top.y  + pin.length
-                    #if not can_stack:
-                    #    self.pin_pos_top.x += 100
-                elif pin.orientation=="B":
-                    pin.pos.x = self.pin_pos_bottom.x
-                    pin.pos.y = self.pin_pos_bottom.y - pin.length
-                    #if not can_stack:
-                    #    self.pin_pos_bottom.x += 100
+                # positioning should be done later
+                #if pin.orientation=="L":
+                #    pin.pos.x = self.pin_pos_left.x - pin.length
+                #    pin.pos.y = self.pin_pos_left.y
+                #elif pin.orientation=="R":
+                #    pin.pos.x = self.pin_pos_right.x + pin.length
+                #    pin.pos.y = self.pin_pos_right.y
+                #elif pin.orientation=="T":
+                #    pin.pos.x = self.pin_pos_top.x
+                #    pin.pos.y = self.pin_pos_top.y  + pin.length
+                #elif pin.orientation=="B":
+                #    pin.pos.x = self.pin_pos_bottom.x
+                #    pin.pos.y = self.pin_pos_bottom.y - pin.length
                 # 
                 pin.orientation = symgen_to_kicad_dir (pin.orientation)
 
+                # can stack power in pins; if same name/pos/type
+                if sgcomp.settings.pin_stacking and "W" in pin.type and len(pins) > 0 and pins[-1].type == pin.type and pins[-1].name == pin.name and pins[-1].orientation == pin.orientation:
+                    pin.can_stack = True
+                else:
+                    pin.can_stack = False
                 
                 if group:
                     pin.group_id = group_id
@@ -548,7 +549,8 @@ class SymGen:
         #
         #self.comp_description = None
         #self.comp_keywords = None
-        self.comp_datasheet = None
+        # todo: Hmmm
+        #self.comp_datasheet = None
 
         return tname, sgdoc
 
@@ -577,9 +579,25 @@ class SymGen:
 
         elif tokens[0] == "%pinlen":
             if self.in_component:
-                sgcomp.pin_length = int (tokens[1])
+                sgcomp.settings.pin_length = int (tokens[1])
             else:
-                self.def_pin_length = int (tokens[1])
+                self.def_settings.pin_length = int (tokens[1])
+
+        elif tokens[0] == "%pin_stack":
+            stack = None
+            if tokens[1].lower() == "on":
+                stack = True
+            elif tokens[1].lower() == "off":
+                stack = False
+            else:
+                print "error : unknown value for pin_stack %s" % self.line
+                self.num_errors += 1
+
+            if stack:
+                if self.in_component:
+                    sgcomp.settings.pin_stacking = stack
+                else:
+                    self.def_settings.pin_stacking = stack
 
         elif tokens[0] == "%width":
             if tokens[1].lower() == "auto":
@@ -588,34 +606,33 @@ class SymGen:
                 width = int (tokens[1])
 
             if self.in_component:
-                self.box_width = width
+                sgcomp.settings.box_width = width
             else:
-                self.def_box_width = width
+                self.def_settings.box_width = width
 
         elif tokens[0] == "%line":
             if self.in_component:
-                self.box_pen = int (tokens[1])
+                sgcomp.settings.box_pen = int (tokens[1])
             else:
-                self.def_box_pen = int (tokens[1])
+                self.def_settings.box_pen = int (tokens[1])
 
         elif tokens[0] == "%label_style":
             if self.in_component:
-                self.label_style = tokens[1]
+                sgcomp.settings.label_style = tokens[1]
             else:
-                self.def_label_style = tokens[1]
+                self.def_settings.label_style = tokens[1]
 
         elif tokens[0] == "%fill":
             fill = self.parse_fill (tokens[1])
             if fill:
                 if self.in_component:
-                    self.box_fill = fill
-                    self.logic_fill = fill
+                    sgcomp.settings.box_fill = fill
+                    sgcomp.settings.logic_fill = fill
                 else:
-                    self.def_box_fill = fill
+                    self.def_settings.box_fill = fill
             else:
                 print "error : unknown fill %s" % self.line
                 self.num_errors += 1
-
 
         elif tokens[0] == "%iconlib":
             if not self.in_component:
@@ -642,7 +659,7 @@ class SymGen:
             if len(tokens) > 2:
                 fill = self.parse_fill (tokens[2])
                 if fill:
-                    self.def_logic_fill = tokens[2]
+                    self.def_settings.logic_fill = tokens[2]
                 else:
                     print "error : unknown fill %s" % self.line
                     self.num_errors += 1
@@ -733,7 +750,7 @@ class SymGen:
         unit.unit_rect.size.x = 0
         unit.unit_rect.size.y = 0
 
-        unit.set_width (self.box_width)
+        unit.set_width (comp.settings.box_width)
 
         self.unit_num = self.unit_num + 1
 
@@ -783,8 +800,8 @@ class SymGen:
 
             elif token.startswith("W"):
                 j += 1
-                self.box_width = int(tokens[j])
-                unit.set_width (self.box_width)
+                comp.settings.box_width = int(tokens[j])
+                unit.set_width (comp.settings.box_width)
 
             elif token.upper().startswith("LABEL"):
                 j += 1
@@ -833,11 +850,11 @@ class SymGen:
         # need pin pos generator ?
 
         self.pin_pos_left = Point()
-        self.pin_pos_left.x = -self.box_width/2
+        self.pin_pos_left.x = -comp.settings.box_width/2
         self.pin_pos_left.y = 0
 
         self.pin_pos_right = Point()
-        self.pin_pos_right.x = self.box_width/2
+        self.pin_pos_right.x = comp.settings.box_width/2
         self.pin_pos_right.y = 0
 
         self.pin_pos_top.x = 0
@@ -861,12 +878,12 @@ class SymGen:
             if unit.unit_shape in ["and", "nand", "or", "nor", "xor", "xnor", "not", "buffer"]:
                 #comp.pin_length = 150
 
-                comp.label_style = ls_center
+                comp.settings.label_style = ls_center
                 if self.opt_power_unit_style == PowerStyle.LINES:
-                    comp.pin_names_inside = True
-                unit.fill = self.logic_fill
+                    comp.settings.pin_names_inside = True
+                unit.fill = comp.settings.logic_fill
             else:
-                unit.fill = self.box_fill
+                unit.fill = comp.settings.box_fill
 
         else:
             print "error: unknown shape: " + unit.unit_shape
@@ -881,7 +898,7 @@ class SymGen:
         unit.set_width (400)
 
         if self.opt_power_unit_style == PowerStyle.BOX:
-            if sgcomp.label_style == ls_center:
+            if sgcomp.settings.label_style == ls_center:
                 unit.unit_rect.size.y = 200    
             else:
                 unit.unit_rect.size.y = 400    
@@ -891,7 +908,7 @@ class SymGen:
             unit.fill = NoFill
             #unit.fill = Background
         else:
-            if sgcomp.label_style == ls_center:
+            if sgcomp.settings.label_style == ls_center:
                 # sgcomp.pin_names_inside
                 # unit.unit_rect.size.y = 200    
                 unit.unit_rect.size.y = sgcomp.units[0].unit_rect.size.y
@@ -904,47 +921,23 @@ class SymGen:
     def parse_component (self):
 
         sgcomp = SgComponent()
+        sgcomp.settings = copy.copy (self.def_settings)
 
-        items = self.line.split()
+        # reset all current vars used during parsing
 
-        if len(items) >= 3:
-            sgcomp.name = items[1]
-            sgcomp.ref = items[2]
-        else:
-            print "error: expected COMP name ref: " + self.line
-            self.num_errors += 1
-
-        print "Component: "+ sgcomp.name
-
-        #desc = self.get_descriptor(re.sub('[^0-9]', '', sgcomp.name))
-        #if desc:
-        #    print "found %s" % desc.description
-
-        # reset all current vars
-
-        sgcomp.units = []
-
-        #pins = []
-        self.unit_num = 0
-        # template = None
         self.last_shape = None
-
-        #self.unit_shape = None
+        self.max_height = 0
+        self.unit_label = ""
+        self.unit_num = 0
+        self.last_unit = None
         self.icons = []
 
-        # self.pin_length = self.def_pin_length
-        self.box_width = self.def_box_width
-        self.box_pen = self.def_box_pen
-        self.box_fill = self.def_box_fill
-        self.logic_fill = self.def_logic_fill
-        self.label_style = self.def_label_style
-
         self.pin_pos_left = Point()
-        self.pin_pos_left.x = -self.box_width/2
+        self.pin_pos_left.x = -sgcomp.settings.box_width/2
         self.pin_pos_left.y = 0
 
         self.pin_pos_right = Point()
-        self.pin_pos_right.x = self.box_width/2
+        self.pin_pos_right.x = sgcomp.settings.box_width/2
         self.pin_pos_right.y = 0
 
         self.pin_pos_top = Point()
@@ -955,21 +948,13 @@ class SymGen:
         self.pin_pos_bottom.x = 0
         self.pin_pos_bottom.y = -600
 
-        self.max_height = 0
-        #self.y_offset = 0
-
-        self.unit_label = ""
-
         self.ref_pos= Point()
-        self.ref_pos.x = -self.box_width/2
+        self.ref_pos.x = -sgcomp.settings.box_width/2
         self.ref_pos.y = 0
 
         self.name_pos = Point()
-        self.name_pos.x = -self.box_width/2
+        self.name_pos.x = -sgcomp.settings.box_width/2
         self.name_pos.y = 0
-
-        #cur_pin_type = "I"
-        #cur_pin_dir = "L"
 
         self.comp_description = None
         self.comp_keywords = None
@@ -978,7 +963,44 @@ class SymGen:
         self.in_component = True
         self.units_have_variant = 0
 
-        sgcomp.pin_length = self.def_pin_length
+        # parse COMP ...
+        items = self.line.split()
+
+        if len(items) >= 3:
+
+            if len(items) >= 4:
+                if items[3].upper () == "FROM":
+                    # todo: check num items
+                    src_name = items[4]
+                    src_comp = self.find_component (src_name)
+                    if src_comp:
+                        sgcomp = copy.deepcopy (src_comp)
+                        sgcomp.is_template = False
+                        # remove all aliases
+                        # rename doc entry for comp
+                        doc = sgcomp.doc_fields[src_name]
+                        assert isinstance(doc, SgDoc)
+                        sgcomp.doc_fields = {}
+                        self.comp_description = doc.description
+                        self.comp_keywords = doc.keywords
+                        self.comp_datasheet = doc.datasheet
+                    else:
+                        print "error: %s not defined in FROM: %s" % (src_name, self.line)
+                        self.num_errors += 1
+                elif items[3].upper () == "TEMPLATE":
+                    sgcomp.is_template = True
+                else:
+                    print "error: expected FROM: " + self.line
+                    self.num_errors += 1
+            #
+            sgcomp.name = items[1]
+            sgcomp.ref = items[2]
+
+        else:
+            print "error: expected COMP name ref: " + self.line
+            self.num_errors += 1
+
+        print "Component: "+ sgcomp.name
 
         # 
         self.get_next_line()
@@ -986,9 +1008,6 @@ class SymGen:
 
         while self.line.startswith ("%"):
             self.parse_directive(sgcomp)
-
-        #
-        sgcomp.label_style = self.label_style
 
         #
         tokens = self.line.split()
@@ -1028,7 +1047,7 @@ class SymGen:
         alias_name = None
         tokens = self.line.split()
        
-        while tokens[0] != "UNIT":
+        while tokens[0].upper() not in ["UNIT", "END"]:
             if self.line.startswith ("DESC"):
                 self.comp_description = after (self.line, " ")
                 self.get_next_line()
@@ -1045,16 +1064,9 @@ class SymGen:
                 tokens = self.line.split()
 
             elif self.line.startswith ("ALIAS"):
-                #if not self.comp_datasheet:
-                #    if alias_name:
-                #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + alias_name
-                #    else:
-                #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + name
-                
+               
                 name, sgdoc = self.make_doc (sgcomp, alias_name)
                 sgcomp.doc_fields [name] = sgdoc
-                #self.add_doc(comp, alias_name)
-
                 #
                 alias_name = after (self.line, " ")
                 self.get_next_line()
@@ -1062,7 +1074,7 @@ class SymGen:
 
                 #self.comp_description = None
                 #self.comp_keywords = None
-                self.comp_datasheet = None
+                #self.comp_datasheet = None
             else:
                 print "error: unexpected line: " + self.line
                 self.num_errors += 1
@@ -1070,15 +1082,8 @@ class SymGen:
                 tokens = self.line.split()
         # while
 
-        #if not self.comp_datasheet:
-        #    if alias_name:
-        #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + alias_name
-        #    else:
-        #        self.comp_datasheet = "http://www.ti.com/lit/gpn/sn" + name
-        
         name, sgdoc = self.make_doc (sgcomp, alias_name)
         sgcomp.doc_fields [name] = sgdoc
-        #! self.add_doc(comp, alias_name)
 
         # units
 
@@ -1135,6 +1140,8 @@ class SymGen:
             print "error: expected END: " + self.line
             self.num_errors += 1
 
+        self.in_component = False
+
         return sgcomp
 
 
@@ -1161,7 +1168,7 @@ class SymGen:
         comp.definition['reference'] = sgcomp.ref
         comp.definition['name'] = sgcomp.name
 
-        if sgcomp.pin_names_inside:
+        if sgcomp.settings.pin_names_inside:
             comp.definition['text_offset'] = "0"
         else:
             comp.definition['text_offset'] = str(self.def_name_offset)
@@ -1179,7 +1186,6 @@ class SymGen:
                 doc_fields ['keywords'] = sgdoc.keywords
             if sgdoc.datasheet:
                 doc_fields ['datasheet'] = sgdoc.datasheet
-            #self.lib.documentation.components[key] = OrderedDict([('description',sgdoc.description), ('keywords',sgdoc.keywords), ('datasheet',sgdoc.datasheet)])
             self.lib.documentation.components[key] = doc_fields
             if key != sgcomp.name:
                 comp.aliases[key] = self.lib.documentation.components[key]
@@ -1191,6 +1197,7 @@ class SymGen:
             comp.fields [2]['name'] = sgcomp.default_footprint
 
         # check footprints
+        match = None
         if self.footprints:
             found = False
             if sgcomp.default_footprint:
@@ -1214,7 +1221,7 @@ class SymGen:
                         print ("found: %s" % match)
 
         if len(sgcomp.fplist) == 1 and not sgcomp.default_footprint:
-            print "error: (%s) footprint field should contain default footprint" % comp.name
+            print "error: (%s) footprint field should contain default footprint (%s)" % (comp.name, match if match and len(match)<=2 else sgcomp.fplist[0])
             self.num_errors += 1
 
         #
@@ -1252,7 +1259,6 @@ class SymGen:
         values.append ("L")     # L=units are not interchangeable
         values.append ("N")     # option flag ( Normal or Power)
 
-        # comp.definition = dict(zip(Component._DEF_KEYS, values))
         comp.definition['unit_count'] = str(len(sgcomp.units))
         if len(sgcomp.units) == 1 :
             comp.definition['units_locked'] = "F"
@@ -1323,7 +1329,7 @@ class SymGen:
                 width += width % 100
 
                 # allow for pin_len
-                width += 2 * ((width/2 + sgcomp.pin_length) % 100)
+                width += 2 * ((width/2 + sgcomp.settings.pin_length) % 100)
 
                 unit.set_width (width)
             
@@ -1335,9 +1341,15 @@ class SymGen:
                 for pin in element.pins:
                     assert isinstance(pin, Pin)
                     if pin.orientation == "R":
-                        pin.pos.x = self.pin_pos_left.x - pin.length
+                        if pin.type == "N":
+                            pin.pos.x = self.pin_pos_left.x
+                        else:
+                            pin.pos.x = self.pin_pos_left.x - pin.length
                     elif pin.orientation == "L":
-                        pin.pos.x = self.pin_pos_right.x + pin.length
+                        if pin.type == "N":
+                            pin.pos.x = align_to_grid(self.pin_pos_right.x, 100)
+                        else:
+                            pin.pos.x = self.pin_pos_right.x + pin.length
 
             #self.cur_pos = Point(0,50)
             self.cur_pos = Point(0,0)
@@ -1378,7 +1390,7 @@ class SymGen:
             # pins
             #temp = self.pin_length
 
-            sgcomp.pin_length = 150
+            sgcomp.settings.pin_length = 150
 
             element = unit.elements[0]
             
@@ -1502,7 +1514,7 @@ class SymGen:
                         if comp_icon:
                             style = StyleAttributes()
                             style.fill = unit.fill
-                            style.pensize = self.box_pen
+                            style.pensize = sgcomp.settings.box_pen
                             copy_icon (comp, comp_icon, self.unit_num, gatedef.get_center(), style=style)
                         else:
                             print "error: unknown icon %s " % icon_name 
@@ -1511,7 +1523,7 @@ class SymGen:
                 j=0
                 for pin in unit_pins:
                     if pin.is_input() and j<len(inputs_pos):
-                        pin.length = sgcomp.pin_length + gatedef.offsets[j]
+                        pin.length = sgcomp.settings.pin_length + gatedef.offsets[j]
                         pin.unit = self.unit_num
                         pin.demorgan = variant
             
@@ -1538,7 +1550,7 @@ class SymGen:
                 j = 0
                 for pin in unit_pins:
                     if pin.is_output():
-                        pin.length = sgcomp.pin_length
+                        pin.length = sgcomp.settings.pin_length
                         pin.unit = self.unit_num
                         pin.demorgan = variant
                         pin.orientation = "L"
@@ -1547,7 +1559,7 @@ class SymGen:
                         else:
                             pin.shape = "I" if output_shape == " " else " "
 
-                        pin.pos.x = outputs_pos[j].x + sgcomp.pin_length
+                        pin.pos.x = outputs_pos[j].x + sgcomp.settings.pin_length
                         pin.pos.y = outputs_pos[j].y       
                         j += 1
                         #pins.append (pin)
@@ -1599,7 +1611,7 @@ class SymGen:
 
     def set_label_pos(self, sgcomp, unit):
 
-        if sgcomp.label_style == ls_floating:
+        if sgcomp.settings.label_style == ls_floating:
             self.max_height = max (self.max_height, unit.unit_rect.size.y)
     
             if unit.unit_shape == "box":
@@ -1663,7 +1675,7 @@ class SymGen:
         # shape, template
         min_height = 0
         
-        if sgcomp.label_style == ls_center:
+        if sgcomp.settings.label_style == ls_center:
             min_height = 200
 
         #if min_height == 0:
@@ -1678,7 +1690,7 @@ class SymGen:
                 min_height += align_to_grid(extent.height+99,100)  # 200
 
             if len(left_pins)+len(right_pins) != 0:
-                if sgcomp.pin_length == 150:
+                if sgcomp.settings.pin_length == 150:
                     top_margin = 0
                 else:
                     top_margin = 50                    
@@ -1693,7 +1705,7 @@ class SymGen:
             min_height += align_to_grid(extent.height+99,100) # 200
 
             if len(left_pins)+len(right_pins) != 0:
-                if sgcomp.pin_length == 150:
+                if sgcomp.settings.pin_length == 150:
                     bottom_margin = 0
                 else:
                     bottom_margin = 50                    
@@ -1747,7 +1759,7 @@ class SymGen:
             rect.unit = unit
             rect.demorgan = variant
             rect.fill = xunit.fill
-            rect.pensize = self.box_pen
+            rect.pensize = sgcomp.settings.box_pen
             comp.drawOrdered.append( rect.get_element() )
 
         elif element.shape == "control":
@@ -1755,7 +1767,7 @@ class SymGen:
             poly.unit = unit
             poly.demorgan = variant
             poly.fill = xunit.fill
-            poly.pensize = self.box_pen
+            poly.pensize = sgcomp.settings.box_pen
             poly.points.append (Point (-box_size.x/2 + 50, self.cur_pos.y - box_size.y))
             poly.points.append (Point (-box_size.x/2 + 50, self.cur_pos.y - box_size.y+50))
             poly.points.append (Point (-box_size.x/2, self.cur_pos.y - box_size.y+50))
@@ -1898,7 +1910,7 @@ class SymGen:
                         style.fill = xunit.fill
                     else:
                         style.fill = xunit.fill
-                    style.pensize = self.box_pen
+                    style.pensize = sgcomp.settings.box_pen
                     copy_icon (comp, comp_icon, unit, Point(0, y_pos -k * 150 + icons_y_extent/2), style=style)
                     k += 1
                 else:
@@ -1992,26 +2004,23 @@ class SymGen:
                             self.num_errors += 1
         
     def draw_pins (self, unit, pins, comp, unit_num, variant):
-        for pin in pins:
+        for j,pin in enumerate(pins):
             if pin.orientation == 'R':
                 pin.pos.y = self.pin_pos_left.y
                 self.pin_pos_left.y -= 100
             elif pin.orientation == 'L':
                 pin.pos.y = self.pin_pos_right.y
                 self.pin_pos_right.y -= 100
-
+                # todo: should be option?
                 if pin.type == "T"  and self.opt_pin_qualifiers:
                     self.draw_pin_text (comp, unit_num, variant, pin, "&xdtri;")
             elif pin.orientation == 'D':
                 pin.pos.x = self.pin_pos_top.x
                 pin.pos.y = self.pin_pos_top.y + pin.length
-                #pin.pos.y = self.unit_rect.top() + pin.length
                 self.pin_pos_top.x += 100
             elif pin.orientation == 'U':
                 pin.pos.x = self.pin_pos_bottom.x
-                
                 pin.pos.y = self.pin_pos_bottom.y - pin.length
-                #pin.pos.y = self.unit_rect.bottom() - pin.length
                 self.pin_pos_bottom.x += 100
 
             if pin.qualifiers and self.opt_pin_qualifiers:
@@ -2076,7 +2085,7 @@ class SymGen:
                         j += 1
 
         # align pins (bottom)
-        _pins = self.find_pins (pins, "U")
+        _pins = self.find_pins_non_stacked (pins, "U")
         if len(_pins) > 0:
             if _pins[0].align == "C":
                 # need to force alignment to 100 mil grid?
@@ -2086,13 +2095,21 @@ class SymGen:
                 else:
                     x_offset = -width/2 + 50
                 j = 0
-                for pin in pins:
+                for k,pin in enumerate(pins):
                     if pin.orientation == 'U':
                         pin.pos.x = j * 100 + x_offset
-                        j += 1
+                        if pins[k].can_stack:
+                            # passive, invisible
+                            pin.shape = "N"
+                            pin.type = "P"
+
+                        if k < len(pins)-1 and pins[k+1].can_stack:
+                            pass
+                        else:
+                            j += 1
 
         # align pins (top)
-        _pins = self.find_pins (pins, "D")
+        _pins = self.find_pins_non_stacked (pins, "D")
         if len(_pins) > 0:
             if _pins[0].align == "C":
                 # need to force alignment to 100 mil grid?
@@ -2102,10 +2119,18 @@ class SymGen:
                 else:
                     x_offset = -width/2 + 50
                 j = 0
-                for pin in pins:
+                for k,pin in enumerate(pins):
                     if pin.orientation == 'D':
                         pin.pos.x = j * 100 + x_offset
-                        j += 1
+                        if pins[k].can_stack:
+                            # passive, invisible
+                            pin.shape = "N"
+                            pin.type = "P"
+
+                        if k < len(pins)-1 and pins[k+1].can_stack:
+                            pass
+                        else:
+                            j += 1
 
         for pin in pins:
             if pin.type != " ":
@@ -2161,24 +2186,26 @@ class SymGen:
         outf.write ("%%lib %s\n" % os.path.basename (out_filename) )
         outf.write ("\n" )
 
+        global_defaults = SgSettings()
+
         outf.write ("#\n" )
         outf.write ("# Global Defaults\n" )
         outf.write ("#\n" )
-        outf.write ("%%line %d\n" % self.def_box_pen )
+        outf.write ("%%line %d\n" % global_defaults.box_pen )
         outf.write ("\n" )
-        outf.write ("%%pinlen %d\n" % self.def_pin_length )
-        outf.write ("%%width %d\n" % self.def_box_width )
+        outf.write ("%%pinlen %d\n" % global_defaults.pin_length )
+        outf.write ("%%width %d\n" % global_defaults.box_width )
 
-        if self.def_box_fill == NoFill:
+        if global_defaults.box_fill == NoFill:
             outf.write ("%%fill %s\n" % "None" )
-        elif self.def_box_fill == Foreground:
+        elif global_defaults.box_fill == Foreground:
             outf.write ("%%fill %s\n" % "fore" )
-        elif self.def_box_fill == Background:
+        elif global_defaults.box_fill == Background:
             outf.write ("%%fill %s\n" % "back" )
 
         outf.write ("\n" )
 
-        outf.write ("%%style %s\n" % self.symbol_style.name )
+        outf.write ("%%style %s\n" % self.symbol_style.name )   # is this real default?
         outf.write ("\n" )
 
         for comp in self.components:
@@ -2187,7 +2214,7 @@ class SymGen:
             outf.write ("#\n" )
             outf.write ("COMP %s %s\n" % (comp.name, comp.ref))
 
-            cur_width = self.def_box_width
+            cur_width = global_defaults.box_width
 
             #if comp.pin_length == self.def_pin_length:
             #    outf.write ("%%pinlen %d\n" % comp.pin_length)
@@ -2378,12 +2405,13 @@ class SymGen:
 
         if self.components:
             for comp in self.components:
-                self.draw_component(comp)
+                if not comp.is_template:
+                    self.draw_component(comp)
 
-                for name in comp.doc_fields:
-                    if (comp.doc_fields[name].description and 
-                        "obsolete" in comp.doc_fields[name].description.lower() ):
-                        obsolete.append (name+ ": " + comp.doc_fields[name].description)
+                    for name in comp.doc_fields:
+                        if (comp.doc_fields[name].description and 
+                            "obsolete" in comp.doc_fields[name].description.lower() ):
+                            obsolete.append (name+ ": " + comp.doc_fields[name].description)
 
             if obsolete:
                 print ("")

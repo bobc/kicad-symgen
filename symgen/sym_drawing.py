@@ -28,6 +28,8 @@ def kicad_to_symgen_dir (direction):
         return "B"
     elif direction=="D":
         return "T"
+    else:
+        return direction
 
 # convert pin orientation from symgen directions to KiCad directions
 def symgen_to_kicad_dir (direction):
@@ -257,9 +259,39 @@ class Pin (DrawBase):
         self.orientation="L"
         self.sizenum = 50
         self.sizename = 50
+
+        # aka "electrial type"
+        # type is one of:
+        # I Input
+        # O Output
+        # B Bidirectional
+        # T Tristate
+        # P Passive
+        # C Open Collector
+        # E Open Emitter
+        # N NC             (displayed with cross)
+        # U Unspecified
+        # W Power input
+        # w Power Output
         self.type = "I"
+        
+        # aka "Graphical style"
+        # shape is ' ' or one or more of:
+        # " "     simple line (default)
+        # I       Inverted               --o|  
+        # C       Clock                  ---|> 
+        # F       Falling edge clock     ---|< 
+        # L       Input, active low      --\| 
+        # V       Output, active low     --/| 
+        # X       Non-logic              -->|< 
+        # N       Invisible
+        # typical combinations:
+        # CI      Clock, inverted        --o|> 
+        # CL      Clock, low             --\|> 
         self.shape = " "
+
         self.visible = True
+        self.can_stack = False
 
         # extra stuff
         self.qualifiers = ""

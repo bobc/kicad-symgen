@@ -56,11 +56,24 @@ class SgRawline (SgItem):
     def __init__(self):
         pass
             
+class SgSettings:
+    def __init__(self):
+        self.pin_length = 200
+        self.box_width = 600
+        self.box_pen = 10
+        self.box_fill = Background
+        self.logic_fill = NoFill
+        self.label_style = ls_floating
+        self.pin_stacking = False
+
+        # name_offset
+        # extra_offset       
+        self.pin_names_inside = False
+
+
 class SgComponent (SgItem):
     name = "name"
     ref = "ref"
-
-    pin_length = 150
 
     def __init__(self):
         self.fplist = []
@@ -68,16 +81,14 @@ class SgComponent (SgItem):
         self.doc_fields = {}
         self.user_fields = []
 
-        self.pin_length = 150
         self.default_footprint = ""
-
-        self.pin_names_inside = False
-
-        self.label_style = ls_floating
+        self.is_template = False
+        self.settings = SgSettings()
 
 class ComponentDef:
     name = "name"
     ref = "ref"
+
     offset = 0
     show_pin_number = True
     show_pin_name = True

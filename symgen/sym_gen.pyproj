@@ -9,12 +9,12 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\xilinx</WorkingDirectory>
+    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\memory_xxx</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>-d --lib C:\git_bobc\kicad-symbols\fpga_xilinx_artix7.lib</CommandLineArguments>
+    <CommandLineArguments>--inp memory_eeprom.txt --fp_dir c:\git_bobc\kicad-footprints</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
