@@ -67,10 +67,6 @@ class Group (IecBase):
 
 # aka Unit
 class IecSymbol (IecBase):
-    #control = None
-
-    elements = []
-    qualifiers = ""
 
     def __init__(self):
         self.icons = []
@@ -79,6 +75,7 @@ class IecSymbol (IecBase):
         self.unit_shape = ""
         self.template = None
         self.combine = "auto"
+        self.qualifiers = ""
 
         self.is_power_unit = False
         self.is_overlay = False
@@ -88,7 +85,7 @@ class IecSymbol (IecBase):
         self.vert_margin = 0
         self.fill = NoFill
 
-        #self.width = 0
+        # self.width = 0
         # self.box_width = 0
         # self.y_offset = 0
         # self.y_pin_extent = 0

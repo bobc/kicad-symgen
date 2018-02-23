@@ -6,6 +6,13 @@ from sym_drawing import *
 ls_center = "center"
 ls_floating = "floating"
 
+ha_left = "L"
+ha_center = "C"
+ha_right = "R"
+
+va_top = "T"
+va_bottom = "B"
+
 class StyleAttributes:
 
     pensize = 10
@@ -69,6 +76,8 @@ class SgSettings:
         # name_offset
         # extra_offset       
         self.pin_names_inside = False
+
+        self.label_horiz_align = ha_right
 
 
 class SgComponent (SgItem):
