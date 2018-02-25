@@ -976,13 +976,21 @@ class GenerateKicad(LibraryGenerator):
                             self.num_errors += 1
 
                 j=0
+                input_pins = []
                 for pin in unit_pins:
-                    if pin.is_input() and j<len(inputs_pos):
+                    if pin.is_input() and pin.orientation == "R":
+                        input_pins.append (pin)
+                for pin in unit_pins:
+                    if pin.is_input() and pin.orientation == "U":
+                        input_pins.append (pin)
+
+                for pin in input_pins:
+                    if j < len(inputs_pos):
                         pin.length = sgcomp.settings.pin_length + gatedef.offsets[j]
                         pin.unit = self.unit_num
                         pin.demorgan = variant
             
-                        if unit.unit_shape == "buffer" and j==1:
+                        if (unit.unit_shape == "buffer" or unit.unit_shape == "not") and j==1:
                             dy = align_to_grid(abs(inputs_pos[j].y)+99, 100)
                             dy = dy - abs(inputs_pos[j].y)
                             pin.length += dy
