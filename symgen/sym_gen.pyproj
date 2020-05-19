@@ -9,14 +9,16 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\janis</WorkingDirectory>
+    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\Memory_xxx</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp symgen_test.txt</CommandLineArguments>
+    <CommandLineArguments>--inp Memory_EEPROM.txt --output v6-sweet</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
+    <InterpreterId>{28dce741-0f01-4575-a3aa-3c3e3876dfd5}</InterpreterId>
+    <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,6 +72,9 @@
     <Content Include="common\boundingbox.pyc" />
     <Content Include="common\print_color.pyc" />
     <Content Include="common\sexpr.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{28dce741-0f01-4575-a3aa-3c3e3876dfd5}\3.5" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

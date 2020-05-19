@@ -56,14 +56,14 @@ unit box | or
 unit pwr
 """
 
-class Group (IecBase):
 
-    def __init__(self):
-        self.qualifiers = ""
-        self.type = " "
-        self.label = ""
-        self.id = 0
-        self.pins = []
+# SgComponent
+#  IecSymbol (unit)
+#   alternate
+#    IecElement
+#     Group
+#      Pin
+
 
 # aka Unit
 class IecSymbol (IecBase):
@@ -79,6 +79,7 @@ class IecSymbol (IecBase):
 
         self.is_power_unit = False
         self.is_overlay = False
+        self.is_alternate = False
 
         self.unit_rect = Rectangle()
 
@@ -94,8 +95,6 @@ class IecSymbol (IecBase):
         self.unit_rect.pos.x = -width/2
         self.unit_rect.size.x = width
 
-
-
     def draw (self, comp, unit, variant):
         pos = Point(0,0)
         width = 600
@@ -108,12 +107,12 @@ class IecSymbol (IecBase):
 
 class IecElement (IecBase):
 
-
     def __init__(self):
         self.pins = []
         self.shape = "box"
         self.label = ""
         self.groups = []
+        self.alternate = 0
 
     def draw (self, comp, unit, variant, pos, width):
         height = 100
@@ -131,5 +130,13 @@ class IecElement (IecBase):
         return height
 
 
+class Group (IecBase):
+
+    def __init__(self):
+        self.qualifiers = ""
+        self.type = " "
+        self.label = ""
+        self.id = 0
+        self.pins = []
 
 

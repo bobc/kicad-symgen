@@ -157,6 +157,8 @@ class SymGen:
 
         self.def_logic_combine = "multi"
 
+        self.output_format = "v6-sweet"
+
 
     def process_list(self):
 
@@ -225,11 +227,11 @@ class SymGen:
 
         self.line = self.file.readline()
         #if self.verbose:
-        #    print (self.line.rstrip())
+        #    print(self.line.rstrip())
         while self.line and (self.line.startswith ("#") or len(self.line.strip())==0):
             self.line = self.file.readline()
             #if self.verbose:
-            #    print (self.line.rstrip())
+            #    print(self.line.rstrip())
     
         self.line = self.line.strip()
             
@@ -269,7 +271,7 @@ class SymGen:
 
         element = IecElement()
 
-        tokens = self.line.split()
+        tokens = tokenise (self.line)
 
         #element.shape = "box"
         # todo: is this right?
@@ -287,7 +289,7 @@ class SymGen:
                 j += 1
 
             self.get_next_line()
-            tokens = self.line.split()
+            tokens = tokenise (self.line)
         
         while not tokens[0] in ['COMP', 'UNIT', 'ELEM', 'END']:
             if tokens[0].startswith("%"):
@@ -304,6 +306,7 @@ class SymGen:
                         filename = self.strip_quotes(tok)
                 #
                 headings, file_rows = self.read_file (filename)
+                print(headings)
                 data_rows = self.select_rows (headings, file_rows, sel_fields)
 
                 for row in data_rows:
@@ -317,7 +320,7 @@ class SymGen:
                 src_lines.append (self.line)
 
             self.get_next_line()
-            tokens = self.line.split()
+            tokens = tokenise (self.line)
         # end while
 
         element.pins = self.parse_pins (src_lines, sgcomp, element)
@@ -335,7 +338,7 @@ class SymGen:
         group = None
 
         for line in lines:
-            tokens = line.split()
+            tokens = tokenise(line)
             if tokens[0].upper() == "SPC":
                 if len(tokens) == 2:
                     _dir = tokens[1]
@@ -371,6 +374,7 @@ class SymGen:
                     group.pins.append (pin)
 
             elif tokens[0].upper() == "GROUP":
+                # GROUP qualifiers type label
                 group = Group()
                 group_id += 1
                 group.id = group_id
@@ -446,8 +450,8 @@ class SymGen:
                 if pin_type in ["I", "O", "T", "C", "P", "B", "W","w", "N"]:
                     pin.type = pin_type
                 else:
-                    print line
-                    print "error: unknown pin type: " + pin_type
+                    print(line)
+                    print("error: unknown pin type: " + pin_type)
                     self.num_errors += 1
                 pin.shape = flags
 
@@ -577,7 +581,7 @@ class SymGen:
             elif tokens[1].lower() == "off":
                 stack = False
             else:
-                print "error : unknown value for pin_stack %s" % self.line
+                print("error : unknown value for pin_stack %s" % self.line)
                 self.num_errors += 1
 
             if stack:
@@ -618,7 +622,7 @@ class SymGen:
                 else:
                     self.def_settings.box_fill = fill
             else:
-                print "error : unknown fill %s" % self.line
+                print("error : unknown fill %s" % self.line)
                 self.num_errors += 1
 
         elif tokens[0] == "%iconlib":
@@ -640,7 +644,7 @@ class SymGen:
             elif tok == "DIN":
                 self.symbol_style = SymbolStyle.DIN
             else:
-                print "error : unknown style %s : expecting ANSI, IEC or DIN" % tok
+                print("error : unknown style %s : expecting ANSI, IEC or DIN" % tok)
                 self.num_errors += 1
 
             if len(tokens) > 2:
@@ -648,11 +652,11 @@ class SymGen:
                 if fill:
                     self.def_settings.logic_fill = tokens[2]
                 else:
-                    print "error : unknown fill %s" % self.line
+                    print("error : unknown fill %s" % self.line)
                     self.num_errors += 1
 
         else:
-            print "error : unknown directive %s" % self.line
+            print("error : unknown directive %s" % self.line)
             self.num_errors += 1
 
         self.get_next_line()
@@ -685,7 +689,7 @@ class SymGen:
         unit.qualifiers = self.unit_label
         #unit.pin_length = self.pin_length
 
-        tokens = self.line.split()
+        tokens = tokenise (self.line)
         
         # unit [ PWR|AND|... [ SEPerate | COMBined ] ] | Width int | ICON name
         j = 1
@@ -754,7 +758,7 @@ class SymGen:
                     self.icons.append(tokens[j])
                 unit.icons = self.icons
             else:
-                print "error : unknown parameter %s in UNIT" % token
+                print("error : unknown parameter %s in UNIT" % token)
                 self.num_errors += 1
             j += 1
 
@@ -777,7 +781,7 @@ class SymGen:
         #
 
         #debug
-        #print "unit %d %s %s" % (self.unit_num, unit.unit_shape, "power" if unit.is_power_unit else "")
+        #print("unit %d %s %s" % (self.unit_num, unit.unit_shape, "power" if unit.is_power_unit else ""))
 
         # need pin pos generator ?
 
@@ -793,15 +797,15 @@ class SymGen:
         self.pin_pos_bottom.x = 0
 
         #if comp.name == "4017":
-        #    print "oop"
+        #    print("oop")
 
         self.get_next_line()
-        tokens = self.line.split()
+        tokens = tokenise (self.line)
 
         while tokens[0].upper() not in ['UNIT','END']:
             element = self.parse_element (comp, unit.unit_shape)
             unit.elements.append (element)
-            tokens = self.line.split()
+            tokens = tokenise (self.line)
 
         # ===============================================================================
 
@@ -818,7 +822,7 @@ class SymGen:
                 unit.fill = comp.settings.box_fill
 
         else:
-            print "error: unknown shape: " + unit.unit_shape
+            print("error: unknown shape: " + unit.unit_shape)
             self.num_errors += 1
 
         # ===============================================================================
@@ -886,22 +890,22 @@ class SymGen:
                         self.comp_keywords = doc.keywords
                         self.comp_datasheet = doc.datasheet
                     else:
-                        print "error: %s not defined in FROM: %s" % (src_name, self.line)
+                        print("error: %s not defined in FROM: %s" % (src_name, self.line))
                         self.num_errors += 1
                 elif items[3].upper () == "TEMPLATE":
                     sgcomp.is_template = True
                 else:
-                    print "error: expected FROM: " + self.line
+                    print("error: expected FROM: " + self.line)
                     self.num_errors += 1
             #
             sgcomp.name = items[1]
             sgcomp.ref = items[2]
 
         else:
-            print "error: expected COMP name ref: " + self.line
+            print("error: expected COMP name ref: " + self.line)
             self.num_errors += 1
 
-        print "Component: "+ sgcomp.name
+        print("Component: "+ sgcomp.name)
 
         # 
         self.get_next_line()
@@ -914,6 +918,8 @@ class SymGen:
         tokens = self.line.split()
         while tokens[0].startswith ("FIELD"):
 
+            # FIELD $FOOTPRINT value
+            # FIELD NAME value
             if tokens[1].upper()== "$FOOTPRINT":
                 field_text = after(self.line, tokens[1]).strip()
                 sgcomp.default_footprint = field_text
@@ -977,7 +983,7 @@ class SymGen:
                 #self.comp_keywords = None
                 #self.comp_datasheet = None
             else:
-                print "error: unexpected line: " + self.line
+                print("error: unexpected line: " + self.line)
                 self.num_errors += 1
                 self.get_next_line()
                 tokens = self.line.split()
@@ -1022,7 +1028,7 @@ class SymGen:
                             elif pin.orientation == 'U':
                                 self.last_unit.elements[-1].pins.append (pin)
                     else:
-                        print "error: no elements ? %s" % sgcomp.name
+                        print("error: no elements ? %s" % sgcomp.name)
 
                 # todo: is this needed?
                 #else:
@@ -1042,7 +1048,7 @@ class SymGen:
         if self.line.startswith ("END"):
             self.get_next_line()
         else:
-            print "error: expected END: " + self.line
+            print("error: expected END: " + self.line)
             self.num_errors += 1
 
         self.in_component = False
@@ -1193,14 +1199,14 @@ class SymGen:
 
         self.footprints = []
 
-        print ("Loading footprints")
+        print("Loading footprints")
         for root, dirnames, filenames in os.walk(sourcedir):
             for filename in fnmatch.filter(filenames, '*.kicad_mod'):
                 dir = os.path.split (root) [-1]
                 dir = before (dir, ".")
                 self.footprints.append(dir + ":" +before(filename, '.kicad_mod'))
 
-        print ("%d footprints loaded" % len(self.footprints))
+        print("%d footprints loaded" % len(self.footprints))
 
     def parse_input_file (self, inp_filename):
 
@@ -1230,7 +1236,7 @@ class SymGen:
                 self.components.append (comp)
             else:
                 # 
-                print "error: unexpected line: " + self.line
+                print("error: unexpected line: " + self.line)
                 self.num_errors += 1
                 self.get_next_line()
 
@@ -1246,11 +1252,16 @@ class SymGen:
         # combine power units
 
         #
-        generator = GenerateKicad()
-        # generator = GenerateSweetLib()
+        if self.output_format == "legacy":
+            generator = GenerateKicad()
+        elif self.output_format == "v6-sweet":
+            generator = GenerateSweetLib()
+        else:
+            print ("error: invalid output format : %s" % self.output_format)
 
-        generator.GenerateLibrary (self)
+        if generator:
+            generator.GenerateLibrary (self)
 
-        print "%d parse errors" % self.num_errors
-        print "%d generate errors" % generator.num_errors
+            print("%d parse errors" % self.num_errors)
+            print("%d generate errors" % generator.num_errors)
 

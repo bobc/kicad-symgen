@@ -82,6 +82,66 @@ class SweetPin (object):
         elif self.direction == 'U':
             self.direction = 270
         
+class Effects(object):
+
+    def __init__(self):
+        self.text_size = Point ()
+        self.text_size.x = 1.27
+        self.text_size.y = 1.27
+
+        self.visible = True
+
+        self.h_justify = 'C'
+        self.v_justify = 'C'
+
+        self.bold = False
+        self.italic = False
+
+    def init(self, text_size, visible, h_justify, v_justify):
+        self.text_size = Point ()
+        self.text_size.x = mils_to_mm(text_size_mil)
+        self.text_size.y = mils_to_mm(text_size_mil)
+
+        self.visible = visible
+
+        self.h_justify = h_justify
+        self.v_justify = v_justify
+
+    def init_field(self, field):
+        self.text_size = Point ()
+        self.text_size.x = mils_to_mm(field['text_size'])
+        self.text_size.y = self.text_size.x
+
+        self.visible = field['visibility'] == 'V'
+
+        self.h_justify = field['htext_justify']
+
+        self.v_justify = field['vtext_justify'][0]
+        self.bold   = field['vtext_justify'][1] != 'N'
+        self.italic = field['vtext_justify'][2] != 'N'
+
+    def sexpr (self):
+        if self.text_size.x != 1.27 or not self.visible or self.h_justify != 'C' or self.v_justify != 'C':
+            t = "(effects (font (size %s %s))" % (self.text_size.x, self.text_size.y)
+
+            if self.h_justify != 'C' or self.v_justify != 'C':
+                t += " (justify "
+                if self.h_justify == 'L':
+                    t += " left"
+                elif self.h_justify == 'R':
+                    t += " right"
+                t += ")"
+
+            if not self.visible:
+                t += " hide"
+
+            t += ")"
+
+            return t
+        else:
+            return None
+
+
 
 class GenerateSweetLib(GenerateKicad):
 
@@ -93,55 +153,106 @@ class GenerateSweetLib(GenerateKicad):
 
         return super(GenerateSweetLib, self).__init__()
 
+    def get_pins (self, comp):
+        pins = []
+
+        numeric_pins = True
+
+        if comp:
+            for elem in comp.drawOrdered:
+                if elem[0] == 'X':
+                    item = dict(elem[1])
+
+                    pin = SweetPin (item)
+
+                    pins.append (pin)
+
+                    if not pin.num.isdigit():
+                        numeric_pins = False
+
+            if numeric_pins:
+                # sort by num
+                for passnum in range(len(pins)-1,0,-1):
+                    for i in range(passnum):
+                        if pins[i].num > pins[i+1].num :
+                            temp = pins[i]
+                            pins[i] = pins[i+1]
+                            pins[i+1] = temp
+
+        return pins
+
     def gen_unit (self, sgcomp, k_comp, unit):
 
-        part_name = "%s_U%d" % (sgcomp.name, self.unit_num)
-
-        self.unit_filename = os.path.join (self.lib_folder, "%s.kicad_part" % part_name )
+        part_name = "%s:%s_U%d" % (self.symbols.out_basename, sgcomp.name, self.unit_num)
 
         #
-        self.unit_file = open (self.unit_filename, "w")
-
-        self.unit_file.write ('(part "%s"\n' % part_name )
+        self.outfile.write ('  (symbol "%s"\n' % (part_name) )
         # more stuff
+
+        # TODO: unit, convert
+        pins = self.get_pins (k_comp)
 
         for elem in k_comp.drawOrdered:
             if elem[0] == 'X':
-                pin = elem[1]
+                pass
+            elif elem[0] == 'S':
+                rect = elem[1]
 
-                sweet_pin = SweetPin (pin)
+                self.outfile.write ('    (rectangle (start %s %s) (end %s %s) (stroke (width %s)) (fill (type background)))\n' % 
+                    ( mils_to_mm (rect['startx']), mils_to_mm (rect ['starty']),
+                      mils_to_mm (rect['endx']), mils_to_mm (rect ['endy']),
+                      mils_to_mm (rect['thickness'])
+                    ))
+            #
 
-                self.unit_file.write (' (pin %s %s (at %s %s %s)\n' % ( sweet_pin.elec_type, sweet_pin.pin_type, sweet_pin.posx, sweet_pin.posy, sweet_pin.direction ) )
-                self.unit_file.write ('   (length %s)\n' % sweet_pin.length )
-                self.unit_file.write ('   (name "%s" (font (size %s %s)) (visible %s))\n' % ( sweet_pin.name, sweet_pin.name_text_size.x, sweet_pin.name_text_size.y, convert_yes_no(k_comp.definition['draw_pinname']) ) )
-                self.unit_file.write ('   (number "%s" (font (size %s %s)) (visible %s))\n' % ( sweet_pin.num, sweet_pin.num_text_size.x, sweet_pin.num_text_size.y, convert_yes_no(k_comp.definition['draw_pinnumber']) ) )
-                self.unit_file.write ('   (visible %s))\n' % (sweet_pin.visible) )
+        for sweet_pin in pins:
 
-                #(name "" (font (size 1.2 1.2)) (visible yes))
-                #(number "2" (font (size 1.2 1.2)) (visible yes))
-                #(visible yes))
+            # TODO: add pin effects
+            #self.outfile.write ('    (pin %s %s (at %s %s %s) (length %s) (name "%s" (effects (font (size %s %s)) %s)) (number "%s" (effects (font (size %s %s)) %s)) %s)\n' % 
 
+            self.outfile.write ('    (pin {} {} (at {:g} {:g} {}) (length {}) (name "{}") (number "{}") {})\n'.format
+                ( sweet_pin.elec_type, sweet_pin.pin_type, 
+                    sweet_pin.posx, sweet_pin.posy, sweet_pin.direction,
+                    sweet_pin.length,
+                    sweet_pin.name, 
+                    sweet_pin.num,
+                    "hide" if not sweet_pin.visible else ""
+                    ) 
+                )
 
-        self.unit_file.write (')\n' )
-        self.unit_file.close()
+        self.outfile.write ('  )\n' )
 
         return part_name
+
+    def write_field (self, name, value, id, field):
+
+        effects = Effects ()
+        effects.init_field (field)
+
+        self.outfile.write ('    (property "%s" "%s" (id %s) (at %g %g %s)' % 
+                            (name, value.strip('"'), 
+                             id,
+                             mils_to_mm(field['posx']), 
+                             mils_to_mm(field['posy']),
+                             0 if field['text_orient'] == 'H' else 90
+                            ) )
+
+        if effects.sexpr():
+            self.outfile.write ('\n')
+            self.outfile.write ('      %s\n' % (effects.sexpr()) )
+            self.outfile.write ('    ')
+
+        self.outfile.write (')\n')
 
     def draw_component (self, comp):
         assert isinstance(comp, SgComponent)
 
-        # each part should be in separate file
-        # each unit/variant should be in separate file?
-
-        self.filename = os.path.join (self.lib_folder, comp.name + ".kicad_part")
-
-        print "Generating: " + self.filename
 
         component_data = []
         # units are not interchangeable
         component_data.append("DEF %s %s 0 40 Y Y 1 L N" % (comp.name, comp.ref) )      
         component_data.append("F0 \"U\" 0 0 50 H V C CNN")
-        component_data.append("F1 \"74469\" 0 -200 50 H V C CNN")
+        component_data.append("F1 \"74469\" 0 -200 50 H V L CNN")
         component_data.append("F2 \"\" 0 0 50 H I C CNN")
         component_data.append("F3 \"\" 0 0 50 H I C CNN")
         component_data.append("DRAW")
@@ -166,48 +277,63 @@ class GenerateSweetLib(GenerateKicad):
             #
             self.last_unit = unit
             self.unit_num += 1
-
-
         #
-        self.outfile = open (self.filename, "w")
+        # Loop through each alias. The first entry is assumed to be the "base" symbol
+        #
+        is_alias = False
 
-        self.outfile.write ('(part "%s"\n' % comp.name )
-        self.outfile.write ('  (reference "%s")\n' % comp.ref )
-        self.outfile.write ('  (value "%s")\n' % comp.name )
-        # more stuff
+        for name in comp.doc_fields.keys():
+            if is_alias:
+                self.outfile.write ('  (symbol "%s:%s" (extends "%s")\n' % (self.symbols.out_basename, name, comp.name ) )
+            else:
+                self.outfile.write ('  (symbol "%s:%s" (pin_names (offset %s))\n' % (self.symbols.out_basename, name, 0.508 ) )
+                #
+                self.write_field ("Reference", comp.ref, 0, k_comp.fields[0]) 
 
-        if comp.default_footprint:
-            self.outfile.write ('  (footprint %s)\n' % comp.default_footprint )
+            self.write_field ("Value", name, 1, k_comp.fields[1]) 
 
-        sgdoc = comp.doc_fields[comp.name]
+            if not is_alias:
+                if comp.default_footprint:
+                    self.write_field ("Footprint", comp.default_footprint, 2, k_comp.fields[2]) 
 
-        if sgdoc.datasheet:
-            self.outfile.write ('  (datasheet "%s")\n' %  sgdoc.datasheet)
-        if sgdoc.keywords:
-            self.outfile.write ('  (keywords "%s")\n' %  sgdoc.keywords)
-        if sgdoc.description:
-            self.outfile.write ('  (property "Description" "%s")\n' % sgdoc.description)
+            sgdoc = comp.doc_fields[name]
 
+            if sgdoc.datasheet:
+                self.write_field ("Datasheet", sgdoc.datasheet, 3, k_comp.fields[2]) 
+            if sgdoc.keywords:
+                self.write_field ("ki_keywords", sgdoc.keywords, 4, k_comp.fields[2]) 
+            if sgdoc.description:
+                self.write_field ("ki_description", sgdoc.description, 5, k_comp.fields[2]) 
 
-        self.outfile.write ('  (alternates\n' )
-        for unit_name in unit_list:
-            self.outfile.write ('    %s\n' % unit_name)
-        self.outfile.write ('  )\n' )
+            if not is_alias:
+                if k_comp.fplist:
+                    self.write_field ("ki_fp_filters", k_comp.fplist, 6, k_comp.fields[2]) 
 
-        self.outfile.write (')\n' )
-        self.outfile.close()
+                self.outfile.write ('    (alternates\n' )
+                for unit_name in unit_list:
+                    self.outfile.write ('      %s\n' % unit_name)
+                self.outfile.write ('    )\n' )
+
+            self.outfile.write ('  )\n' )
+
+            is_alias = True
 
     def GenerateLibrary (self, a_symbols):
 
         self.symbols = a_symbols
         self.num_errors = 0
 
-        self.lib_folder = os.path.join (self.symbols.out_path, self.symbols.out_basename + ".sweet")
+        self.libfile = os.path.join (self.symbols.out_path, self.symbols.out_basename + ".kicad_sym")
+        self.outfile = open (self.libfile, "w")
 
-        if not os.path.exists (self.lib_folder):
-            os.makedirs (self.lib_folder)
+        print("Creating library %s" % self.libfile)
+
+        self.outfile.write ('(kicad_symbol_lib (version 20200126) (host symgen "2.0.0")\n')
 
         if self.symbols.components:
             for comp in self.symbols.components:
                 if not comp.is_template:
                     self.draw_component(comp)
+
+        self.outfile.write (')\n' )
+        self.outfile.close()

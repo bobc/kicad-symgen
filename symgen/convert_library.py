@@ -127,7 +127,7 @@ class ConvertLibrary:
 
     def dump_lib (self, lib_filename, dump_path, ref_list_filename):
 
-        print "Reading %s" % (lib_filename)
+        print("Reading %s" % (lib_filename))
         lib = SchLib(lib_filename)
 
         opt_force_pinlen = False
@@ -145,10 +145,10 @@ class ConvertLibrary:
         template_doc_filename = os.path.join (out_path, out_filename + "_template.dcm")
 
         if ref_list_filename:
-            print "Reading ref list %s" % (ref_list_filename)
+            print("Reading ref list %s" % (ref_list_filename))
             self.logic_list = read_ref_list(ref_list_filename)
 
-        print "Extracting library %s" % (dump_filename)
+        print("Extracting library %s" % (dump_filename))
 
         #
         if self.use_templates:
@@ -258,20 +258,20 @@ class ConvertLibrary:
                     elif "buffer" in desc.description:  # check num units, num inputs
                         type = "BUF"
                     else:
-                        print "info: %s unknown type: %s" % (comp.name, desc.description)
+                        print("info: %s unknown type: %s" % (comp.name, desc.description))
                         self.num_errors += 1
 
                 # todo: demorgan options?
                 # power pins, unit = 0?
                 # need to sort by y coord, detect gaps
-                print comp.name
+                print(comp.name)
 
                 # remove illegal chars
                 clean_name = comp.name
                 clean_name = clean_name.replace ( "/", "_")
 
                 if clean_name != comp.name:
-                    print "warning: %s contains illegal chars, converted to %s" % (comp.name, clean_name)
+                    print("warning: %s contains illegal chars, converted to %s" % (comp.name, clean_name))
 
                 outf.write ("#\n")
                 outf.write ("# %s\n" % (clean_name))
@@ -304,11 +304,11 @@ class ConvertLibrary:
                 if len(comp.fplist) == 0:
                     if max_pin_number != -1: 
                         if max_pin_number != len(unique_pins):
-                            print "warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number)
+                            print("warning: %s invalid num pins? unique=%d, max=%d" % (comp.name, len(unique_pins), max_pin_number))
                             self.num_errors += 1
 
                         elif not max_pin_number in [4,6,8,14,16,20,24,28,32,40,44,48,64,68,80,84,100,144]:
-                            print "warning: %s invalid num pins? num=%d" % (comp.name, len(unique_pins))
+                            print("warning: %s invalid num pins? num=%d" % (comp.name, len(unique_pins)))
                             self.num_errors += 1
 
                     #outf.write ("DIP?%d*\n" % max_pin_number)
@@ -354,20 +354,20 @@ class ConvertLibrary:
                 if f_desc:
                     outf.write ("DESC %s\n" % capitalise(f_desc))
                 else:
-                    print "info: missing DESC %s"  % (comp.name)
+                    print("info: missing DESC %s"  % (comp.name))
                 if f_keyw:
                     outf.write ("KEYW %s\n" % f_keyw)
                 else:
-                    print "info: missing KEYW %s"  % (comp.name)
+                    print("info: missing KEYW %s"  % (comp.name))
                 if f_doc:
                     outf.write ("DOC %s\n" % f_doc)
                 else:
-                    print "info: missing DOC %s"  % (comp.name)
+                    print("info: missing DOC %s"  % (comp.name))
 
                 # process aliases
                 if len(comp.aliases) > 0:
                     # todo use desc?
-                    for alias in comp.aliases.keys():
+                    for alias in list(comp.aliases.keys()):
                         f_desc = None
                         f_doc = None  
                         f_keyw = None
@@ -388,15 +388,15 @@ class ConvertLibrary:
                         if f_desc:
                             outf.write ("DESC %s\n" % capitalise(f_desc))
                         else:
-                            print "info: missing DESC %s"  % (alias)
+                            print("info: missing DESC %s"  % (alias))
                         if f_keyw:
                             outf.write ("KEYW %s\n" % f_keyw)
                         else:
-                            print "info: missing KEYW %s"  % (alias)
+                            print("info: missing KEYW %s"  % (alias))
                         if f_doc:
                             outf.write ("DOC %s\n" % f_doc)
                         else:
-                            print "info: missing DOC %s"  % (alias)
+                            print("info: missing DOC %s"  % (alias))
 
                 #
                 for pin in comp.pins:
@@ -456,7 +456,7 @@ class ConvertLibrary:
                         # print "  lib sum "+ lib_sum
                         if lib_sum == this_sum:
                             found = True
-                            print "same as " + xcomp.name
+                            print("same as " + xcomp.name)
                             unit_template = xcomp.name
                             break
                     if not found:
@@ -474,7 +474,7 @@ class ConvertLibrary:
                 for pin in comp.pins:
                     if pin['name'] != '~' and pin['name'].startswith('~') and 'I' in pin['pin_type']:
                         pin['name'] = after (pin['name'], "~")
-                        print "info: double inversion %s %s %s"  % (comp.name, pin['num'], pin['name'])
+                        print("info: double inversion %s %s %s"  % (comp.name, pin['num'], pin['name']))
 
                     if 'I' in pin['pin_type']:
                         pin['pin_type'] = pin['pin_type'].replace("I","")
@@ -583,7 +583,7 @@ class ConvertLibrary:
                             for pin in unit_pins:
                                 # debug
                                 if pin['unit']==str(0) and num_units>1 and not is_power_pin (pin):
-                                    print "info: common pin %s %s %s"  % (comp.name, pin['num'], pin['name'])
+                                    print("info: common pin %s %s %s"  % (comp.name, pin['num'], pin['name']))
 
                                 if pin['convert'] in ['0','1'] and not (self.separate_power_unit and is_power_pin(pin)):
                                     pins.append (pin)

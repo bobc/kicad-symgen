@@ -285,3 +285,33 @@ def numeric_pins (pins):
         if not pin.number.isdigit():
             return False
     return True
+
+
+def tokenise (s):
+    in_quote = False
+    tok = ""
+    result = []
+    j = 0
+    while j < len(s):
+        if in_quote:
+            if s[j] == '"':
+                in_quote = False
+                tok = tok + s[j]
+            else:
+                tok = tok + s[j]
+        else:
+            if s[j] == '"':
+                in_quote = True
+                tok = tok + s[j]
+            elif s[j] in [" ", '\t']:
+                if tok:
+                    result.append (tok)
+                tok = ""
+            else:
+                tok = tok + s[j]
+        j += 1
+
+    if tok:
+        result.append (tok)
+    return result
+
