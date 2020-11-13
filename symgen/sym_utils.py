@@ -250,7 +250,9 @@ def is_positive_power (pin):
        ):
         return True
     elif (name in ["GND", "VSS", "VEE", "V-"] 
-            or norm_name.startswith ("GND") ):
+            or norm_name.startswith ("GND")
+            or norm_name.startswith ("VSS") 
+           ):
         return False
     else:
         return True
