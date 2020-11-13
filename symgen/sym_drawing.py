@@ -246,6 +246,20 @@ class DrawBase(object):
         bb = BoundingBox(Point(),Point())
         return bb
 
+class AlternatePin(object):
+
+    def __init__(self):
+        self.name = ""
+        self.type = "I"
+        self.shape = " "
+
+    def __init__(self, name, _type="I", shape= " "):
+        self.name = name
+        self.type = _type
+        self.shape = shape
+        
+
+
 class Pin (DrawBase):
 
     def __init__(self, s=None):
@@ -253,6 +267,8 @@ class Pin (DrawBase):
         self.demorgan = 0
 
         self.name=""
+        self.alternate_names = []
+
         self.number=""
         self.pos = Point()
         self.length = 100
@@ -316,6 +332,7 @@ class Pin (DrawBase):
         values.append (str(self.demorgan))
         values.append (self.type)
         values.append (self.shape)
+        values.append (self.alternate_names)
         return values
 
     # parse, get_bounds
@@ -348,20 +365,38 @@ class Pin (DrawBase):
         elif orientation == 'D':
             return 270
 
+    def get_text_len (self, t):
+        if t == "~":
+            return 0
+
+        t = t.replace ('~~', '-')
+        t = t.replace ('~', '')
+        return len(t)
 
     def get_text_bounds (self):
         bb = BoundingBox(Point(),Point())
         #
+        pin_len = self.get_text_len (self.name)
+
+        # alternate names
+        for p in self.alternate_names:
+            pin_len = max (pin_len, self.get_text_len (p.name))
+
         bb.pmin = Point (0, self.sizename/2)
-        bb.pmax = Point (len(self.name) * self.sizename, -self.sizename/2)
+        bb.pmax = Point (pin_len * self.sizename, -self.sizename/2)
 
         bb.rotate (self.get_angle (self.orientation))
-        
+
         return bb
+
+    def get_elect_type (self):
+        return self.type
 
     def __str__(self):
         return self.get_string()
+
     __repr__ = __str__
+
 
 class Arc (DrawBase):
 

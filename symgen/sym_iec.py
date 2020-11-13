@@ -86,6 +86,8 @@ class IecSymbol (IecBase):
         self.vert_margin = 0
         self.fill = NoFill
 
+        self.modified = True
+
         # self.width = 0
         # self.box_width = 0
         # self.y_offset = 0

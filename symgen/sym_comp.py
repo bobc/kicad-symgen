@@ -72,12 +72,13 @@ class SgSettings:
         self.logic_fill = NoFill
         self.label_style = ls_floating
         self.pin_stacking = False
+        self.stack_patterns = []
 
         # name_offset
         # extra_offset       
         self.pin_names_inside = False
 
-        self.label_horiz_align = ha_right
+        self.label_horiz_align = ha_left
 
 
 class SgComponent (SgItem):
@@ -93,6 +94,8 @@ class SgComponent (SgItem):
         self.default_footprint = ""
         self.is_template = False
         self.settings = SgSettings()
+
+        self.parent = None
 
 class ComponentDef:
     name = "name"
