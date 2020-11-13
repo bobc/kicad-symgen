@@ -50,6 +50,7 @@ class ConvertLibrary:
 
     def __init__(self):
         self.num_errors = 0
+
         # conversion options
         self.symbol_style = SymbolStyle.ANSI
         self.use_templates = False
@@ -57,6 +58,7 @@ class ConvertLibrary:
         self.squash_gaps = False
         self.label_style = ls_floating
         self.auto_width = False
+        self.alternate_names = True
 
 
     def get_descriptor (self, name):
@@ -125,13 +127,70 @@ class ConvertLibrary:
                 l.append (pin)
         return l
 
+    def get_clean_name (self, name):
+        return name.replace ( "/", "_")
+
+    def output_component_header (self, outf, name, reference, pin_len, comp, f_desc, f_keyw, f_doc, is_derived):
+
+        # remove illegal chars
+        clean_name = self.get_clean_name (name)
+
+        if clean_name != name:
+            print("warning: %s contains illegal chars, converted to %s" % (name, clean_name))
+
+        outf.write ("#\n")
+        outf.write ("# %s\n" % (clean_name))
+        outf.write ("#\n")
+        outf.write ("COMP %s %s" % (clean_name, reference))
+        if is_derived:
+            outf.write (" FROM {}".format (self.get_clean_name (comp.name)))
+        outf.write ("\n")
+
+        if not self.opt_force_pinlen and pin_len != self.def_pin_len:
+            outf.write ("%%pinlen %d\n" % (pin_len))
+
+        # TODO: need to repeat these ?
+        footprint = ""
+        j = 2
+        for field in comp.fields[2:]:
+            if field['fieldname']:
+                if field['name'] and field['name'] != '""':
+                    outf.write ("FIELD %s %s\n" % (field['fieldname'], field['name']))
+            else:
+                if field['name'] != '""':
+                    if j==2:
+                        outf.write ("FIELD $FOOTPRINT %s\n" % (field['name']))
+                        footprint = field['name']
+                    else:
+                        outf.write ("FIELD $DATASHEET%d %s\n" % (j, field['name']))
+                    j += 1
+
+
+        if len(comp.fplist) != 0:
+            outf.write ("FPLIST")
+            for fp in comp.fplist:
+                outf.write (" %s" % fp)
+            outf.write ("\n")
+
+        # doc fields
+
+        if f_desc:
+            outf.write ("DESC %s\n" % capitalise(f_desc))
+                
+        if f_keyw:
+            outf.write ("KEYW %s\n" % f_keyw)
+                
+        if f_doc:
+            outf.write ("DOC %s\n" % f_doc)
+        #
+
     def dump_lib (self, lib_filename, dump_path, ref_list_filename):
 
         print("Reading %s" % (lib_filename))
         lib = SchLib(lib_filename)
 
-        opt_force_pinlen = False
-
+        self.opt_force_pinlen = False
+        
         keywords = {}
 
         #out_path, out_filename = os.path.split (dump_path)
@@ -162,7 +221,8 @@ class ConvertLibrary:
         else:
             def_width = 600
 
-        def_pin_len = 150
+        #def_pin_len = 150
+        self.def_pin_len = 100
 
         outf = open (dump_filename,'w')
 
@@ -175,7 +235,7 @@ class ConvertLibrary:
         outf.write ("# Global Defaults\n")
         outf.write ("#\n")
         outf.write ("%%lib %s.lib\n" % out_filename)
-        outf.write ("%%pinlen %d\n" % def_pin_len)
+        outf.write ("%%pinlen %d\n" % self.def_pin_len)
         outf.write ("%%width %s\n" % ("auto" if self.auto_width else def_width ) )
         outf.write ("%fill back\n")
         outf.write ("%line 10\n")
@@ -220,13 +280,13 @@ class ConvertLibrary:
 
                     pin_len = int (pin['length'])
 
-                
+                # todo: shorter pins?
                 if len(comp.pins) < 100:
-                    pin_len = 150
+                    pin_len = 100
                 elif len(comp.pins) < 1000:
-                    pin_len = 200
+                    pin_len = 150
                 else:
-                    pin_len = 250
+                    pin_len = 200
 
                 num_units = int(comp.definition['unit_count'])
 
@@ -266,39 +326,22 @@ class ConvertLibrary:
                 # need to sort by y coord, detect gaps
                 print(comp.name)
 
-                # remove illegal chars
-                clean_name = comp.name
-                clean_name = clean_name.replace ( "/", "_")
+                #
+                #
+                #
 
-                if clean_name != comp.name:
-                    print("warning: %s contains illegal chars, converted to %s" % (comp.name, clean_name))
-
-                outf.write ("#\n")
-                outf.write ("# %s\n" % (clean_name))
-                outf.write ("#\n")
-                outf.write ("COMP %s %s\n" % (clean_name, comp.reference))
 
                 # auto select?
                 pin_len = min (pin_len, 300)
-
-                if not opt_force_pinlen and pin_len != def_pin_len:
-                    outf.write ("%%pinlen %d\n" % (pin_len))
 
                 # 
                 footprint = ""
                 j = 2
                 for field in comp.fields[2:]:
-                    if field['fieldname']:
-                        if field['name'] and field['name'] != '""':
-                            outf.write ("FIELD %s %s\n" % (field['fieldname'], field['name']))
-                    else:
+                    if not field['fieldname']:
                         if field['name'] != '""':
                             if j==2:
-                                outf.write ("FIELD $FOOTPRINT %s\n" % (field['name']))
                                 footprint = field['name']
-                            else:
-                                outf.write ("FIELD $DATASHEET%d %s\n" % (j, field['name']))
-                            j += 1
 
 
                 if len(comp.fplist) == 0:
@@ -312,10 +355,6 @@ class ConvertLibrary:
                             self.num_errors += 1
 
                     #outf.write ("DIP?%d*\n" % max_pin_number)
-                else:
-                    outf.write ("FPLIST\n")
-                    for fp in comp.fplist:
-                        outf.write ("%s\n" % fp)
 
                 # doc fields
                 f_desc = None
@@ -351,52 +390,17 @@ class ConvertLibrary:
                         f_doc = desc.get_datasheet (family)
 
                 #
-                if f_desc:
-                    outf.write ("DESC %s\n" % capitalise(f_desc))
-                else:
+                if not f_desc:
                     print("info: missing DESC %s"  % (comp.name))
-                if f_keyw:
-                    outf.write ("KEYW %s\n" % f_keyw)
-                else:
+                if not f_keyw:
                     print("info: missing KEYW %s"  % (comp.name))
-                if f_doc:
-                    outf.write ("DOC %s\n" % f_doc)
-                else:
+                if not f_doc:
                     print("info: missing DOC %s"  % (comp.name))
 
-                # process aliases
-                if len(comp.aliases) > 0:
-                    # todo use desc?
-                    for alias in list(comp.aliases.keys()):
-                        f_desc = None
-                        f_doc = None  
-                        f_keyw = None
-
-                        outf.write ("ALIAS %s\n" % alias)
-                        alias_doc = comp.aliases[alias]
-                        
-                        if alias_doc:
-                            f_desc = alias_doc['description']
-
-                            f_keyw = alias_doc['keywords']
-                            if f_keyw:
-                                for kw in f_keyw.split():
-                                    keywords [kw] = 1
-
-                            f_doc = alias_doc['datasheet']
-                        #
-                        if f_desc:
-                            outf.write ("DESC %s\n" % capitalise(f_desc))
-                        else:
-                            print("info: missing DESC %s"  % (alias))
-                        if f_keyw:
-                            outf.write ("KEYW %s\n" % f_keyw)
-                        else:
-                            print("info: missing KEYW %s"  % (alias))
-                        if f_doc:
-                            outf.write ("DOC %s\n" % f_doc)
-                        else:
-                            print("info: missing DOC %s"  % (alias))
+                #
+                #
+                #
+                self.output_component_header (outf, comp.name, comp.reference, pin_len, comp, f_desc, f_keyw, f_doc, False)
 
                 #
                 for pin in comp.pins:
@@ -597,6 +601,7 @@ class ConvertLibrary:
 
                                 horiz_pins=[]
                                 vert_pins=[]
+                                have_alternate_names = False
                                 for pin in pins:
                                     if is_power_pin(pin):
                                         if is_positive_power(pin):
@@ -612,6 +617,9 @@ class ConvertLibrary:
                                         else:
                                             horiz_pins.append (pin)
 
+                                    if '/' in pin['name']:
+                                        have_alternate_names = True
+         
 
                                 pins_def = ""
 
@@ -626,7 +634,7 @@ class ConvertLibrary:
                                             max_y = int(pin['posy'])
 
                                 for _dir in ['L','R']:
-                                    cur_y = max_y
+                                    cur_y = max_y + 100
                                     for pin in pins:
                                         if is_power_pin(pin):
                                             if is_positive_power(pin):
@@ -644,7 +652,21 @@ class ConvertLibrary:
                                                     pins_def += "SPC %s\n" % _dir
                                                     first_space = False
                                                 cur_y -= 100
-                                            pins_def += "%s %s %s %s\n" % (pin['num'],pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']),pin['direction'])
+
+                                            if self.alternate_names and '/' in pin['name']:
+                                                alt_list = pin['name'].split('/')
+
+                                                # match common port names, eg. PA1, PTB2, RC3
+                                                if _dir == 'R' and ( re.match('P[A-Z][0-9]+', alt_list[-1]) or re.match('PT[A-Z][0-9]+', alt_list[-1]) or re.match('R[A-Z][0-9]+', alt_list[-1]) ):
+                                                    alt_list.reverse()
+                                                    name = '/'.join (alt_list)
+                                                else:
+                                                    name = pin['name']
+
+                                                pins_def += "%s %s %s %s\n" % (pin['num'], name, get_pin_type(pin['electrical_type'],pin['pin_type']), pin['direction'])
+                                            else:
+                                                pins_def += "%s %s %s %s\n" % (pin['num'], pin['name'], get_pin_type(pin['electrical_type'],pin['pin_type']), pin['direction'])
+                                            
                                             cur_y = py
 
                                 # look for vert pins
@@ -687,7 +709,13 @@ class ConvertLibrary:
                                     line += " " + type
                                 else:
                                     if width>0 and width != def_width and def_width != 0:
-                                        line += " WIDTH %d" % (width)
+                                        if self.alternate_names and have_alternate_names:
+                                            #TODO: need AUTO?
+                                            #line += " AUTO"
+                                            line += " WIDTH 0"
+                                        else:
+                                            line += " WIDTH %d" % (width)
+
                                     if unit_template:
                                         line += " TEMPLATE %s" % (unit_template)
                                 line += '\n'
@@ -738,6 +766,40 @@ class ConvertLibrary:
 
                     #
                     outf.write ("END\n")
+
+                #
+                # process aliases
+                #
+                if len(comp.aliases) > 0:
+                    # todo use desc?
+                    for alias in list(comp.aliases.keys()):
+                        f_desc = None
+                        f_doc = None  
+                        f_keyw = None
+
+                        alias_doc = comp.aliases[alias]
+                        
+                        if alias_doc:
+                            f_desc = alias_doc['description']
+
+                            f_keyw = alias_doc['keywords']
+                            if f_keyw:
+                                for kw in f_keyw.split():
+                                    keywords [kw] = 1
+
+                            f_doc = alias_doc['datasheet']
+                        #
+                        if not f_desc:
+                            print("info: missing DESC %s"  % (alias))
+                        if not f_keyw:
+                            print("info: missing KEYW %s"  % (alias))
+                        if not f_doc:
+                            print("info: missing DOC %s"  % (alias))
+
+                        self.output_component_header (outf, alias, comp.reference, pin_len, comp, capitalise(f_desc), f_keyw, f_doc, True)
+
+                        outf.write ("END\n")
+
 
         outf.close()
 
