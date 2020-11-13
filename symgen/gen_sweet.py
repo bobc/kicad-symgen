@@ -12,76 +12,42 @@ def convert_yes_no (y_or_n):
 def mils_to_mm (mils):
     return float(mils) * 0.0254
 
-class SweetPin (object):
-    def __init__(self, pin):
-        self.elec_type = pin['electrical_type']
-        self.pin_type = pin['pin_type']
-        self.posx = mils_to_mm(pin['posx']) 
-        self.posy = mils_to_mm(pin['posy'])
-        self.direction = pin['direction']
+def convert_elect_type_to_sweet (elec_type):
+    if elec_type == 'I':
+        return 'input'
+    elif elec_type == 'O':
+        return 'output'
+    elif elec_type == 'B':
+        return 'bidirectional'
+    elif elec_type == 'T':
+        return 'tri_state'
+    elif elec_type == 'P':
+        return 'passive'
+    elif elec_type == 'C':
+        return 'open_collector'
+    elif elec_type == 'E':
+        return 'open_emitter'
+    elif elec_type == 'N':
+        return 'unconnected'
+    elif elec_type == 'U':
+        return 'unspecified'
+    elif elec_type == 'W':
+        return 'power_in'
+    elif elec_type == 'w':
+        return 'power_out'
 
-        self.length = mils_to_mm(pin['length'])
+def convert_pin_type_to_sweet (pin_type):
+    if pin_type == ' ' or pin_type == '':
+        return 'line'
+    elif pin_type == 'C':
+        return 'clock'
+    elif pin_type == 'I':
+        return  'inverted'
+    elif pin_type == 'F':
+        return  'falling_edge'
+    else:
+        return 'line'
 
-        self.name = pin['name']
-        self.name_text_size = Point ()
-        self.name_text_size.x = mils_to_mm(pin['name_text_size'])
-        self.name_text_size.y = mils_to_mm(pin['name_text_size'])
-        
-        self.num = pin['num'] 
-        self.num_text_size = Point()
-        self.num_text_size.x = mils_to_mm(pin['num_text_size'])
-        self.num_text_size.y = mils_to_mm(pin['num_text_size'])
-
-
-        if self.elec_type == 'I':
-            self.elec_type = 'input'
-        elif self.elec_type == 'O':
-            self.elec_type = 'output'
-        elif self.elec_type == 'B':
-            self.elec_type = 'bidirectional'
-        elif self.elec_type == 'T':
-            self.elec_type = 'tristate'
-        elif self.elec_type == 'P':
-            self.elec_type = 'passive'
-        elif self.elec_type == 'C':
-            self.elec_type = 'open_collector'
-        elif self.elec_type == 'E':
-            self.elec_type = 'open_emitter'
-        elif self.elec_type == 'N':
-            self.elec_type = 'unconnected'
-        elif self.elec_type == 'U':
-            self.elec_type = 'unspecified'
-        elif self.elec_type == 'W':
-            self.elec_type = 'power_in'
-        elif self.elec_type == 'w':
-            self.elec_type = 'power_out'
-
-        if 'N' in pin['pin_type']:
-            self.visible = 'no'
-            self.pin_type = self.pin_type.replace ('N', '')
-        else:
-            self.visible = 'yes'
-
-        if self.pin_type == ' ' or self.pin_type == '':
-            self.pin_type = 'line'
-        elif self.pin_type == 'C':
-            self.pin_type = 'clock'
-        elif self.pin_type == 'I':
-            self.pin_type = 'inverted'
-        elif self.pin_type == 'F':
-            self.pin_type = 'falling_edge'
-        else:
-            self.pin_type = 'line'
-
-        if self.direction == 'L':
-            self.direction = 0
-        elif self.direction == 'D':
-            self.direction = 90
-        elif self.direction == 'R':
-            self.direction = 180
-        elif self.direction == 'U':
-            self.direction = 270
-        
 class Effects(object):
 
     def __init__(self):
@@ -99,8 +65,8 @@ class Effects(object):
 
     def init(self, text_size, visible, h_justify, v_justify):
         self.text_size = Point ()
-        self.text_size.x = mils_to_mm(text_size_mil)
-        self.text_size.y = mils_to_mm(text_size_mil)
+        self.text_size.x = text_size
+        self.text_size.y = text_size
 
         self.visible = visible
 
@@ -120,8 +86,8 @@ class Effects(object):
         self.bold   = field['vtext_justify'][1] != 'N'
         self.italic = field['vtext_justify'][2] != 'N'
 
-    def sexpr (self):
-        if self.text_size.x != 1.27 or not self.visible or self.h_justify != 'C' or self.v_justify != 'C':
+    def sexpr (self, default_empty = False):
+        if not default_empty or self.text_size.x != 1.27 or not self.visible or self.h_justify != 'C' or self.v_justify != 'C':
             t = "(effects (font (size %s %s))" % (self.text_size.x, self.text_size.y)
 
             if self.h_justify != 'C' or self.v_justify != 'C':
@@ -139,9 +105,73 @@ class Effects(object):
 
             return t
         else:
-            return None
+            return ""
 
 
+
+class SweetPin (object):
+
+    opt_alternate_names = True
+
+    def __init__(self, pin):
+        self.elec_type = pin['electrical_type']
+        self.pin_type = pin['pin_type']
+        self.posx = mils_to_mm(pin['posx']) 
+        self.posy = mils_to_mm(pin['posy'])
+        self.direction = pin['direction']
+
+        self.length = mils_to_mm(pin['length'])
+
+        if self.opt_alternate_names and '/' in pin['name']:
+            names = pin['name'].split ('/')
+            self.name = names[0]
+            self.alternate_names = names[1:]
+
+        else:
+            if pin['alternate_names']:
+                self.alternate_names = []
+                self.alternate_names.extend (pin['alternate_names'])
+            else:
+                self.alternate_names = []
+            self.name = pin['name']
+
+        self.name_text_size = Point ()
+        self.name_text_size.x = mils_to_mm(pin['name_text_size'])
+        self.name_text_size.y = mils_to_mm(pin['name_text_size'])
+        
+        
+
+
+        self.num = pin['num'] 
+        self.num_text_size = Point()
+        self.num_text_size.x = mils_to_mm(pin['num_text_size'])
+        self.num_text_size.y = mils_to_mm(pin['num_text_size'])
+
+        self.name_effects = Effects()
+        self.name_effects.init(self.name_text_size.x, True, AlignCenter, AlignCenter)
+
+        self.num_effects = Effects ()
+        self.num_effects.init(self.num_text_size.x, True, AlignCenter, AlignCenter)
+
+        self.elec_type = convert_elect_type_to_sweet (self.elec_type)
+
+        if 'N' in pin['pin_type']:
+            self.visible = False
+            self.pin_type = self.pin_type.replace ('N', '')
+        else:
+            self.visible = True
+
+        self.pin_type = convert_pin_type_to_sweet (self.pin_type)
+
+        if self.direction == 'L':
+            self.direction = 180
+        elif self.direction == 'D':
+            self.direction = 270
+        elif self.direction == 'R':
+            self.direction = 0
+        elif self.direction == 'U':
+            self.direction = 90
+        
 
 class GenerateSweetLib(GenerateKicad):
 
@@ -183,7 +213,9 @@ class GenerateSweetLib(GenerateKicad):
 
     def gen_unit (self, sgcomp, k_comp, unit):
 
-        part_name = "%s:%s_U%d" % (self.symbols.out_basename, sgcomp.name, self.unit_num)
+        #part_name = "%s:%s_U%d" % (self.symbols.out_basename, sgcomp.name, self.unit_num)
+        #todo: demorgan 
+        part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, 0)
 
         #
         self.outfile.write ('  (symbol "%s"\n' % (part_name) )
@@ -198,11 +230,16 @@ class GenerateSweetLib(GenerateKicad):
             elif elem[0] == 'S':
                 rect = elem[1]
 
-                self.outfile.write ('    (rectangle (start %s %s) (end %s %s) (stroke (width %s)) (fill (type background)))\n' % 
+                self.outfile.write ('    (rectangle (start {:g} {:g}) (end {:g} {:g})\n'.format 
                     ( mils_to_mm (rect['startx']), mils_to_mm (rect ['starty']),
-                      mils_to_mm (rect['endx']), mils_to_mm (rect ['endy']),
-                      mils_to_mm (rect['thickness'])
+                      mils_to_mm (rect['endx']), mils_to_mm (rect ['endy'])
                     ))
+
+                self.outfile.write ('      (stroke (width {:g})) (fill (type background))\n' .format ( 
+                        mils_to_mm (rect['thickness'])
+                    ))
+
+                self.outfile.write ('    )\n')
             #
 
         for sweet_pin in pins:
@@ -210,15 +247,39 @@ class GenerateSweetLib(GenerateKicad):
             # TODO: add pin effects
             #self.outfile.write ('    (pin %s %s (at %s %s %s) (length %s) (name "%s" (effects (font (size %s %s)) %s)) (number "%s" (effects (font (size %s %s)) %s)) %s)\n' % 
 
-            self.outfile.write ('    (pin {} {} (at {:g} {:g} {}) (length {}) (name "{}") (number "{}") {})\n'.format
+            self.outfile.write ('    (pin {} {} (at {:g} {:g} {}) (length {}) {}\n'.format
                 ( sweet_pin.elec_type, sweet_pin.pin_type, 
                     sweet_pin.posx, sweet_pin.posy, sweet_pin.direction,
                     sweet_pin.length,
-                    sweet_pin.name, 
-                    sweet_pin.num,
                     "hide" if not sweet_pin.visible else ""
                     ) 
                 )
+
+            self.outfile.write ('      (name "{}" {})\n'.format
+                (   sweet_pin.name, 
+                    sweet_pin.name_effects.sexpr(False)
+                    ) 
+                )
+
+            self.outfile.write ('      (number "{}" {})\n'.format
+                (   sweet_pin.num,
+                    sweet_pin.num_effects.sexpr(False)
+                    ) 
+                )
+
+            if sweet_pin.alternate_names:
+                for alt_name in sweet_pin.alternate_names:
+                    self.outfile.write ('      (alternate "{}" {} {})\n'.format
+                        (   alt_name.name, 
+                            convert_elect_type_to_sweet(alt_name.type),
+                            convert_pin_type_to_sweet(alt_name.shape)
+                            ) 
+                        )
+
+            self.outfile.write ('      )\n')
+
+            
+
 
         self.outfile.write ('  )\n' )
 
@@ -237,9 +298,9 @@ class GenerateSweetLib(GenerateKicad):
                              0 if field['text_orient'] == 'H' else 90
                             ) )
 
-        if effects.sexpr():
+        if effects.sexpr(False) != "":
             self.outfile.write ('\n')
-            self.outfile.write ('      %s\n' % (effects.sexpr()) )
+            self.outfile.write ('      %s\n' % (effects.sexpr(False)) )
             self.outfile.write ('    ')
 
         self.outfile.write (')\n')
@@ -247,18 +308,40 @@ class GenerateSweetLib(GenerateKicad):
     def draw_component (self, comp):
         assert isinstance(comp, SgComponent)
 
+        self.max_height = 0
+        self.last_unit = None #todo
+
+        self.ref_pos= Point()
+        self.ref_pos.x = -comp.settings.box_width/2
+        self.ref_pos.y = 0
+
+        self.name_pos = Point()
+        self.name_pos.x = -comp.settings.box_width/2
+        self.name_pos.y = 0
 
         component_data = []
         # units are not interchangeable
         component_data.append("DEF %s %s 0 40 Y Y 1 L N" % (comp.name, comp.ref) )      
         component_data.append("F0 \"U\" 0 0 50 H V C CNN")
         component_data.append("F1 \"74469\" 0 -200 50 H V L CNN")
-        component_data.append("F2 \"\" 0 0 50 H I C CNN")
+        component_data.append("F2 \"\" 0 0 50 H I L CNN")
         component_data.append("F3 \"\" 0 0 50 H I C CNN")
         component_data.append("DRAW")
         component_data.append("ENDDRAW")
         component_data.append("ENDDEF")
+        
         k_comp = Component (component_data, [], None)
+
+        if comp.settings.pin_names_inside:
+            k_comp.definition['text_offset'] = "0"
+        else:
+            k_comp.definition['text_offset'] = str(self.symbols.def_name_offset)
+
+        for s in comp.fplist:
+            k_comp.fplist.append (s)
+
+
+        # TODO: field posns
 
         # generate units
 
@@ -269,14 +352,34 @@ class GenerateSweetLib(GenerateKicad):
 
         for unit in comp.units:
             self.draw_unit (comp, k_comp, unit)
-
             #
-            name = self.gen_unit (comp, k_comp, unit)
-            unit_list.append (name)
-
+            #name = self.gen_unit (comp, k_comp, unit)
+            #unit_list.append (name)
             #
             self.last_unit = unit
             self.unit_num += 1
+
+        #
+        k_comp.fields [0]['posx'] = str(int(self.ref_pos.x))
+        k_comp.fields [0]['posy'] = str(self.ref_pos.y)
+
+        k_comp.fields [1]['posx'] = str(int(self.name_pos.x))
+        k_comp.fields [1]['posy'] = str(self.name_pos.y)
+
+        k_comp.fields [2]['posx'] = str(int(self.footprint_pos.x))
+        k_comp.fields [2]['posy'] = str(self.footprint_pos.y)
+
+        k_comp.fields [0]['htext_justify' ] = ha_right
+        k_comp.fields [1]['htext_justify' ] = ha_right
+
+        # if field is positioned on the right, justify text on left
+        if comp.settings.label_horiz_align == ha_right:
+            k_comp.fields [1]['htext_justify' ] = ha_left
+
+        field_pos = Point()
+        field_pos.x = self.footprint_pos.x
+        field_pos.y = self.footprint_pos.y
+
         #
         # Loop through each alias. The first entry is assumed to be the "base" symbol
         #
@@ -286,34 +389,53 @@ class GenerateSweetLib(GenerateKicad):
             if is_alias:
                 self.outfile.write ('  (symbol "%s:%s" (extends "%s")\n' % (self.symbols.out_basename, name, comp.name ) )
             else:
-                self.outfile.write ('  (symbol "%s:%s" (pin_names (offset %s))\n' % (self.symbols.out_basename, name, 0.508 ) )
-                #
-                self.write_field ("Reference", comp.ref, 0, k_comp.fields[0]) 
+                #self.outfile.write ('  (symbol "%s:%s" (pin_names (offset %s))\n' % (self.symbols.out_basename, name, 0.508 ) )
+                if comp.parent:
+                    self.outfile.write ('  (symbol "%s:%s" (extends "%s") (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name, comp.parent.name) )
+                else:
+                    self.outfile.write ('  (symbol "%s:%s" (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name) )
+                
+            self.write_field ("Reference", comp.ref, 0, k_comp.fields[0]) 
 
             self.write_field ("Value", name, 1, k_comp.fields[1]) 
 
-            if not is_alias:
-                if comp.default_footprint:
-                    self.write_field ("Footprint", comp.default_footprint, 2, k_comp.fields[2]) 
+            if comp.default_footprint:
+                self.write_field ("Footprint", comp.default_footprint, 2, k_comp.fields[2]) 
+                field_pos.y = field_pos.y - 100
+                k_comp.fields [2]['posy'] = str(field_pos.y)
 
             sgdoc = comp.doc_fields[name]
 
             if sgdoc.datasheet:
                 self.write_field ("Datasheet", sgdoc.datasheet, 3, k_comp.fields[2]) 
+                field_pos.y = field_pos.y - 100
+                k_comp.fields [2]['posy'] = str(field_pos.y)
+
             if sgdoc.keywords:
                 self.write_field ("ki_keywords", sgdoc.keywords, 4, k_comp.fields[2]) 
+
             if sgdoc.description:
                 self.write_field ("ki_description", sgdoc.description, 5, k_comp.fields[2]) 
 
-            if not is_alias:
-                if k_comp.fplist:
-                    self.write_field ("ki_fp_filters", k_comp.fplist, 6, k_comp.fields[2]) 
+            #if not is_alias:
+            if k_comp.fplist:
+                self.write_field ("ki_fp_filters", ' '.join(k_comp.fplist), 6, k_comp.fields[2]) 
 
-                self.outfile.write ('    (alternates\n' )
-                for unit_name in unit_list:
-                    self.outfile.write ('      %s\n' % unit_name)
-                self.outfile.write ('    )\n' )
+                #self.outfile.write ('    (alternates\n' )
+                #for unit_name in unit_list:
+                #    self.outfile.write ('      %s\n' % unit_name)
+                #self.outfile.write ('    )\n' )
 
+            
+            if not is_alias and comp.parent is None:
+                # generate units
+                self.unit_num = 1
+
+                for unit in comp.units:
+                    self.gen_unit (comp, k_comp, unit)
+                    self.unit_num += 1
+
+            #
             self.outfile.write ('  )\n' )
 
             is_alias = True
@@ -328,7 +450,7 @@ class GenerateSweetLib(GenerateKicad):
 
         print("Creating library %s" % self.libfile)
 
-        self.outfile.write ('(kicad_symbol_lib (version 20200126) (host symgen "2.0.0")\n')
+        self.outfile.write ('(kicad_symbol_lib (version 20200126) (generator symgen "2.0.0")\n')
 
         if self.symbols.components:
             for comp in self.symbols.components:
