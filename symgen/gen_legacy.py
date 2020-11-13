@@ -3,6 +3,9 @@ import os
 from sym_comp import *
 from lib_symgen import *
 
+def sort_num_str(pin):
+    return pin.number
+
 class LibraryGenerator(object):
     """description of class"""
 
@@ -23,6 +26,7 @@ class GenerateKicad(LibraryGenerator):
         self.last_unit = None
         self.ref_pos= Point()
         self.name_pos = Point()
+        self.footprint_pos = Point()
         
         return super(GenerateKicad, self).__init__()
 
@@ -69,7 +73,7 @@ class GenerateKicad(LibraryGenerator):
         
                     if orientation == 'D':
                         if pos.y  % 100 != 0:
-                            print("error: pin not on grid: %s %s" % (params["name"], pos))
+                            print("error: %s pin not on grid: %s %s" % (comp.name, params["name"], pos))
                             self.num_errors += 1
                     elif orientation == 'U':
                         if pos.y % 100 != 0:
@@ -77,7 +81,7 @@ class GenerateKicad(LibraryGenerator):
                             self.num_errors += 1
                     elif orientation in ['L', "R"]:
                         if pos.x % 100 != 0:
-                            print("error: pin not on grid: %s %s" % (params["name"], pos))
+                            print("error: %s pin not on grid: %s %s" % (comp.name, params["name"], pos))
                             self.num_errors += 1
         
     def create_gate (self, unit_shape, num_inputs, num_outputs, demorgan):
@@ -228,7 +232,7 @@ class GenerateKicad(LibraryGenerator):
                     p = self.get_pos (params, "pos").Add (offset)
                     self.set_pos (params, "pos", p)            
 
-    def set_label_pos(self, sgcomp, unit):
+    def set_label_pos(self, sgcomp, unit, top_pins, bottom_pins):
 
         if sgcomp.settings.label_style == ls_floating:
             self.max_height = max (self.max_height, unit.unit_rect.size.y)
@@ -239,18 +243,29 @@ class GenerateKicad(LibraryGenerator):
                 margin = 50 # ??
 
             y = unit.unit_rect.top() + margin
-            #if y > self.ref_pos.y:
-            self.ref_pos.x = unit.unit_rect.left()
-            self.ref_pos.y = y
 
-            y = unit.unit_rect.bottom() - margin
+            x = min([i.pos.x for i in top_pins]) 
+
+            #if y > self.ref_pos.y:
+            #self.ref_pos.x = unit.unit_rect.left()
+            self.ref_pos.x = x - 100
+            self.ref_pos.y = y + 75
+
+            #y = unit.unit_rect.bottom() - margin
             #if y < self.name_pos.y:
             if sgcomp.settings.label_horiz_align == ha_left:
-                self.name_pos.x = unit.unit_rect.left()
+                # self.name_pos.x = unit.unit_rect.left()
+                self.name_pos.x = x - 100
             else:
                 self.name_pos.x = unit.unit_rect.right() - 200
 
             self.name_pos.y = y
+
+            #
+            x = max([i.pos.x for i in bottom_pins]) 
+            self.footprint_pos.x = x + 50
+            self.footprint_pos.y = unit.unit_rect.bottom() - margin
+
         else: # ls_center
             self.ref_pos.x = 0
             self.ref_pos.y = 50
@@ -289,6 +304,10 @@ class GenerateKicad(LibraryGenerator):
     #
     #
     def draw_pins (self, unit, pins, comp, unit_num, variant):
+
+        ##
+        #pins = sorted (pins, key=sort_num_str)
+
         for j,pin in enumerate(pins):
             if pin.orientation == 'R':
                 pin.pos.y = self.pin_pos_left.y
@@ -417,7 +436,8 @@ class GenerateKicad(LibraryGenerator):
                         else:
                             j += 1
 
-        for pin in pins:
+        sorted_pins = sorted (pins, key=sort_num_str)
+        for pin in sorted_pins:
             if pin.type != " ":
                 comp.drawOrdered.append( pin.get_element() )
 
@@ -801,6 +821,9 @@ class GenerateKicad(LibraryGenerator):
             #self.cur_pos = Point(0,50)
             self.cur_pos = Point(0,0)
 
+            top_pins = []
+            bottom_pins = []
+
             # draw each element
             for element in unit.elements:
                 for pin in element.pins:
@@ -808,6 +831,9 @@ class GenerateKicad(LibraryGenerator):
                         comp.definition['text_offset'] = str(self.symbols.def_extra_offset)
                         break
                         
+                top_pins.extend( self.find_pins_with_label (element.pins, "D") )
+                bottom_pins.extend ( self.find_pins_with_label (element.pins, "U") )
+
                 # 
                 variant_from = 1
                 variant_to = 1+self.units_have_variant
@@ -832,7 +858,7 @@ class GenerateKicad(LibraryGenerator):
                 unit.unit_rect.pos.y = offset.y
                 # move labels?
                 if not unit.is_power_unit:
-                    self.set_label_pos(sgcomp, unit)
+                    self.set_label_pos(sgcomp, unit, top_pins, bottom_pins)
 
                 #
                 self.check_pin_grid (comp, self.unit_num)
