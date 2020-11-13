@@ -155,10 +155,13 @@ class SymGen:
 
         self.opt_pin_qualifiers = False
 
+        self.opt_alternate_names = True
+
         self.def_logic_combine = "multi"
 
         self.output_format = "v6-sweet"
 
+        self.stack_patterns = []
 
     def process_list(self):
 
@@ -234,6 +237,8 @@ class SymGen:
             #    print(self.line.rstrip())
     
         self.line = self.line.strip()
+
+        self.tokens = tokenise (self.line)
             
     def find_component (self, name):
         for comp in self.components:
@@ -271,32 +276,29 @@ class SymGen:
 
         element = IecElement()
 
-        tokens = tokenise (self.line)
-
         #element.shape = "box"
         # todo: is this right?
         element.shape = shape 
 
-        if tokens[0].upper() == "ELEM":
+        if self.tokens[0].upper() == "ELEM":
             j = 1
-            while j < len(tokens):
-                if tokens[j].upper() == "CONTROL":
+            while j < len(self.tokens):
+                if self.tokens[j].upper() == "CONTROL":
                     element.shape = "control"
-                elif tokens[j].upper() == "LABEL":
+                elif self.tokens[j].upper() == "LABEL":
                     j += 1
-                    if j < len(tokens):
-                        element.label = self.strip_quotes(tokens[j])
+                    if j < len(self.tokens):
+                        element.label = self.strip_quotes(self.tokens[j])
                 j += 1
 
             self.get_next_line()
-            tokens = tokenise (self.line)
         
-        while not tokens[0] in ['COMP', 'UNIT', 'ELEM', 'END']:
-            if tokens[0].startswith("%"):
+        while not self.tokens[0] in ['COMP', 'UNIT', 'ELEM', 'END']:
+            if self.tokens[0].startswith("%"):
                 sel_fields = []
                 filename = None
                 state = "field"
-                for tok in tokens[1:]:
+                for tok in self.tokens[1:]:
                     if state == "field":
                         if tok == "FROM":
                             state = "table"
@@ -320,11 +322,41 @@ class SymGen:
                 src_lines.append (self.line)
 
             self.get_next_line()
-            tokens = tokenise (self.line)
         # end while
 
         element.pins = self.parse_pins (src_lines, sgcomp, element)
         return element
+
+    def get_pin_by_number (self, pins, number):
+        for pin in pins:
+            if pin.number == number:
+                return pin
+        return None
+
+    def find_pattern (self, sgcomp, name):
+        
+        for k,pattern in enumerate(sgcomp.settings.stack_patterns):
+        
+            if name in pattern:
+                return k
+
+        return -1
+
+    def match_stacking_pattern (self, sgcomp, prev_pin, this_pin):
+
+        if len(sgcomp.settings.stack_patterns)==0:
+            return False
+
+        pattern = self.find_pattern (sgcomp, this_pin.name)
+
+        if pattern == -1:
+            return False
+
+        # check for same type and orientation
+        if this_pin.type == prev_pin.type and this_pin.orientation == prev_pin.orientation and pattern == self.find_pattern(sgcomp, prev_pin.name):
+            return True
+        else:
+            return False
 
     # return list of elements ?
     def parse_pins (self, lines, sgcomp, element):
@@ -412,6 +444,8 @@ class SymGen:
                 if len(tokens) >= 3:
                     cur_pin_type = tokens[2]
 
+                #
+
                 # position, alignment
                 if len(tokens) >= 4:
                     cur_pin_dir = tokens[3][0]
@@ -455,9 +489,16 @@ class SymGen:
                     self.num_errors += 1
                 pin.shape = flags
 
+                #
+                if self.opt_alternate_names and '/' in pin.name:
+                    names = pin.name.split ('/')
+                    pin.name = names[0]
+                    for name in names[1:]:
+                        pin.alternate_names.append (AlternatePin(name, pin.type, pin.shape))
+
+                #
                 pin.orientation = cur_pin_dir
                 pin.align = cur_pin_align
-
 
                 # no connect
                 if "N" in pin.shape:
@@ -467,35 +508,28 @@ class SymGen:
                 else:
                     pin.length = sgcomp.settings.pin_length
 
-                # positioning should be done later
-                #if pin.orientation=="L":
-                #    pin.pos.x = self.pin_pos_left.x - pin.length
-                #    pin.pos.y = self.pin_pos_left.y
-                #elif pin.orientation=="R":
-                #    pin.pos.x = self.pin_pos_right.x + pin.length
-                #    pin.pos.y = self.pin_pos_right.y
-                #elif pin.orientation=="T":
-                #    pin.pos.x = self.pin_pos_top.x
-                #    pin.pos.y = self.pin_pos_top.y  + pin.length
-                #elif pin.orientation=="B":
-                #    pin.pos.x = self.pin_pos_bottom.x
-                #    pin.pos.y = self.pin_pos_bottom.y - pin.length
-                # 
+                # pin position will be set later
                 pin.orientation = symgen_to_kicad_dir (pin.orientation)
 
                 # can stack power in pins; if same name/pos/type
-                if sgcomp.settings.pin_stacking and "W" in pin.type and len(pins) > 0 and pins[-1].type == pin.type and pins[-1].name == pin.name and pins[-1].orientation == pin.orientation:
+                if sgcomp.settings.pin_stacking and "W" in pin.type and len(pins) > 0 and self.match_stacking_pattern (sgcomp, pins[-1], pin):
                     pin.can_stack = True
                 else:
                     pin.can_stack = False
                 
-                if group:
-                    pin.group_id = group_id
-                    group.pins.append (pin)
-                else:
-                    pin.group_id = -1
+                cur_pin = self.get_pin_by_number (pins, pin.number)
 
-                pins.append (pin)
+                if cur_pin:
+                    # add to existing
+                    cur_pin.alternate_names.append (AlternatePin (pin.name, pin.type, pin.shape))
+                else:
+                    if group:
+                        pin.group_id = group_id
+                        group.pins.append (pin)
+                    else:
+                        pin.group_id = -1
+
+                    pins.append (pin)
 
         #end while
 
@@ -561,60 +595,62 @@ class SymGen:
 
     def parse_directive(self, sgcomp):
 
-        tokens = self.line.split()
-        
-        if tokens[0] == "%lib":
-            self.out_basename = tokens[1]
+        if self.tokens[0] == "%lib":
+            self.out_basename = self.tokens[1]
             if self.out_basename.endswith (".lib"):
                 self.out_basename = before (self.out_basename, ".lib")
 
-        elif tokens[0] == "%pinlen":
+        elif self.tokens[0] == "%pinlen":
             if self.in_component:
-                sgcomp.settings.pin_length = int (tokens[1])
+                sgcomp.settings.pin_length = int (self.tokens[1])
             else:
-                self.def_settings.pin_length = int (tokens[1])
+                self.def_settings.pin_length = int (self.tokens[1])
 
-        elif tokens[0] == "%pin_stack":
+        elif self.tokens[0] == "%pin_stack":
             stack = None
-            if tokens[1].lower() == "on":
-                stack = True
-            elif tokens[1].lower() == "off":
+            stack_pattern =None
+
+            if self.tokens[1].lower() == "off":
                 stack = False
             else:
-                print("error : unknown value for pin_stack %s" % self.line)
-                self.num_errors += 1
+                stack = True
+                stack_pattern = self.tokens[1:]
 
             if stack:
                 if self.in_component:
                     sgcomp.settings.pin_stacking = stack
+                    if stack_pattern:
+                        sgcomp.settings.stack_patterns.append(stack_pattern)
                 else:
                     self.def_settings.pin_stacking = stack
+                    if stack_pattern:
+                        self.def_settings.stack_patterns.append (stack_pattern)
 
-        elif tokens[0] == "%width":
-            if tokens[1].lower() == "auto":
+        elif self.tokens[0] == "%width":
+            if self.tokens[1].lower() == "auto":
                 width = 0
             else:
-                width = int (tokens[1])
+                width = int (self.tokens[1])
 
             if self.in_component:
                 sgcomp.settings.box_width = width
             else:
                 self.def_settings.box_width = width
 
-        elif tokens[0] == "%line":
+        elif self.tokens[0] == "%line":
             if self.in_component:
-                sgcomp.settings.box_pen = int (tokens[1])
+                sgcomp.settings.box_pen = int (self.tokens[1])
             else:
-                self.def_settings.box_pen = int (tokens[1])
+                self.def_settings.box_pen = int (self.tokens[1])
 
-        elif tokens[0] == "%label_style":
+        elif self.tokens[0] == "%label_style":
             if self.in_component:
-                sgcomp.settings.label_style = tokens[1]
+                sgcomp.settings.label_style = self.tokens[1]
             else:
-                self.def_settings.label_style = tokens[1]
+                self.def_settings.label_style = self.tokens[1]
 
-        elif tokens[0] == "%fill":
-            fill = self.parse_fill (tokens[1])
+        elif self.tokens[0] == "%fill":
+            fill = self.parse_fill (self.tokens[1])
             if fill:
                 if self.in_component:
                     sgcomp.settings.box_fill = fill
@@ -625,14 +661,14 @@ class SymGen:
                 print("error : unknown fill %s" % self.line)
                 self.num_errors += 1
 
-        elif tokens[0] == "%iconlib":
+        elif self.tokens[0] == "%iconlib":
             if not self.in_component:
-                # filename = os.path.join ("data", tokens[1])
-                filename = os.path.abspath(os.path.join(self.out_path, tokens[1]))
+                # filename = os.path.join ("data", self.tokens[1])
+                filename = os.path.abspath(os.path.join(self.out_path, self.tokens[1]))
                 self.icon_lib = SchLib(filename)
 
-        elif tokens[0] == "%style":
-            tok = tokens[1].upper()
+        elif self.tokens[0] == "%style":
+            tok = self.tokens[1].upper()
 
             # ANSI|IEC fill single|multi
 
@@ -647,10 +683,10 @@ class SymGen:
                 print("error : unknown style %s : expecting ANSI, IEC or DIN" % tok)
                 self.num_errors += 1
 
-            if len(tokens) > 2:
-                fill = self.parse_fill (tokens[2])
+            if len(self.tokens) > 2:
+                fill = self.parse_fill (self.tokens[2])
                 if fill:
-                    self.def_settings.logic_fill = tokens[2]
+                    self.def_settings.logic_fill = self.tokens[2]
                 else:
                     print("error : unknown fill %s" % self.line)
                     self.num_errors += 1
@@ -689,12 +725,10 @@ class SymGen:
         unit.qualifiers = self.unit_label
         #unit.pin_length = self.pin_length
 
-        tokens = tokenise (self.line)
-        
         # unit [ PWR|AND|... [ SEPerate | COMBined ] ] | Width int | ICON name
         j = 1
-        while j < len(tokens):
-            token = tokens[j].upper()
+        while j < len(self.tokens):
+            token = self.tokens[j].upper()
 
             if token == "PWR":
                 unit.unit_shape = "power"
@@ -725,37 +759,38 @@ class SymGen:
                 self.unit_combine = "combine"
 
             elif token == "EXTENDS":
-                # this works with FROM inheritance
+                # this works with FROM inheritance at COMP level?
+                # EXTENDS <unit num>
                 j += 1
-                src_unit = int(tokens[j])
+                src_unit = int(self.tokens[j])
 
                 self.unit_num = self.unit_num - 1
                 unit = comp.units[src_unit]
 
             elif token.startswith("W"):
                 j += 1
-                comp.settings.box_width = int(tokens[j])
+                comp.settings.box_width = int(self.tokens[j])
                 
                 unit.set_width (comp.settings.box_width)
 
             elif token.upper().startswith("LABEL"):
                 j += 1
-                self.unit_label = self.strip_quotes (tokens[j])
+                self.unit_label = self.strip_quotes (self.tokens[j])
                 
                 unit.qualifiers = self.unit_label
 
             elif token.startswith("TEMP"):
                 j += 1
-                unit.template = tokens[j]
+                unit.template = self.tokens[j]
                 unit.unit_shape = "none"
                 self.last_shape = unit.unit_shape
 
             elif token.startswith("ICON"):
                 self.last_shape = unit.unit_shape
                 self.icons = []
-                while j < len(tokens)-1:
+                while j < len(self.tokens)-1:
                     j += 1
-                    self.icons.append(tokens[j])
+                    self.icons.append(self.tokens[j])
                 unit.icons = self.icons
             else:
                 print("error : unknown parameter %s in UNIT" % token)
@@ -800,12 +835,10 @@ class SymGen:
         #    print("oop")
 
         self.get_next_line()
-        tokens = tokenise (self.line)
 
-        while tokens[0].upper() not in ['UNIT','END']:
+        while self.tokens[0].upper() not in ['UNIT','END']:
             element = self.parse_element (comp, unit.unit_shape)
             unit.elements.append (element)
-            tokens = tokenise (self.line)
 
         # ===============================================================================
 
@@ -881,6 +914,7 @@ class SymGen:
                     if src_comp:
                         sgcomp = copy.deepcopy (src_comp)
                         sgcomp.is_template = False
+                        sgcomp.parent = src_comp
                         # remove all aliases
                         # rename doc entry for comp
                         doc = sgcomp.doc_fields[src_name]
@@ -889,6 +923,9 @@ class SymGen:
                         self.comp_description = doc.description
                         self.comp_keywords = doc.keywords
                         self.comp_datasheet = doc.datasheet
+
+                        for unit in sgcomp.units:
+                            unit.modified = False
                     else:
                         print("error: %s not defined in FROM: %s" % (src_name, self.line))
                         self.num_errors += 1
@@ -909,24 +946,22 @@ class SymGen:
 
         # 
         self.get_next_line()
-        tokens = self.line.split()
 
         while self.line.startswith ("%"):
             self.parse_directive(sgcomp)
 
         #
-        tokens = self.line.split()
-        while tokens[0].startswith ("FIELD"):
+        while self.tokens[0].startswith ("FIELD"):
 
             # FIELD $FOOTPRINT value
             # FIELD NAME value
-            if tokens[1].upper()== "$FOOTPRINT":
-                field_text = after(self.line, tokens[1]).strip()
+            if self.tokens[1].upper()== "$FOOTPRINT":
+                field_text = after(self.line, self.tokens[1]).strip()
                 sgcomp.default_footprint = field_text
             else:
-                field_text = after(self.line, tokens[1]).strip()
+                field_text = after(self.line, self.tokens[1]).strip()
                 
-                line = 'F%d %s 0 0 50 H I C CNN "%s"' % (len(sgcomp.user_fields), field_text, tokens[1])
+                line = 'F%d %s 0 0 50 H I C CNN "%s"' % (len(sgcomp.user_fields), field_text, self.tokens[1])
                 s = shlex.shlex(line)
                 s.whitespace_split = True
                 s.commenters = ''
@@ -937,38 +972,33 @@ class SymGen:
                 sgcomp.user_fields.append (dict(zip(Component._FN_KEYS,values)))
 
             self.get_next_line()
-            tokens = self.line.split()
     
         #
         if self.line.startswith ("FPLIST"):
-            self.get_next_line()
-            tokens = self.line.split()
             sgcomp.fplist = []
-            while not tokens[0] in self.kw:
+            sgcomp.fplist.extend (self.tokens[1:])
+
+            self.get_next_line()
+            
+            while not self.tokens[0] in self.kw:
                 sgcomp.fplist.append (self.line)
-                #comp.fplist.append (self.line)
                 self.get_next_line()
-                tokens = self.line.split()
 
         # get aliases, documentation fields
         alias_name = None
-        tokens = self.line.split()
        
-        while tokens[0].upper() not in ["UNIT", "END"]:
+        while self.tokens[0].upper() not in ["UNIT", "END"]:
             if self.line.startswith ("DESC"):
                 self.comp_description = after (self.line, " ")
                 self.get_next_line()
-                tokens = self.line.split()
 
             elif self.line.startswith ("KEYW"):
                 self.comp_keywords = after (self.line, " ")
                 self.get_next_line()
-                tokens = self.line.split()
 
             elif self.line.startswith ("DOC"):
                 self.comp_datasheet = after (self.line, " ")
                 self.get_next_line()
-                tokens = self.line.split()
 
             elif self.line.startswith ("ALIAS"):
                
@@ -977,7 +1007,6 @@ class SymGen:
                 #
                 alias_name = after (self.line, " ")
                 self.get_next_line()
-                tokens = self.line.split()
 
                 #self.comp_description = None
                 #self.comp_keywords = None
@@ -986,7 +1015,6 @@ class SymGen:
                 print("error: unexpected line: " + self.line)
                 self.num_errors += 1
                 self.get_next_line()
-                tokens = self.line.split()
         # while
 
         name, sgdoc = self.make_doc (sgcomp, alias_name)
@@ -994,7 +1022,7 @@ class SymGen:
 
         # units
 
-        while tokens[0].upper() == "UNIT":
+        while self.tokens[0].upper() == "UNIT":
 
             unit = self.parse_unit(sgcomp)
 
@@ -1043,7 +1071,6 @@ class SymGen:
                 sgcomp.units.append (unit)
 
             self.last_unit = unit
-            tokens = self.line.split()
 
         if self.line.startswith ("END"):
             self.get_next_line()
