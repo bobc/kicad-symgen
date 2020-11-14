@@ -24,9 +24,15 @@ class GenerateKicad(LibraryGenerator):
 
         self.max_height = 0
         self.last_unit = None
+
         self.ref_pos= Point()
+        self.ref_style = StyleAttributes()
+
         self.name_pos = Point()
+        self.name_style = StyleAttributes()
+
         self.footprint_pos = Point()
+        self.footprint_style = StyleAttributes()
         
         return super(GenerateKicad, self).__init__()
 
@@ -242,28 +248,51 @@ class GenerateKicad(LibraryGenerator):
             else:
                 margin = 50 # ??
 
+            # reference
             y = unit.unit_rect.top() + margin
 
-            x = min([i.pos.x for i in top_pins]) 
+            x_pos = [i.pos.x for i in top_pins]
+            if x_pos:
+                x = min(x_pos) 
 
             #if y > self.ref_pos.y:
             #self.ref_pos.x = unit.unit_rect.left()
-            self.ref_pos.x = x - 100
+                self.ref_pos.x = x - 100
+                self.ref_style.horiz_alignment = ha_right
+            else:
+                self.ref_pos.x = 0
+                self.ref_style.horiz_alignment = ha_center
             self.ref_pos.y = y + 75
+
+            # name
 
             #y = unit.unit_rect.bottom() - margin
             #if y < self.name_pos.y:
             if sgcomp.settings.label_horiz_align == ha_left:
                 # self.name_pos.x = unit.unit_rect.left()
-                self.name_pos.x = x - 100
+                if x_pos:
+                    self.name_pos.x = x - 100
+                    self.name_style.horiz_alignment = ha_right
+                else:
+                    self.name_pos.x = 0
+                    self.name_style.horiz_alignment = ha_center
             else:
+                # right
                 self.name_pos.x = unit.unit_rect.right() - 200
 
             self.name_pos.y = y
 
-            #
-            x = max([i.pos.x for i in bottom_pins]) 
-            self.footprint_pos.x = x + 50
+            # footprint
+            x_pos = [i.pos.x for i in bottom_pins]
+            if x_pos:
+                x = max(x_pos) 
+                self.footprint_pos.x = x + 50
+                self.footprint_style.horiz_alignment = ha_left
+            else:
+                x = 0
+                self.footprint_pos.x = 0
+                self.footprint_style.horiz_alignment = ha_center
+
             self.footprint_pos.y = unit.unit_rect.bottom() - margin
 
         else: # ls_center

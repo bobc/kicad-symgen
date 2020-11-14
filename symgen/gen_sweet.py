@@ -211,6 +211,16 @@ class GenerateSweetLib(GenerateKicad):
 
         return pins
 
+    def apply_format (self, comp, name):
+        format = [x for x in comp.settings.pin_name_formats if re.match(x[0], name) ]
+
+        if format:
+            p = re.sub (format[0][0], format[0][1], name, flags=re.IGNORECASE)
+            print (f"{name} {p}")
+            return p
+        else:
+            return name
+
     def gen_unit (self, sgcomp, k_comp, unit):
 
         #part_name = "%s:%s_U%d" % (self.symbols.out_basename, sgcomp.name, self.unit_num)
@@ -256,7 +266,7 @@ class GenerateSweetLib(GenerateKicad):
                 )
 
             self.outfile.write ('      (name "{}" {})\n'.format
-                (   sweet_pin.name, 
+                (   self.apply_format (sgcomp, sweet_pin.name), 
                     sweet_pin.name_effects.sexpr(False)
                     ) 
                 )
@@ -270,7 +280,7 @@ class GenerateSweetLib(GenerateKicad):
             if sweet_pin.alternate_names:
                 for alt_name in sweet_pin.alternate_names:
                     self.outfile.write ('      (alternate "{}" {} {})\n'.format
-                        (   alt_name.name, 
+                        (   self.apply_format (sgcomp, alt_name.name), 
                             convert_elect_type_to_sweet(alt_name.type),
                             convert_pin_type_to_sweet(alt_name.shape)
                             ) 
@@ -385,15 +395,24 @@ class GenerateSweetLib(GenerateKicad):
         #
         is_alias = False
 
+        if comp.parent is None:
+            flat_unit = True
+        elif len([x for x in comp.units if x.modified]):
+            flat_unit  = True
+        else:
+            flat_unit = False
+
         for name in comp.doc_fields.keys():
-            if is_alias:
-                self.outfile.write ('  (symbol "%s:%s" (extends "%s")\n' % (self.symbols.out_basename, name, comp.name ) )
+            #  (pin_names (offset %s))
+
+            if flat_unit:
+                self.outfile.write ('  (symbol "%s:%s" (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name) )
             else:
-                #self.outfile.write ('  (symbol "%s:%s" (pin_names (offset %s))\n' % (self.symbols.out_basename, name, 0.508 ) )
-                if comp.parent:
-                    self.outfile.write ('  (symbol "%s:%s" (extends "%s") (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name, comp.parent.name) )
+                if is_alias:
+                    self.outfile.write ('  (symbol "%s:%s" (extends "%s")\n' % (self.symbols.out_basename, name, comp.name ) )
                 else:
-                    self.outfile.write ('  (symbol "%s:%s" (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name) )
+                    self.outfile.write ('  (symbol "%s:%s" (extends "%s") (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name, comp.parent.name) )
+                
                 
             self.write_field ("Reference", comp.ref, 0, k_comp.fields[0]) 
 
@@ -427,7 +446,7 @@ class GenerateSweetLib(GenerateKicad):
                 #self.outfile.write ('    )\n' )
 
             
-            if not is_alias and comp.parent is None:
+            if not is_alias and flat_unit:
                 # generate units
                 self.unit_num = 1
 

@@ -11,6 +11,7 @@ ha_center = "C"
 ha_right = "R"
 
 va_top = "T"
+va_center = "C"
 va_bottom = "B"
 
 class StyleAttributes:
@@ -19,21 +20,21 @@ class StyleAttributes:
     fill = NoFill
 
     offset = 0
-    show_pin_number = True
     show_pin_name = True
+    show_pin_number = True
 
-    font_size = 50
     angle = "H"
-    visible = False    
-    horiz_alignment = "C"
-    vert_alignment = "C"
-    italic = False
+    font_size = 50
     bold = False
+    italic = False
+    visible = False    
+    vert_alignment = "C"
+    horiz_alignment = "C"
 
-    pin_length = 100
-    orientation = "L"   # direction
     sizenum = 50
     sizename = 50
+    pin_length = 100
+    orientation = "L"   # direction
 
     def __init__(self):
         pass
@@ -72,13 +73,15 @@ class SgSettings:
         self.logic_fill = NoFill
         self.label_style = ls_floating
         self.pin_stacking = False
-        self.stack_patterns = []
+        self.stack_patterns = []      # pattern, pattern...
+        self.pin_name_formats = []    # pattern, format
 
         # name_offset
         # extra_offset       
         self.pin_names_inside = False
 
         self.label_horiz_align = ha_left
+        self.label_vert_align = va_top
 
 
 class SgComponent (SgItem):

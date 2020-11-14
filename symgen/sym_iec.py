@@ -10,7 +10,8 @@ class IecBase(object):
     """description of class"""
 
     def __init__(self):
-        pass
+        self.is_derived = False
+
 """
 symbol-unit
     element  [control] [1+]
@@ -69,6 +70,7 @@ unit pwr
 class IecSymbol (IecBase):
 
     def __init__(self):
+        super(IecSymbol, self).__init__()
         self.icons = []
         self.elements = []
 
@@ -110,6 +112,7 @@ class IecSymbol (IecBase):
 class IecElement (IecBase):
 
     def __init__(self):
+        super(IecElement, self).__init__()
         self.pins = []
         self.shape = "box"
         self.label = ""
@@ -135,6 +138,7 @@ class IecElement (IecBase):
 class Group (IecBase):
 
     def __init__(self):
+        super(Group, self).__init__()
         self.qualifiers = ""
         self.type = " "
         self.label = ""

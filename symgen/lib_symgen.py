@@ -161,7 +161,7 @@ class SymGen:
 
         self.output_format = "v6-sweet"
 
-        self.stack_patterns = []
+
 
     def process_list(self):
 
@@ -271,14 +271,16 @@ class SymGen:
             result.append (result_row)
         return result
 
-    def parse_element (self, sgcomp, shape):
+    def parse_element (self, sgcomp, unit):
         src_lines = []
 
         element = IecElement()
 
         #element.shape = "box"
         # todo: is this right?
-        element.shape = shape 
+        element.shape = unit.unit_shape 
+
+        element_num = 0
 
         if self.tokens[0].upper() == "ELEM":
             j = 1
@@ -289,10 +291,19 @@ class SymGen:
                     j += 1
                     if j < len(self.tokens):
                         element.label = self.strip_quotes(self.tokens[j])
+                elif self.tokens[j].isnumeric():
+                    element_num = int (self.tokens[j])
+
                 j += 1
 
             self.get_next_line()
-        
+        else:
+            pass
+
+        if unit.is_derived:
+            element = unit.elements[element_num]
+            element.is_derived = True
+
         while not self.tokens[0] in ['COMP', 'UNIT', 'ELEM', 'END']:
             if self.tokens[0].startswith("%"):
                 sel_fields = []
@@ -360,7 +371,7 @@ class SymGen:
 
     # return list of elements ?
     def parse_pins (self, lines, sgcomp, element):
-        pins = []
+        pins = element.pins
 
         cur_pin_type = "I"
         cur_pin_dir = "L"
@@ -427,9 +438,10 @@ class SymGen:
             elif tokens[0].upper() == "DEL":
                 j = 1
                 while j < len(tokens):
-                    num = int(tokens[j])
-                    p = filter (lambda x: x.num == num, pins)
-                    pins.remove(p[0])
+                    num = tokens[j]
+                    filtered_pins = [x for x in pins if x.number != num]
+                    pins = filtered_pins
+                    j +=1
 
             else:    
                 pin = Pin()
@@ -626,6 +638,20 @@ class SymGen:
                     if stack_pattern:
                         self.def_settings.stack_patterns.append (stack_pattern)
 
+        elif self.tokens[0] == "%pin_name_format":
+            
+            name_format =None
+
+            if len(self.tokens) >= 3:
+                name_format = self.tokens[1:]
+
+                if self.in_component:
+                    sgcomp.settings.pin_name_formats.append(name_format)
+                else:
+                    self.def_settings.pin_name_formats.append (name_format)
+            else:
+                print("error : insufficient argements %s : expecting '%%pin_name_format name format'" % self.line)
+
         elif self.tokens[0] == "%width":
             if self.tokens[1].lower() == "auto":
                 width = 0
@@ -713,12 +739,11 @@ class SymGen:
 
         unit.set_width (comp.settings.box_width)
 
-        self.unit_num = self.unit_num + 1
-
         unit.unit_shape = self.last_shape
         if not unit.unit_shape:
             unit.unit_shape = "box"
         
+        self.unit_num = self.unit_num + 1
         self.unit_combine = "auto"
 
         unit.vert_margin = 200
@@ -726,6 +751,7 @@ class SymGen:
         #unit.pin_length = self.pin_length
 
         # unit [ PWR|AND|... [ SEPerate | COMBined ] ] | Width int | ICON name
+        # unit EXTENDS int
         j = 1
         while j < len(self.tokens):
             token = self.tokens[j].upper()
@@ -759,13 +785,15 @@ class SymGen:
                 self.unit_combine = "combine"
 
             elif token == "EXTENDS":
-                # this works with FROM inheritance at COMP level?
+                # this works with FROM inheritance at COMP level
                 # EXTENDS <unit num>
                 j += 1
                 src_unit = int(self.tokens[j])
 
                 self.unit_num = self.unit_num - 1
                 unit = comp.units[src_unit]
+                unit.is_derived = True
+                unit.modified = True
 
             elif token.startswith("W"):
                 j += 1
@@ -798,23 +826,21 @@ class SymGen:
             j += 1
 
         # 
-        #self.get_next_line()
+        if not unit.is_derived:
+            if unit.unit_shape != self.last_shape:
+                self.icons = []    
+                unit.icons = []
+                unit.template = None
 
-        if unit.unit_shape != self.last_shape:
-            self.icons = []    
-            unit.icons = []
-            unit.template = None
+            self.last_shape = unit.unit_shape
 
-        self.last_shape = unit.unit_shape
-
-        unit.icons = self.icons
-        unit.combine = self.unit_combine
+            unit.icons = self.icons
+            unit.combine = self.unit_combine
 
         #if len(unit.icons) == 0 and unit.template:
         #    unit.icons.append(unit.template)
 
         #
-
         #debug
         #print("unit %d %s %s" % (self.unit_num, unit.unit_shape, "power" if unit.is_power_unit else ""))
 
@@ -837,8 +863,10 @@ class SymGen:
         self.get_next_line()
 
         while self.tokens[0].upper() not in ['UNIT','END']:
-            element = self.parse_element (comp, unit.unit_shape)
-            unit.elements.append (element)
+            element = self.parse_element (comp, unit)
+
+            if not element.is_derived:
+                unit.elements.append (element)
 
         # ===============================================================================
 
@@ -1026,51 +1054,56 @@ class SymGen:
 
             unit = self.parse_unit(sgcomp)
 
-            #
-            unit.is_overlay = False
-                    
-            if not self.regen and unit.unit_shape == "power":
-                unit.is_power_unit = True
-
-                if self.unit_combine == "seperate" or not self.opt_combine_power_for_single_units:
-                    pass
-                    # todo: is this needed?
-                    #self.set_power_unit_size (sgcomp, unit)
-                    
-                    #sgcomp.pin_names_inside = True
-
-                # this relies on pwr unit being last unit...
-                elif self.opt_combine_power_for_single_units and self.unit_num==2 or self.unit_combine=="combine":
-                    #unit.unit_shape = "none"
-                    unit.is_overlay = True
-        
-                    #self.unit_num = self.unit_num - 1
-
-                    self.pin_pos_top.y    = self.last_unit.unit_rect.top()
-                    self.pin_pos_bottom.y = self.last_unit.unit_rect.bottom()
-
-                    if unit.elements:
-                        for pin in unit.elements[0].pins:
-                            if pin.orientation == 'D':
-                                self.last_unit.elements[0].pins.append (pin)
-                            elif pin.orientation == 'U':
-                                self.last_unit.elements[-1].pins.append (pin)
-                    else:
-                        print("error: no elements ? %s" % sgcomp.name)
-
-                # todo: is this needed?
-                #else:
-                #    # auto
-                #    self.set_power_unit_size (sgcomp, unit)                        
+            if unit.is_derived:
+                # derived_unit
+                pass
+            
             else:
-                unit.is_power_unit = False
+                # new unit
+                unit.is_overlay = False
+                    
+                if not self.regen and unit.unit_shape == "power":
+                    unit.is_power_unit = True
 
+                    if self.unit_combine == "seperate" or not self.opt_combine_power_for_single_units:
+                        pass
+                        # todo: is this needed?
+                        #self.set_power_unit_size (sgcomp, unit)
+                    
+                        #sgcomp.pin_names_inside = True
+
+                    # this relies on pwr unit being last unit...
+                    elif self.opt_combine_power_for_single_units and self.unit_num==2 or self.unit_combine=="combine":
+                        #unit.unit_shape = "none"
+                        unit.is_overlay = True
+        
+                        #self.unit_num = self.unit_num - 1
+
+                        self.pin_pos_top.y    = self.last_unit.unit_rect.top()
+                        self.pin_pos_bottom.y = self.last_unit.unit_rect.bottom()
+
+                        if unit.elements:
+                            for pin in unit.elements[0].pins:
+                                if pin.orientation == 'D':
+                                    self.last_unit.elements[0].pins.append (pin)
+                                elif pin.orientation == 'U':
+                                    self.last_unit.elements[-1].pins.append (pin)
+                        else:
+                            print("error: no elements ? %s" % sgcomp.name)
+
+                    # todo: is this needed?
+                    #else:
+                    #    # auto
+                    #    self.set_power_unit_size (sgcomp, unit)                        
+                else:
+                    unit.is_power_unit = False
+
+                #
+                if not unit.is_overlay or self.regen:
+                    sgcomp.units.append (unit)
+
+                self.last_unit = unit
             #
-
-            if not unit.is_overlay or self.regen:
-                sgcomp.units.append (unit)
-
-            self.last_unit = unit
 
         if self.line.startswith ("END"):
             self.get_next_line()
