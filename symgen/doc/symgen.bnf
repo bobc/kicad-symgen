@@ -20,10 +20,14 @@
 %token PC_LINE   = '%line'
 %token PC_ICONLIB= '%iconlib'
 %token PC_STYLE  = '%style'
+%token PC_LABEL_STYLE  = '%label_style'
+%token PC_PIN_STACK = '%pin_stack'
+
 %token PC_SELECT  = '%select'
 
 %token IEC    = 'IEC'
 %token ANSI   = 'ANSI'
+%token DIN    = 'DIN'
 
 %token BACK   = 'BACK'
 %token FORE   = 'FORE'
@@ -62,7 +66,10 @@
 %token XNOR   = 'XNOR'
 
 %token SPC   = 'SPC'
+%token DEL   = 'DEL'
 %token FROM  = 'FROM'
+%token EXTENDS  = 'EXTENDS'
+
 
 %token GRP_NO_LABEL = '-'
 %token GRP_CLOCK    = 'C'   /* clock    */
@@ -79,15 +86,16 @@ directive : PC_LIB NAME                   /* output library name */
           | PC_FILL [FORE | BACK | NONE]  /* body fill color: foreground, background, none */
           | PC_LINE NUMBER                /* default pen size in mils */
           | PC_ICONLIB NAME               /* name of icon library e.g template.lib */
-          | PC_STYLE [IEC | ANSI]
+          | PC_STYLE [IEC | ANSI | DIN]
+          | PC_PIN_STACK NAME*            /* pin stacking */
           ;
 
-component : COMP NAME REF
+component : COMP NAME REF [ FROM NAME |]
 
             directive *
 
-            [ FPLIST
-              footprint_spec *
+            [ FPLIST footprint_spec *
+
             |]
 
             [ DESC description |]
@@ -139,15 +147,14 @@ group_type  : GRP_NO_LABEL
 unit_type : PWR [ SEPerate | COMBined |]
           | NONE
           | NOT | BUF | AND | OR | NAND | NOR | XOR | XNOR
+          | EXTENDS NUMBER
           ;
 
 /* NB : no spaces allowed between flags and pin_type */
 
 pin_def   : NUMBER NAME [ flag pin_type
                             [position
-                              [pin_label
-                                [qualifiers|]
-                              |]
+                              [qualifiers|]
                             |]
                         |]
 
@@ -201,4 +208,4 @@ pin_type  : STRING ;
 */
 position  : STRING ;
 
-pin_label : QUOTED_STRING;
+

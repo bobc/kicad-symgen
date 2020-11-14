@@ -6,30 +6,35 @@ input = ( directive | component )*
 # a directive outside a component definition applies to all subsequent components
 # a directive inside a component definition applies to only that component
 
-directive = "%lib" name           # output library name
-            | "%pinlen" number    # len in mils
-            | "%width" number     # width in mils
-            | "%fill" back        # body fill: fore, back, none
-            | "%line" number      # default pen size in mils
-            | "%iconlib" name     # name of icon library e.g template.lib
-            | "%style" "IEC" | "ANSI"
+directive = "%lib" name                 # output library name
+            | "%pinlen" number          # len in mils
+            | "%width" "AUTO"|number    # width in mils
+            | "%fill" fill              # body fill: fore, back, none
+            | "%line" number            # default pen size in mils
+            | "%label_style" style
+            | "%iconlib" name           # name of icon library e.g template.lib
+            | "%style" "IEC" | "ANSI" | "DIN" fill
+            | "%pin_stack" OFF | name +
 
-component = "COMP" NAME REF
+component = "COMP" NAME REF [FROM name | TEMPLATE]
 
             directive *
 
-            [ "FPLIST"
-            footprint_spec
+            ["FIELD" "$FOOTPRINT"|NAME value
+            ]*
+
+            [ "FPLIST" footprint_spec *
+            [footprint_spec]
             ]
 
-            [ "DESC" ]
-            [ "KEYW" ]
-            [ "DOC"  ]
+            [ "DESC" description]
+            [ "KEYW" keyword *]
+            [ "DOC"  name ]
 
             [ "ALIAS" name
-              [ "DESC" ]
-              [ "KEYW" ]
-              [ "DOC"  ]
+              [ "DESC" description ]
+              [ "KEYW" keyword *]
+              [ "DOC"  name ]
             ]
 
             unit *
@@ -61,15 +66,18 @@ label = string
 unit_type =  PWR [ SEPerate | COMBined ]
         | NONE
         | NOT | BUF | AND | OR | NAND | NOR | XOR | XNOR
+        | EXTENDS number
 
 
 # NB : no spaces allowed between flags and type
 
-pin_def = NUMBER NAME [ flag* pin_type [position [label [qualifiers]]]]       # todo: [align] ?
+pin_def = NUMBER NAME [ flag* pin_type [position [qualifiers]]]       # todo: [align] ?
 
           | "SPC" position
 
           | %SELECT column_name+ "FROM" filename
+
+          | DEL number +
 
 # flags generally affect the graphic display, except for "power" which makes the
 # electrical type power input or output depending on pin_type.
@@ -105,5 +113,5 @@ position = "L" | "R" | "T" | "B"        # position with respect to unit: left, r
 
 NAME = valid pin name. If name starts with "~", the pin shape is set to inverted style if applicable
 
-NUMBER = valid pin number, [0-9]*
+NUMBER = valid pin number, [0-9]+
 

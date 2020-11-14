@@ -2,7 +2,7 @@
 
 ## About
 
-A component library generator for KiCad
+A symbol library generator for KiCad
 
 # Running symgen
 
