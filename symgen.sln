@@ -1,9 +1,12 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "sym_gen", "symgen\sym_gen.pyproj", "{12233739-7C7B-4D9F-B968-2C8E8F872AB6}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "atmel_extract", "atmel_extract\atmel_extract.pyproj", "{A1A57383-50E5-481F-9DD0-1B5A725BC4F5}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "scan_libs", "scan_libs\scan_libs.pyproj", "{73F30526-51D4-496F-A8AE-E28F411E6CAE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,8 +16,15 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{12233739-7C7B-4D9F-B968-2C8E8F872AB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{12233739-7C7B-4D9F-B968-2C8E8F872AB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1A57383-50E5-481F-9DD0-1B5A725BC4F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1A57383-50E5-481F-9DD0-1B5A725BC4F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73F30526-51D4-496F-A8AE-E28F411E6CAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73F30526-51D4-496F-A8AE-E28F411E6CAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DFD6154-F437-47BE-B117-1AE3429FB381}
 	EndGlobalSection
 EndGlobal
