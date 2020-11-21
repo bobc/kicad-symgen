@@ -120,12 +120,13 @@ class Component(object):
     _DEF_KEYS = ['name','reference','unused','text_offset','draw_pinnumber','draw_pinname','unit_count','units_locked','option_flag']
     _F0_KEYS = ['reference','posx','posy','text_size','text_orient','visibility','htext_justify','vtext_justify']
     _FN_KEYS = ['name','posx','posy','text_size','text_orient','visibility','htext_justify','vtext_justify','fieldname']
-    _ARC_KEYS = ['posx','posy','radius','start_angle','end_angle','unit','convert','thickness','fill','startx','starty','endx','endy']
+
+    _ARC_KEYS    = ['posx','posy','radius','start_angle','end_angle','unit','convert','thickness','fill','startx','starty','endx','endy']
     _CIRCLE_KEYS = ['posx','posy','radius','unit','convert','thickness','fill']
-    _POLY_KEYS = ['point_count','unit','convert','thickness','points','fill']
-    _RECT_KEYS = ['startx','starty','endx','endy','unit','convert','thickness','fill']
-    _TEXT_KEYS = ['direction','posx','posy','text_size','text_type','unit','convert','text', 'italic', 'bold', 'hjustify', 'vjustify']
-    _PIN_KEYS = ['name','num','posx','posy','length','direction','name_text_size','num_text_size','unit','convert','electrical_type','pin_type','alternate_names']
+    _POLY_KEYS   = ['point_count','unit','convert','thickness','points','fill']
+    _RECT_KEYS   = ['startx','starty','endx','endy','unit','convert','thickness','fill']
+    _TEXT_KEYS   = ['direction','posx','posy','text_size','text_type','unit','convert','text', 'italic', 'bold', 'hjustify', 'vjustify']
+    _PIN_KEYS    = ['name','num','posx','posy','length','direction','name_text_size','num_text_size','unit','convert','electrical_type','pin_type','alternate_names']
 
     _DRAW_KEYS = {'A':_ARC_KEYS, 'C':_CIRCLE_KEYS, 'P':_POLY_KEYS, 'S':_RECT_KEYS, 'T':_TEXT_KEYS, 'X':_PIN_KEYS}
     # _DRAW_ELEMS = {'arcs':'A', 'circles':'C', 'polylines':'P', 'rectangles':'S', 'texts':'T', 'pins':'X'}

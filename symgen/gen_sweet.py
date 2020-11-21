@@ -48,6 +48,17 @@ def convert_pin_type_to_sweet (pin_type):
     else:
         return 'line'
 
+def apply_format (comp, name):
+    format = [x for x in comp.settings.pin_name_formats if re.match(x[0], name) ]
+
+    if format:
+        p = re.sub (format[0][0], format[0][1], name, flags=re.IGNORECASE)
+        #print (f"{name} {p}")
+        return p
+    else:
+        return name
+
+
 class Effects(object):
 
     def __init__(self):
@@ -86,7 +97,7 @@ class Effects(object):
         self.bold   = field['vtext_justify'][1] != 'N'
         self.italic = field['vtext_justify'][2] != 'N'
 
-    def sexpr (self, default_empty = False):
+    def get_sexpr (self, default_empty = False):
         if not default_empty or self.text_size.x != 1.27 or not self.visible or self.h_justify != 'C' or self.v_justify != 'C':
             t = "(effects (font (size %s %s))" % (self.text_size.x, self.text_size.y)
 
@@ -108,8 +119,22 @@ class Effects(object):
             return ""
 
 
+class SweetBase(object):
 
-class SweetPin (object):
+    key = ' '
+    unit=0
+    demorgan=1
+    pensize=10
+    fill = NoFill
+
+    def __init__(self, s=None):
+        self.key = ' '
+        self.unit=0
+        self.demorgan=1
+        self.pensize=10
+        self.fill='none'
+
+class SweetPin (SweetBase):
 
     opt_alternate_names = True
 
@@ -121,6 +146,9 @@ class SweetPin (object):
         self.direction = pin['direction']
 
         self.length = mils_to_mm(pin['length'])
+
+        self.unit = int(pin['unit'])
+        self.demorgan = int(pin['convert'])
 
         if self.opt_alternate_names and '/' in pin['name']:
             names = pin['name'].split ('/')
@@ -138,9 +166,6 @@ class SweetPin (object):
         self.name_text_size = Point ()
         self.name_text_size.x = mils_to_mm(pin['name_text_size'])
         self.name_text_size.y = mils_to_mm(pin['name_text_size'])
-        
-        
-
 
         self.num = pin['num'] 
         self.num_text_size = Point()
@@ -172,6 +197,75 @@ class SweetPin (object):
         elif self.direction == 'U':
             self.direction = 90
         
+    def get_sexpr(self, sgcomp):
+        # TODO: add pin effects
+        # '    (pin %s %s (at %s %s %s) (length %s) (name "%s" (effects (font (size %s %s)) %s)) (number "%s" (effects (font (size %s %s)) %s)) %s)\n' 
+
+        s = '    (pin {} {} (at {:g} {:g} {}) (length {}) {}\n'.format (
+                self.elec_type, self.pin_type, 
+                self.posx, self.posy, self.direction,
+                self.length,
+                "hide" if not self.visible else ""
+                ) 
+
+        s += '      (name "{}" {})\n'.format (
+                apply_format (sgcomp, self.name), 
+                self.name_effects.get_sexpr(False)
+                ) 
+
+        s += '      (number "{}" {})\n'.format (
+                self.num,
+                self.num_effects.get_sexpr(False)
+                ) 
+            
+
+        if self.alternate_names:
+            for alt_name in self.alternate_names:
+                s += '      (alternate "{}" {} {})\n'.format (
+                       apply_format (sgcomp, alt_name.name), 
+                       convert_elect_type_to_sweet(alt_name.type),
+                       convert_pin_type_to_sweet(alt_name.shape)
+                       ) 
+                    
+
+        s += '      )\n'
+        return s
+
+
+class SweetRectangle (SweetBase):
+
+    def __init__(self, rect):
+        # 'startx','starty','endx','endy','thickness','fill']
+
+        self.unit = int(rect['unit'])
+        self.demorgan = int(rect['convert'] )
+
+        self.start = Point (mils_to_mm(rect['startx']), mils_to_mm(rect['starty']) )
+        self.end = Point (mils_to_mm(rect['endx']), mils_to_mm(rect['endy']) )
+
+        self.thickness = mils_to_mm (rect['thickness'])
+        
+        self.fill = rect['fill']
+
+        if self.fill == 'N':    self.fill = "none"
+        elif self.fill == 'F':  self.fill = "outline"
+        elif self.fill == 'f':  self.fill = "background"
+        else:
+            self.fill = "none"
+        
+    def get_sexpr(self):
+
+        s = '    (rectangle (start {:g} {:g}) (end {:g} {:g})\n'.format (
+                    self.start.x, self.start.y,
+                    self.end.x, self.end.y,
+                    )
+                    
+        s += '      (stroke (width {:g})) (fill (type {}))\n' .format ( self.thickness, self.fill )
+
+        s += '    )\n'
+
+        return s
+
 
 class GenerateSweetLib(GenerateKicad):
 
@@ -183,7 +277,7 @@ class GenerateSweetLib(GenerateKicad):
 
         return super(GenerateSweetLib, self).__init__()
 
-    def get_pins (self, comp):
+    def get_pins (self, comp, unit, demorgan):
         pins = []
 
         numeric_pins = True
@@ -192,13 +286,13 @@ class GenerateSweetLib(GenerateKicad):
             for elem in comp.drawOrdered:
                 if elem[0] == 'X':
                     item = dict(elem[1])
-
                     pin = SweetPin (item)
 
-                    pins.append (pin)
+                    if pin.unit == 0 or pin.unit == unit:
+                        pins.append (pin)
 
-                    if not pin.num.isdigit():
-                        numeric_pins = False
+                        if not pin.num.isdigit():
+                            numeric_pins = False
 
             if numeric_pins:
                 # sort by num
@@ -211,85 +305,34 @@ class GenerateSweetLib(GenerateKicad):
 
         return pins
 
-    def apply_format (self, comp, name):
-        format = [x for x in comp.settings.pin_name_formats if re.match(x[0], name) ]
-
-        if format:
-            p = re.sub (format[0][0], format[0][1], name, flags=re.IGNORECASE)
-            print (f"{name} {p}")
-            return p
-        else:
-            return name
-
     def gen_unit (self, sgcomp, k_comp, unit):
 
         #part_name = "%s:%s_U%d" % (self.symbols.out_basename, sgcomp.name, self.unit_num)
         #todo: demorgan 
-        part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, 0)
+
+        demorgan = 0
+
+        part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, demorgan)
 
         #
         self.outfile.write ('  (symbol "%s"\n' % (part_name) )
         # more stuff
 
         # TODO: unit, convert
-        pins = self.get_pins (k_comp)
+        pins = self.get_pins (k_comp, self.unit_num, demorgan)
 
         for elem in k_comp.drawOrdered:
             if elem[0] == 'X':
                 pass
             elif elem[0] == 'S':
-                rect = elem[1]
+                sweet_rect = SweetRectangle(dict(elem[1]))
 
-                self.outfile.write ('    (rectangle (start {:g} {:g}) (end {:g} {:g})\n'.format 
-                    ( mils_to_mm (rect['startx']), mils_to_mm (rect ['starty']),
-                      mils_to_mm (rect['endx']), mils_to_mm (rect ['endy'])
-                    ))
-
-                self.outfile.write ('      (stroke (width {:g})) (fill (type background))\n' .format ( 
-                        mils_to_mm (rect['thickness'])
-                    ))
-
-                self.outfile.write ('    )\n')
+                if sweet_rect.unit == 0 or sweet_rect.unit == self.unit_num:
+                    self.outfile.write (sweet_rect.get_sexpr())
             #
 
         for sweet_pin in pins:
-
-            # TODO: add pin effects
-            #self.outfile.write ('    (pin %s %s (at %s %s %s) (length %s) (name "%s" (effects (font (size %s %s)) %s)) (number "%s" (effects (font (size %s %s)) %s)) %s)\n' % 
-
-            self.outfile.write ('    (pin {} {} (at {:g} {:g} {}) (length {}) {}\n'.format
-                ( sweet_pin.elec_type, sweet_pin.pin_type, 
-                    sweet_pin.posx, sweet_pin.posy, sweet_pin.direction,
-                    sweet_pin.length,
-                    "hide" if not sweet_pin.visible else ""
-                    ) 
-                )
-
-            self.outfile.write ('      (name "{}" {})\n'.format
-                (   self.apply_format (sgcomp, sweet_pin.name), 
-                    sweet_pin.name_effects.sexpr(False)
-                    ) 
-                )
-
-            self.outfile.write ('      (number "{}" {})\n'.format
-                (   sweet_pin.num,
-                    sweet_pin.num_effects.sexpr(False)
-                    ) 
-                )
-
-            if sweet_pin.alternate_names:
-                for alt_name in sweet_pin.alternate_names:
-                    self.outfile.write ('      (alternate "{}" {} {})\n'.format
-                        (   self.apply_format (sgcomp, alt_name.name), 
-                            convert_elect_type_to_sweet(alt_name.type),
-                            convert_pin_type_to_sweet(alt_name.shape)
-                            ) 
-                        )
-
-            self.outfile.write ('      )\n')
-
-            
-
+            self.outfile.write (sweet_pin.get_sexpr(sgcomp))
 
         self.outfile.write ('  )\n' )
 
@@ -308,9 +351,9 @@ class GenerateSweetLib(GenerateKicad):
                              0 if field['text_orient'] == 'H' else 90
                             ) )
 
-        if effects.sexpr(False) != "":
+        if effects.get_sexpr(False) != "":
             self.outfile.write ('\n')
-            self.outfile.write ('      %s\n' % (effects.sexpr(False)) )
+            self.outfile.write ('      %s\n' % (effects.get_sexpr(False)) )
             self.outfile.write ('    ')
 
         self.outfile.write (')\n')
@@ -406,7 +449,10 @@ class GenerateSweetLib(GenerateKicad):
             #  (pin_names (offset %s))
 
             if flat_unit:
-                self.outfile.write ('  (symbol "%s:%s" (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name) )
+                if is_alias:
+                    self.outfile.write ('  (symbol "%s:%s" (extends "%s") (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name, comp.name) )
+                else:
+                    self.outfile.write ('  (symbol "%s:%s" (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name) )
             else:
                 if is_alias:
                     self.outfile.write ('  (symbol "%s:%s" (extends "%s")\n' % (self.symbols.out_basename, name, comp.name ) )
@@ -414,31 +460,44 @@ class GenerateSweetLib(GenerateKicad):
                     self.outfile.write ('  (symbol "%s:%s" (extends "%s") (in_bom yes) (on_board yes)\n' % (self.symbols.out_basename, name, comp.parent.name) )
                 
                 
-            self.write_field ("Reference", comp.ref, 0, k_comp.fields[0]) 
+            field_id = 0
 
-            self.write_field ("Value", name, 1, k_comp.fields[1]) 
+            self.write_field ("Reference", comp.ref, field_id, k_comp.fields[0]) 
+            field_id += 1
+
+            self.write_field ("Value", name, field_id, k_comp.fields[1]) 
+            field_id += 1
 
             if comp.default_footprint:
-                self.write_field ("Footprint", comp.default_footprint, 2, k_comp.fields[2]) 
+                self.write_field ("Footprint", comp.default_footprint, field_id, k_comp.fields[2]) 
+                field_id += 1
                 field_pos.y = field_pos.y - 100
                 k_comp.fields [2]['posy'] = str(field_pos.y)
 
             sgdoc = comp.doc_fields[name]
 
             if sgdoc.datasheet:
-                self.write_field ("Datasheet", sgdoc.datasheet, 3, k_comp.fields[2]) 
+                self.write_field ("Datasheet", sgdoc.datasheet, field_id, k_comp.fields[2]) 
+                field_id += 1
                 field_pos.y = field_pos.y - 100
                 k_comp.fields [2]['posy'] = str(field_pos.y)
 
+            if not is_alias and flat_unit and len(comp.units) > 1:
+                self.write_field ("ki_locked", "", field_id, k_comp.fields[2]) 
+                field_id += 1
+
             if sgdoc.keywords:
-                self.write_field ("ki_keywords", sgdoc.keywords, 4, k_comp.fields[2]) 
+                self.write_field ("ki_keywords", sgdoc.keywords, field_id, k_comp.fields[2]) 
+                field_id += 1
 
             if sgdoc.description:
-                self.write_field ("ki_description", sgdoc.description, 5, k_comp.fields[2]) 
+                self.write_field ("ki_description", sgdoc.description, field_id, k_comp.fields[2]) 
+                field_id += 1
 
             #if not is_alias:
             if k_comp.fplist:
-                self.write_field ("ki_fp_filters", ' '.join(k_comp.fplist), 6, k_comp.fields[2]) 
+                self.write_field ("ki_fp_filters", ' '.join(k_comp.fplist), field_id, k_comp.fields[2]) 
+                field_id += 1
 
                 #self.outfile.write ('    (alternates\n' )
                 #for unit_name in unit_list:
@@ -469,6 +528,7 @@ class GenerateSweetLib(GenerateKicad):
 
         print("Creating library %s" % self.libfile)
 
+        # 20201005
         self.outfile.write ('(kicad_symbol_lib (version 20200126) (generator symgen "2.0.0")\n')
 
         if self.symbols.components:

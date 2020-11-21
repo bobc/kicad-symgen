@@ -5,7 +5,7 @@ def before(value, a):
     # Find first part and return slice before it.
     pos_a = value.find(a)
     if pos_a == -1: 
-        return ""
+        return value
     return value[0:pos_a]
     
 def after(value, a):
