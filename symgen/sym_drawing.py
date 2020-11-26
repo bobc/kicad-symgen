@@ -322,8 +322,8 @@ class Pin (DrawBase):
         values = [] 
         values.append (self.name)
         values.append (self.number)
-        values.append (str(self.pos.x))
-        values.append (str(self.pos.y))
+        values.append (str(int(self.pos.x)))
+        values.append (str(int(self.pos.y)))
         values.append (str(self.length))
         values.append (self.orientation)
         values.append (str(self.sizename))
@@ -344,10 +344,13 @@ class Pin (DrawBase):
         return self.type in ['I','B'] and not 'W' in self.shape.upper()
 
     def get_string (self):
-        if self.shape == " " :
+        if self.shape == " " and self.number == "~":
             return "SPC %s" % (kicad_to_symgen_dir(self.orientation))
         else:
-            s = "%s %s %s %s%s" % (self.number, self.name, get_pin_type (self.type, self.shape), kicad_to_symgen_dir(self.orientation), 
+            s = "%s %s %s %s %s" % (self.number, 
+                                   self.name, 
+                                   get_pin_type (self.type, self.shape), 
+                                   kicad_to_symgen_dir(self.orientation), 
                                    "" if self.align == "L" else self.align)
             if self.qualifiers:
                 s += '"'+self.qualifiers+'"'

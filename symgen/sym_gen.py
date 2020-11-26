@@ -31,10 +31,16 @@
    / missing graphics
 """
 
+import os
 import sys
 import argparse
 
 import file_util
+
+v5schlib = os.path.abspath(os.path.join(sys.path[0], 'v5_schlib'))
+if not v5schlib in sys.path:
+    sys.path.append(v5schlib)
+
 from lib_symgen import *
 from convert_library import *
 
@@ -76,6 +82,8 @@ else:
     actions = "gen"
 
 # --regen -lib C:\git_bobc\kicad-library\library\74xx.lib 
+# C:\gitlab\kicad-libraries\kicad-symbols_pre_v6\new
+# --inp MCU_Microchip_PIC18.txt --output v6-sweet
 
 if "dump" in actions:
     # -d --lib C:\git_bobc\kicad-library\library\74xx.lib --ref ..\74xx\7400_logic_ref.txt

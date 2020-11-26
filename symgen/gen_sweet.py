@@ -58,6 +58,14 @@ def apply_format (comp, name):
     else:
         return name
 
+def convert_fill (s):
+    fill = s
+    if fill == 'N':    fill = "none"
+    elif fill == 'F':  fill = "outline"
+    elif fill == 'f':  fill = "background"
+    else:
+        fill = "none"
+    return fill
 
 class Effects(object):
 
@@ -244,14 +252,7 @@ class SweetRectangle (SweetBase):
         self.end = Point (mils_to_mm(rect['endx']), mils_to_mm(rect['endy']) )
 
         self.thickness = mils_to_mm (rect['thickness'])
-        
-        self.fill = rect['fill']
-
-        if self.fill == 'N':    self.fill = "none"
-        elif self.fill == 'F':  self.fill = "outline"
-        elif self.fill == 'f':  self.fill = "background"
-        else:
-            self.fill = "none"
+        self.fill = convert_fill(rect['fill'])
         
     def get_sexpr(self):
 
@@ -261,11 +262,133 @@ class SweetRectangle (SweetBase):
                     )
                     
         s += '      (stroke (width {:g})) (fill (type {}))\n' .format ( self.thickness, self.fill )
-
         s += '    )\n'
 
         return s
 
+class SweetPoly (SweetBase):
+
+    def __init__(self, poly):
+        # ['point_count','unit','convert','thickness','points','fill']
+
+        self.unit = int(poly['unit'])
+        self.demorgan = int(poly['convert'] )
+
+        #
+        self.points = []
+        j = 0
+        pts= poly['points']
+        while j < len(pts)/2:
+            self.points.append (Point (mils_to_mm(pts[j*2]), mils_to_mm(pts[j*2+1]) ))
+            j += 1
+
+        #
+        self.thickness = mils_to_mm (poly['thickness'])
+        self.fill = convert_fill(poly['fill'])
+        
+
+    def get_sexpr(self):
+
+        s  = '    (polyline\n'
+        s += '      (pts\n'
+
+        for p in self.points :
+            s += '      (xy {:g} {:g})\n'.format (p.x, p.y)
+
+        s += '      )\n'
+        s += '      (stroke (width {:g})) (fill (type {}))\n' .format ( self.thickness, self.fill )
+        s += '    )\n'
+
+        return s
+
+class SweetArc (SweetBase):
+
+    def __init__(self, arc):
+        # ['posx','posy','radius','start_angle','end_angle', 'startx','starty','endx','endy']
+
+        self.unit = int(arc['unit'])
+        self.demorgan = int(arc['convert'] )
+
+        self.center = Point (mils_to_mm(arc['posx']), mils_to_mm(arc['posy']) )
+        self.radius = mils_to_mm(arc['radius'])
+
+        self.start_angle = int(arc['start_angle']) / 10
+        self.end_angle = int(arc['end_angle']) / 10
+
+        self.start = Point (mils_to_mm(arc['startx']), mils_to_mm(arc['starty']) )
+        self.end   = Point (mils_to_mm(arc['endx']), mils_to_mm(arc['endy']) )
+
+        self.thickness = mils_to_mm (arc['thickness'])
+        self.fill = convert_fill(arc['fill'])
+        
+
+    def get_sexpr(self):
+
+        s = '    (arc (start {:g} {:g}) (end {:g} {:g}) (radius (at {:g} {:g}) (length {:g}) (angles {:g} {:g}))\n'.format (
+                    self.start.x, self.start.y,
+                    self.end.x, self.end.y,
+                    self.center.x, self.center.y,
+                    self.radius,
+                    self.start_angle, self.end_angle
+                    )
+        s += '      (stroke (width {:g})) (fill (type {}))\n' .format ( self.thickness, self.fill )
+        s += '    )\n'
+        return s
+
+class SweetText (SweetBase):
+
+    def __init__(self, text):
+        # ['direction','posx','posy','text_size','text_type','unit','convert','text', 'italic', 'bold', 'hjustify', 'vjustify']
+
+        self.unit = int(text['unit'])
+        self.demorgan = int(text['convert'] )
+
+        self.pos = Point (mils_to_mm(arc['posx']), mils_to_mm(arc['posy']) )
+        self.direction = text['direction']
+
+        self.effects = Effects()
+        self.effects.init (mils_to_mm(text['text_size']), True, text['hjustify'], text['vjustify'])
+        self.effects.bold   = text['bold'] != 'N'
+        self.effects.italic = text['italic'] != 'N'
+
+        self.text = text['text']
+        self.text_type = text['text_type']
+
+        
+
+    def get_sexpr(self):
+
+        s = '    (text "{}" (at {:g} {:g} {:g})\n'.format (
+                    self.text,
+                    self.pos.x, self.pos.y, self.direction
+                    )
+        s += effects.get_sexpr()
+        s += '    )\n'
+        return s
+
+class SweetCircle (SweetBase):
+
+    def __init__(self, circle):
+        # ['posx','posy','radius','unit','convert','thickness','fill']
+
+        self.unit = int(circle['unit'])
+        self.demorgan = int(circle['convert'] )
+
+        self.pos = Point (mils_to_mm(circle['posx']), mils_to_mm(circle['posy']) )
+        self.radius = mils_to_mm(circle['radius'])
+
+        self.thickness = mils_to_mm (circle['thickness'])
+        self.fill = convert_fill(circle['fill'])
+        
+
+    def get_sexpr(self):
+
+        s = '    (circle (center {:g} {:g}) (radius {:g}) (stroke (width {:g})) (fill (type {})))\n'.format (
+                    self.pos.x, self.pos.y, 
+                    self.radius,
+                    self.thickness, self.fill 
+                    )
+        return s
 
 class GenerateSweetLib(GenerateKicad):
 
@@ -288,7 +411,7 @@ class GenerateSweetLib(GenerateKicad):
                     item = dict(elem[1])
                     pin = SweetPin (item)
 
-                    if pin.unit == 0 or pin.unit == unit:
+                    if (pin.unit == 0 or pin.unit == unit) and (demorgan == -1 or pin.demorgan==demorgan):
                         pins.append (pin)
 
                         if not pin.num.isdigit():
@@ -308,33 +431,55 @@ class GenerateSweetLib(GenerateKicad):
     def gen_unit (self, sgcomp, k_comp, unit):
 
         #part_name = "%s:%s_U%d" % (self.symbols.out_basename, sgcomp.name, self.unit_num)
-        #todo: demorgan 
 
-        demorgan = 0
+        # look for demorgan variants
 
-        part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, demorgan)
-
-        #
-        self.outfile.write ('  (symbol "%s"\n' % (part_name) )
-        # more stuff
-
-        # TODO: unit, convert
-        pins = self.get_pins (k_comp, self.unit_num, demorgan)
-
+        shapes = [-1]
         for elem in k_comp.drawOrdered:
-            if elem[0] == 'X':
-                pass
-            elif elem[0] == 'S':
-                sweet_rect = SweetRectangle(dict(elem[1]))
+            item = dict(elem[1])
+            if int(item['convert']) > 1:
+                shapes = [0,1,2]
+                break
 
-                if sweet_rect.unit == 0 or sweet_rect.unit == self.unit_num:
-                    self.outfile.write (sweet_rect.get_sexpr())
+        for demorgan in shapes:
+
+            if demorgan == -1:
+                part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, 1)
+            else:
+                part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, demorgan)
+
             #
+            self.outfile.write ('  (symbol "%s"\n' % (part_name) )
 
-        for sweet_pin in pins:
-            self.outfile.write (sweet_pin.get_sexpr(sgcomp))
+            pins = self.get_pins (k_comp, self.unit_num, demorgan)
 
-        self.outfile.write ('  )\n' )
+            for elem in k_comp.drawOrdered:
+                sweet_item = None
+                if elem[0] == 'X':
+                    pass
+                elif elem[0] == 'S':
+                    sweet_item = SweetRectangle(dict(elem[1]))
+
+                elif elem[0] == 'P':
+                    sweet_item = SweetPoly(dict(elem[1]))
+
+                elif elem[0] == 'A':
+                    sweet_item = SweetArc(dict(elem[1]))
+
+                elif elem[0] == 'C':
+                    sweet_item = SweetCircle(dict(elem[1]))
+
+                elif elem[0] == 'T':
+                    sweet_item = SweetText(dict(elem[1]))
+
+                if sweet_item:
+                    if (sweet_item.unit == 0 or sweet_item.unit == self.unit_num) and ( demorgan==-1 or sweet_item.demorgan == demorgan):
+                        self.outfile.write (sweet_item.get_sexpr())
+
+            for sweet_pin in pins:
+                self.outfile.write (sweet_pin.get_sexpr(sgcomp))
+
+            self.outfile.write ('  )\n' )
 
         return part_name
 

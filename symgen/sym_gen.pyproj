@@ -9,16 +9,14 @@
     <StartupFile>sym_gen.py</StartupFile>
     <SearchPath>
     </SearchPath>
-    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\Memory_xxx</WorkingDirectory>
+    <WorkingDirectory>C:\github\kicad-symgen-symbols\74xgxx</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp Memory_EEPROM.txt --output v6-sweet</CommandLineArguments>
+    <CommandLineArguments>--inp 74xgxx.txt --output v6-sweet</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
-    <InterpreterId>{28dce741-0f01-4575-a3aa-3c3e3876dfd5}</InterpreterId>
-    <InterpreterVersion>3.5</InterpreterVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,7 +51,6 @@
     <Compile Include="sym_drawing.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="schlib.py" />
     <Compile Include="sym_gates.py">
       <SubType>Code</SubType>
     </Compile>
@@ -64,24 +61,21 @@
     <Compile Include="sym_utils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="v5_schlib\schlib.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="common\" />
+    <Folder Include="v5_schlib\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="common\boundingbox.pyc" />
     <Content Include="common\print_color.pyc" />
     <Content Include="common\sexpr.pyc" />
   </ItemGroup>
-  <ItemGroup>
-    <InterpreterReference Include="{28dce741-0f01-4575-a3aa-3c3e3876dfd5}\3.5" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
   </PropertyGroup>
-  <Import Condition="Exists($(PtvsTargetsFile))" Project="$(PtvsTargetsFile)" />
-  <Import Condition="!Exists($(PtvsTargetsFile))" Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
        Visual Studio and specify your pre- and post-build commands in
        the BeforeBuild and AfterBuild targets below. -->
@@ -90,4 +84,5 @@
   </Target>
   <Target Name="AfterBuild">
   </Target>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
 </Project>

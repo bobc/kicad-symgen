@@ -324,7 +324,7 @@ class SchLib(object):
         return os.path.join(dir_path, filename[0] + '.dcm')
 
     def __parse(self):
-        f = open(self.filename, 'r')
+        f = open(self.filename, 'r', encoding="utf8")
         
         checksum_data = ""
         
