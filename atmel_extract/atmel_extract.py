@@ -3,8 +3,8 @@
 # -*- coding: utf-8 -*-
 
 """
- Generate components from XML file
-
+ Extract data from Microchip ATDF files for SAM series MCUs
+ 
  Usage: ...
 
  Copyright Bob Cousins 2020
@@ -50,12 +50,23 @@ PIN_TYPES_MAPPING_SYMGEN = {
      }
 
 PIN_TYPES_MAPPING = [
+    #  positive power pins
     ["VDDCORE"    , "Power"],
     ["VDD"    , "Power"],
-    ["VSS"    , "Power"],
     ["VDD.*"  , "Power"],
-    ["VSS.*"  , "Power"],
+    ["AVDD"    , "Power"],
+    ["VCC.*"  , "Power"],
+    ["AVCC.*"  , "Power"],
+    ["UVCC"  , "Power"],
 
+    # ground pins
+    ["VSS"    , "Power"],
+    ["VSS.*"  , "Power"],
+    ["AGND.*"  , "Power"],
+    ["GND.*"  , "Power"],
+    ["UGND.*"  , "Power"],
+
+    ["AREF"      , "Input"],
     ["VBG"      , "Input"],
     ["VREFP"    , "Input"],
     ["VREFN"    , "Input"],
@@ -63,7 +74,6 @@ PIN_TYPES_MAPPING = [
     ["TST"      , "Input"],
     #VBAT
 
-    ["GND.*"  , "Power"],
 
     ["RESET.*" , "Reset"],
     ["NRST" , "Reset"],
@@ -76,27 +86,43 @@ PIN_TYPES_MAPPING = [
 # Mapping to KiCad packages
 PACKAGES = {
     ##
-    "SOIC14"    : "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm.kicad_mod",  # 4
-    "SOIC20"    : "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm.kicad_mod",  # 3   
+    "PDIP8"  : "Package_DIP:DIP-8_W7.62mm",
+    "PDIP14" : "Package_DIP:DIP-14_W7.62mm",
+    "PDIP20" : "Package_DIP:DIP-20_W7.62mm",
+    "PDIP28" : "Package_DIP:DIP-28_W7.62mm",
+    "PDIP40" : "Package_DIP:DIP-40_W15.24mm",
+
+    "SOIC8" : "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
+    "SOIC8W" : "Package_SO:SOIC-8W_5.3x5.3mm_P1.27mm",
+
+    "SOIC14"    : "Package_SO:SOIC-14_3.9x8.7mm_P1.27mm",  # 4
+    "SOIC20"    : "Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm",  # 3   
     "SOIC32"    : "",  # 1   no such parts?
 
-    "SSOP24"    : "Package_SO:SSOP-24_5.3x8.2mm_P0.65mm.kicad_mod",  # 6
+    "SSOP24"    : "Package_SO:SSOP-24_5.3x8.2mm_P0.65mm",  # 6
 
-    "QFN24"     : "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm.kicad_mod",
-    "QFN32"     : "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.6x3.6mm.kicad_mod",
+    "QFN20"     : "Package_DFN_QFN:QFN-20-1EP_4x4mm_P0.5mm_EP2.6x2.6mm",
+    "QFN24"     : "Package_DFN_QFN:QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm",
+    "QFN28"     : "Package_DFN_QFN:QFN-28-1EP_4x4mm_P0.45mm_EP2.4x2.4mm",
+    "QFN32"     : "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.6x3.6mm",
+    "QFN44"     : "Package_DFN_QFN:QFN-44-1EP_7x7mm_P0.5mm_EP5.2x5.2mm",
     "QFN48"     : "Package_DFN_QFN:QFN-48-1EP_7x7mm_P0.5mm_EP5.15x5.15mm",
     "QFN64"     : "Package_DFN_QFN:QFN-64-1EP_9x9mm_P0.5mm_EP4.7x4.7mm",
     "QFN100"    : "",   # no such parts?
 
-    "LQFP64"    : "Package_QFP:LQFP-64_10x10mm_P0.5mm.kicad_mod",  # 20
-    "LQFP100"   : "Package_QFP:LQFP-100_14x14mm_P0.5mm.kicad_mod",  # 22
-    "LQFP144"   : "Package_QFP:LQFP-144_20x20mm_P0.5mm.kicad_mod",  # 19
+    "VQFN44"    : "Package_DFN_QFN:QFN-44-1EP_7x7mm_P0.5mm_EP5.2x5.2mm",
 
-    "TQFP32"    : "Package_QFP:TQFP-32_7x7mm_P0.8mm.kicad_mod",  # 43
+    "LQFP64"    : "Package_QFP:LQFP-64_10x10mm_P0.5mm",  # 20
+    "LQFP100"   : "Package_QFP:LQFP-100_14x14mm_P0.5mm",  # 22
+    "LQFP144"   : "Package_QFP:LQFP-144_20x20mm_P0.5mm",  # 19
+
+    "TQFP32"    : "Package_QFP:TQFP-32_7x7mm_P0.8mm",  # 43
+    "TQFP44"    : "Package_QFP:TQFP-44_10x10mm_P0.8mm",
+
     "TQFP48"    : "Package_QFP:TQFP-48_7x7mm_P0.5mm",
     "TQFP64"    : "Package_QFP:TQFP-64_10x10mm_P0.5mm",
     "TQFP100"   : "Package_QFP:TQFP-100_14x14mm_P0.5mm",
-    "TQFP128"   : "Package_QFP:TQFP-128_14x14mm_P0.4mm.kicad_mod",  # 4
+    "TQFP128"   : "Package_QFP:TQFP-128_14x14mm_P0.4mm",  # 4
 
     "BGA64"     : "",  # 6
     "BGA100"    : "",  # 3
@@ -112,7 +138,7 @@ PACKAGES = {
     "UFBGA144"  : "",  # 12
     "UFBGA64"   : "Package_BGA:UFBGA-64_5x5mm_Layout8x8_P0.5mm",  # 2
 
-    "VFBGA100"  : "Package_BGA:VFBGA-100_7.0x7.0mm_Layout10x10_P0.65mm.kicad_mod",
+    "VFBGA100"  : "Package_BGA:VFBGA-100_7.0x7.0mm_Layout10x10_P0.65mm",
 
     "WLCSP20" : "Package_CSP:WLCSP-20_1.934x2.434mm_Layout4x5_P0.4mm",  # 2
     "WLCSP27" : "",  # 2
@@ -129,6 +155,8 @@ PACKAGES = {
 
 all_packages = {}
 missing_packages = {}
+
+package_index = {}
 
 # datasheets = {}
 
@@ -293,6 +321,7 @@ class Device:
             key = next(iter(self.variants))
             d = self.variants[key]
             name = d[0]['ordercode']
+            name = before (name, '-')
             
             self.datasheet = datasheets.find (name)
 
@@ -332,8 +361,11 @@ class Device:
         device_file = self
 
 
-        self.family = device_file.query("//device")[0].get("family")
+        self.family = device_file.query("//device")[0].get("family").replace (" ","-")
+        if not self.family : self.family = ""
+
         self.series = device_file.query("//device")[0].get("series")
+        if not self.series : self.series = ""
 
         self.device_name = device_file.query("//device")[0].get("name")
         self.has_pinout = device_file.query("//pinouts")
@@ -386,10 +418,14 @@ class Device:
         #self.pins = p['pinout_pins']
 
         # information about the core and architecture
+        # todo: SAM/AVR
         core = device_file.query("//device")[0].get("architecture").replace("PLUS", "+")
-        for param in (device_file.query("//device/parameters")[0]):
-            if param.get("name") == "__FPU_PRESENT" and param.get("value") == "1":
-                core += "F"
+        core_params = device_file.query("//device/parameters")
+        if core_params:
+            for param in (params[0]):
+                if param.get("name") == "__FPU_PRESENT" and param.get("value") == "1":
+                    core += "F"
+
         p["core"] = core
         self.core = core
 
@@ -546,10 +582,10 @@ class Device:
 
             elif pin.pintype == "Power":
 
-                if pin.name.startswith("VSS") or pin.name.startswith("GND") :
+                if pin.name.startswith("VSS") or pin.name.startswith("GND") or pin.name in [ "AVSS", "AGND", "UGND"]:
                     self.bottomPins.append(pin)
 
-                elif pin.name.startswith("V"):
+                elif pin.name.startswith("V") or pin.name in [ "AVDD", "AVCC", "UVCC"]:
                     self.topPins.append(pin)
 
                 else:
@@ -606,7 +642,15 @@ class Device:
 
         #
         self.package_name = ""
+
+        ordercode = variant['ordercode']
         package = footprints.find (variant['ordercode'])
+
+        if not variant['package'] in package_index:
+            package_index [variant['package']] = []
+        code = after (ordercode, "-")
+        if code not in package_index [variant['package']]:
+            package_index [variant['package']].append (code)
 
         if not package == "": 
             self.package_name = package
@@ -622,7 +666,7 @@ class Device:
             else:        
                 if not variant['package'] in missing_packages:
                     missing_packages [variant['package']] = []
-                name = variant['ordercode'][:8]
+                name = variant['ordercode']
                 if not name in missing_packages [variant['package']]:
                     missing_packages [variant['package']].append (name)
 
@@ -632,8 +676,6 @@ class Device:
                 return
 
             #all_packages[variant['ordercode']] = [ variant['package'], self.package_name ]
-
-
         #
 
         f.write ("#\n")
@@ -685,7 +727,8 @@ class Device:
             f.write ("DESC %s\n" % desc)
             f.write ("KEYW %s\n" % keywords)
 
-            f.write ("DOC %s\n" % self.datasheet)
+            if self.datasheet:
+                f.write ("DOC %s\n" % self.datasheet)
 
         #
 
@@ -943,13 +986,19 @@ def main():
             print ("")
             print ("Missing packages:")
             for s in sorted(missing_packages):
-                print ('    "%s" : "",  # %s' % (s, missing_packages[s]) )
+                print ('    "%s" : "",  # %d %s' % (s, len(missing_packages[s]), missing_packages[s]) )
 
         if True:
             print ("")
             print ("All packages:")
             for s in sorted(all_packages):
                 print ('%s,%s,%s' % (s, all_packages[s][0], all_packages[s][1] ) )
+
+        if True:
+            print ("")
+            print ("All packages:")
+            for s in sorted(package_index):
+                print ('%s : %s' % (s, package_index[s] ) )
 
         print ("")
         print ("Devices:")

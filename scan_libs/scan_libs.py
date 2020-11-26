@@ -3,11 +3,11 @@
 # -*- coding: utf-8 -*-
 
 """
- Generate components from text file
+ Scan libraries for footprint and datasheet data
  
  Usage: symgen
 
- Copyright Bob Cousins 2017
+ Copyright Bob Cousins 2020
 
  Licensed under GPLv3
 

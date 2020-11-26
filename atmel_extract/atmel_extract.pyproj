@@ -11,7 +11,7 @@
     <Name>atmel_extract</Name>
     <RootNamespace>atmel_extract</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp C:\atmel_datapack\sam-devices\same70 -v --data C:\atmel_datapack\sam-devices</CommandLineArguments>
+    <CommandLineArguments>--inp C:\atmel_datapack\avr-devices\atmega -v --data C:\atmel_datapack\avr-devices</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

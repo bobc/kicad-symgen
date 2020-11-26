@@ -34,10 +34,18 @@ class DatasheetFile (object):
         if name in self.data:
             return self.data[name]
         else:
-            for d in self.data:
-                if d == name[0:len(d)]:
-                    return self.data[d]
-        return ""
+            found = None
+            max_len = 0
+            for key in self.data:
+                #if key == name[0:len(key)] and len(key) > max_len:
+                if key == name and len(key) > max_len: # exact match
+                    max_len = len(key)
+                    found = self.data[key]
+
+            if found:
+                return found
+            else:
+                return ""
 
     def write_file (self):
         with open(self.filename, 'w', newline='') as f:
@@ -56,11 +64,12 @@ class FootprintFile (object):
         self.filename = filename
         self.data = []
 
-        with open(filename, newline='') as f:
-            reader = csv.reader(f)
-            for j,row in enumerate(reader):
-                if not j==0:
-                    self.data.append(row)
+        if os.path.isfile (filename):
+            with open(filename, newline='') as f:
+                reader = csv.reader(f)
+                for j,row in enumerate(reader):
+                    if not j==0:
+                        self.data.append(row)
 
     def add (self, name, fp_key, fp_long):
 
@@ -78,10 +87,16 @@ class FootprintFile (object):
 
 
     def find (self, name):
-        for d in self.data:
-            if d[0] == name:
-                return d[2]
-        return ""
+        found = None
+        max_len = 0
+        for row in self.data:
+            if row[0] == name and len(row[0]) > max_len:
+                found = row[2]
+                max_len = len(row[0])
+        if found:
+            return found
+        else:
+            return ""
 
     def write_file (self):
         with open(self.filename, 'w', newline='') as f:

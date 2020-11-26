@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>73f30526-51d4-496f-a8ae-e28f411e6cae</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>scan_libs.py</StartupFile>
+    <StartupFile>scan_libs_check.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>C:\atmel_datapack\sam-devices</WorkingDirectory>
@@ -12,7 +12,7 @@
     <Name>scan_libs</Name>
     <RootNamespace>scan_libs</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp C:\gitlab\kicad-libraries\kicad-symbols_pre_v6\MCU_Microchip_SAM*</CommandLineArguments>
+    <CommandLineArguments>--inp C:\gitlab\kicad-libraries\kicad-symbols_pre_v6\Diode*</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
@@ -28,6 +28,7 @@
     <Compile Include="csv_files.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="scan_libs_check.py" />
     <Compile Include="scan_libs.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
