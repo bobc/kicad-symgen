@@ -61,7 +61,7 @@ parser.add_argument("--ref", help="7400 logic reference list")
 parser.add_argument("-d", "--dump", help="Dump an existing library", action='store_true')
 parser.add_argument("-v", "--verbose", help="Enable verbose output", action="store_true")
 parser.add_argument("--regen", help="Dump an existing library and regenerate from script", action='store_true')
-parser.add_argument("--output", help="Output format : legacy, v6-sweet")
+parser.add_argument("--output", help="Output format : v5, v6")
 
 args = parser.parse_args()
 
@@ -116,7 +116,7 @@ if "gen" in actions:
     if args.output:
         symgen.output_format = args.output
     else:
-        symgen.output_format = "legacy"
+        symgen.output_format = "v6"
 
 
     print ("Generating library from %s" % file)

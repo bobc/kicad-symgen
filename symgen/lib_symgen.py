@@ -1312,9 +1312,9 @@ class SymGen:
         # combine power units
 
         #
-        if self.output_format == "legacy":
+        if self.output_format == "v5":
             generator = GenerateKicad()
-        elif self.output_format == "v6-sweet":
+        elif self.output_format == "v6":
             generator = GenerateSweetLib()
         else:
             print ("error: invalid output format : %s" % self.output_format)
