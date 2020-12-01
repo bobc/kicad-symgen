@@ -14,7 +14,7 @@
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp 74xgxx.txt --output v6-sweet</CommandLineArguments>
+    <CommandLineArguments>--inp 74xgxx.txt --output v6</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>

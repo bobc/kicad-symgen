@@ -22,10 +22,9 @@ class GenerateKicad(LibraryGenerator):
         self.libfile = None
         self.docfile = None
 
-        self.max_height = 0
         self.last_unit = None
 
-        self.ref_pos= Point()
+        self.ref_pos = Point()
         self.ref_style = StyleAttributes()
 
         self.name_pos = Point()
@@ -149,6 +148,12 @@ class GenerateKicad(LibraryGenerator):
                 pins.append (pin)
         return pins
 
+    def get_top_pins (self, pin_list):
+        return self.find_pins_with_label (pin_list, "D")
+
+    def get_bottom_pins (self, pin_list):
+        return self.find_pins_with_label (pin_list, "U")
+
     def test_size (self):
         for j in range (1,41):
             print("%s %s" % (j, self.get_scaled_fontsize(50, j)))
@@ -241,7 +246,6 @@ class GenerateKicad(LibraryGenerator):
     def set_label_pos(self, sgcomp, unit, top_pins, bottom_pins):
 
         if sgcomp.settings.label_style == ls_floating:
-            self.max_height = max (self.max_height, unit.unit_rect.size.y)
     
             if unit.unit_shape == "box":
                 margin = 50
@@ -254,9 +258,6 @@ class GenerateKicad(LibraryGenerator):
             x_pos = [i.pos.x for i in top_pins]
             if x_pos:
                 x = min(x_pos) 
-
-            #if y > self.ref_pos.y:
-            #self.ref_pos.x = unit.unit_rect.left()
                 self.ref_pos.x = x - 100
                 self.ref_style.horiz_alignment = ha_right
             else:
@@ -265,11 +266,7 @@ class GenerateKicad(LibraryGenerator):
             self.ref_pos.y = y + 75
 
             # name
-
-            #y = unit.unit_rect.bottom() - margin
-            #if y < self.name_pos.y:
             if sgcomp.settings.label_horiz_align == ha_left:
-                # self.name_pos.x = unit.unit_rect.left()
                 if x_pos:
                     self.name_pos.x = x - 100
                     self.name_style.horiz_alignment = ha_right
@@ -298,11 +295,82 @@ class GenerateKicad(LibraryGenerator):
         else: # ls_center
             self.ref_pos.x = 0
             self.ref_pos.y = 50
+            self.ref_style.horiz_alignment = ha_center
 
             self.name_pos.x = 0
             self.name_pos.y = -50
+            self.name_style.horiz_alignment = ha_center
 
             sgcomp.settings.label_horiz_align = ha_center
+
+    def set_label_pos2 (self, sgcomp):
+        top_pins = []
+        bottom_pins = []
+
+        top_y = 0
+        bottom_y = 0
+        for unit in sgcomp.units:
+            top_y = max (top_y, unit.unit_rect.top())
+            bottom_y = min (bottom_y, unit.unit_rect.bottom())
+            for elem in unit.elements:
+                top_pins.extend (self.get_top_pins(elem.pins))
+                bottom_pins.extend (self.get_bottom_pins(elem.pins))
+
+        margin = 50
+
+        if sgcomp.settings.label_style == ls_floating:
+
+            # reference
+            top_y = top_y + margin
+
+            x_pos = [i.pos.x for i in top_pins]
+            if x_pos:
+                x = min(x_pos) 
+                self.ref_pos.x = x - 100
+                self.ref_style.horiz_alignment = ha_right
+            else:
+                self.ref_pos.x = 0
+                self.ref_style.horiz_alignment = ha_center
+            self.ref_pos.y = top_y + 75
+
+            # name
+            if sgcomp.settings.label_horiz_align == ha_left:
+                if x_pos:
+                    self.name_pos.x = x - 100
+                    self.name_style.horiz_alignment = ha_right
+                else:
+                    self.name_pos.x = 0
+                    self.name_style.horiz_alignment = ha_center
+            else:
+                # right
+                self.name_pos.x = unit.unit_rect.right() - 200
+
+            self.name_pos.y = top_y
+
+
+        else: # ls_center
+            self.ref_pos.x = 0
+            self.ref_pos.y = 50
+            self.ref_style.horiz_alignment = ha_center
+
+            self.name_pos.x = 0
+            self.name_pos.y = -50
+            self.name_style.horiz_alignment = ha_center
+
+            sgcomp.settings.label_horiz_align = ha_center
+
+        # footprint
+        x_pos = [i.pos.x for i in bottom_pins]
+        if x_pos:
+            x = max(x_pos) 
+            self.footprint_pos.x = x + 50
+            self.footprint_style.horiz_alignment = ha_left
+        else:
+            x = 0
+            self.footprint_pos.x = 0
+            self.footprint_style.horiz_alignment = ha_center
+
+        self.footprint_pos.y = bottom_y - margin
 
     def set_power_unit_size (self, sgcomp, unit):
         #unit.set_width (400)
@@ -577,7 +645,9 @@ class GenerateKicad(LibraryGenerator):
             rect.p2.y = self.cur_pos.y - box_size.y
 
             rect.unit = unit
-            rect.demorgan = variant
+            #todo: this allows 'open' power unit for demorgan variant
+            #rect.demorgan = variant
+            rect.demorgan = 1
             rect.fill = xunit.fill
             rect.pensize = sgcomp.settings.box_pen
             comp.drawOrdered.append( rect.get_element() )
@@ -740,7 +810,7 @@ class GenerateKicad(LibraryGenerator):
         if self.symbols.icon_lib and xunit.template:
             comp_icon = self.symbols.icon_lib.getComponentByName(xunit.template)
             style = StyleAttributes()
-            #style.fill = xunit.fill
+            style.fill = xunit.fill
             if comp_icon:
                 copy_icon (comp, comp_icon, unit, Point(0, 0), style=style)
 
@@ -865,10 +935,10 @@ class GenerateKicad(LibraryGenerator):
 
                 # 
                 variant_from = 1
-                variant_to = 1+self.units_have_variant
-                if unit.is_power_unit:
-                    variant_from = 0
-                    variant_to = 0
+                variant_to = 1 + self.units_have_variant
+                #if unit.is_power_unit:
+                #    variant_from = 0
+                #    variant_to = 0
 
                 for variant in range (variant_from, variant_to+1):
                     self.pin_pos_top.x = 0
@@ -878,7 +948,7 @@ class GenerateKicad(LibraryGenerator):
                 self.cur_pos.y -= elem_height
 
             if unit.is_overlay:
-                self.set_label_pos(sgcomp, self.last_unit) # ??
+                self.set_label_pos(sgcomp, self.last_unit, top_pins, bottom_pins) # ??
             else:
                 offset = Point()
                 # offset.y = self.align_to_grid (unit.unit_rect.size.y/2, 100)
@@ -910,13 +980,14 @@ class GenerateKicad(LibraryGenerator):
 
             #? self.label_style = "fixed"
 
-            self.ref_pos.x = 0
-            self.ref_pos.y = 50
 
-            self.name_pos.x = 0
-            self.name_pos.y = -50
+            #self.ref_pos.x = 0
+            #self.ref_pos.y = 50
 
-            sgcomp.settings.label_horiz_align = ha_center
+            #self.name_pos.x = 0
+            #self.name_pos.y = -50
+
+            #sgcomp.settings.label_horiz_align = ha_center
 
             #
             num_inputs=0
@@ -988,12 +1059,9 @@ class GenerateKicad(LibraryGenerator):
                     self.pin_pos_bottom.x = 0
                     self.pin_pos_bottom.y = -gatedef.height/2
 
-                    self.max_height = gatedef.height
-
                     unit.unit_rect.pos.y = gatedef.height/2
                     unit.unit_rect.size.y = gatedef.height
                     
-                    #self.y_pin_extent = self.max_height
                 else:
                     # setup size for power unit ?
                     self.pin_pos_top.x = 0
@@ -1002,15 +1070,8 @@ class GenerateKicad(LibraryGenerator):
                     self.pin_pos_bottom.x = 0
                     #self.pin_pos_bottom.y = -500    # todo: depends on pin_len
 
-                    if self.symbols.opt_power_unit_style == PowerStyle.BOX:
-                        #? self.max_height = 600
-                        pass
-                        # unit.unit_rect.size.y = self.max_height
-                        #self.y_pin_extent = self.max_height
-                    else:
-                        #? self.max_height = 200
-                        pass
-                        # unit.unit_rect.size.y = self.max_height
+                    unit.unit_rect.pos.y = gatedef.height/2
+                    unit.unit_rect.size.y = gatedef.height
 
                 if num_inputs > len(inputs_pos):
                     print("error: too many input pins, expected %d got %d" % ( len(inputs_pos), num_inputs))
@@ -1092,7 +1153,8 @@ class GenerateKicad(LibraryGenerator):
                 self.draw_pins (unit, other_pins, comp, self.unit_num, variant)
 
 
-            ##
+            self.set_label_pos (sgcomp, unit, [], [])
+            #
             #self.pin_length = temp
 
     draw_unit.__annotations__ = {'sgcomp': SgComponent, 'comp': Component, 'unit': IecSymbol, 'return': None}
@@ -1129,7 +1191,6 @@ class GenerateKicad(LibraryGenerator):
     def draw_component (self, sgcomp):
         assert isinstance (sgcomp, SgComponent)
 
-        self.max_height = 0
         self.last_unit = None #todo
 
         self.ref_pos= Point()

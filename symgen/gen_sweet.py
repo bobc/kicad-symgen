@@ -390,6 +390,17 @@ class SweetCircle (SweetBase):
                     )
         return s
 
+class SweetField (SweetBase):
+
+    def __init__(self, name=None, value=None):
+
+        self.pos = Point()
+        self.orientation = 0
+        self.name = name
+        self.value = value
+        self.id = 0
+        self.effects = Effects()
+
 class GenerateSweetLib(GenerateKicad):
 
     def __init__(self):
@@ -449,7 +460,8 @@ class GenerateSweetLib(GenerateKicad):
                 part_name = "%s_%d_%d" % (sgcomp.name, self.unit_num, demorgan)
 
             #
-            self.outfile.write ('  (symbol "%s"\n' % (part_name) )
+            has_items = False
+            sexpr = '  (symbol "%s"\n' % (part_name) 
 
             pins = self.get_pins (k_comp, self.unit_num, demorgan)
 
@@ -474,31 +486,32 @@ class GenerateSweetLib(GenerateKicad):
 
                 if sweet_item:
                     if (sweet_item.unit == 0 or sweet_item.unit == self.unit_num) and ( demorgan==-1 or sweet_item.demorgan == demorgan):
-                        self.outfile.write (sweet_item.get_sexpr())
+                        sexpr += sweet_item.get_sexpr()
+                        has_items = True
 
             for sweet_pin in pins:
-                self.outfile.write (sweet_pin.get_sexpr(sgcomp))
+                sexpr += sweet_pin.get_sexpr(sgcomp)
+                has_items = True
 
-            self.outfile.write ('  )\n' )
+            sexpr += '  )\n'
+            if has_items:
+                self.outfile.write (sexpr)
 
         return part_name
 
-    def write_field (self, name, value, id, field):
-
-        effects = Effects ()
-        effects.init_field (field)
+    def write_field (self, field, id):
 
         self.outfile.write ('    (property "%s" "%s" (id %s) (at %g %g %s)' % 
-                            (name, value.strip('"'), 
+                            (field.name, field.value.strip('"'), 
                              id,
-                             mils_to_mm(field['posx']), 
-                             mils_to_mm(field['posy']),
-                             0 if field['text_orient'] == 'H' else 90
+                             mils_to_mm(field.pos.x), 
+                             mils_to_mm(field.pos.y),
+                             0
                             ) )
 
-        if effects.get_sexpr(False) != "":
+        if field.effects.get_sexpr(False) != "":
             self.outfile.write ('\n')
-            self.outfile.write ('      %s\n' % (effects.get_sexpr(False)) )
+            self.outfile.write ('      %s\n' % (field.effects.get_sexpr(False)) )
             self.outfile.write ('    ')
 
         self.outfile.write (')\n')
@@ -506,16 +519,17 @@ class GenerateSweetLib(GenerateKicad):
     def draw_component (self, comp):
         assert isinstance(comp, SgComponent)
 
-        self.max_height = 0
         self.last_unit = None #todo
 
         self.ref_pos= Point()
         self.ref_pos.x = -comp.settings.box_width/2
         self.ref_pos.y = 0
+        self.ref_style.horiz_alignment = ha_center
 
         self.name_pos = Point()
         self.name_pos.x = -comp.settings.box_width/2
         self.name_pos.y = 0
+        self.name_style.horiz_alignment = ha_center
 
         component_data = []
         # units are not interchangeable
@@ -534,9 +548,6 @@ class GenerateSweetLib(GenerateKicad):
             k_comp.definition['text_offset'] = "0"
         else:
             k_comp.definition['text_offset'] = str(self.symbols.def_name_offset)
-
-        for s in comp.fplist:
-            k_comp.fplist.append (s)
 
 
         # TODO: field posns
@@ -557,22 +568,24 @@ class GenerateSweetLib(GenerateKicad):
             self.last_unit = unit
             self.unit_num += 1
 
+        self.set_label_pos2 (comp)
+
         #
-        k_comp.fields [0]['posx'] = str(int(self.ref_pos.x))
-        k_comp.fields [0]['posy'] = str(self.ref_pos.y)
+        ref_field = SweetField("Reference", comp.ref)
+        ref_field.pos.x = int(self.ref_pos.x)
+        ref_field.pos.y = int(self.ref_pos.y)
+        ref_field.effects.h_justify = self.ref_style.horiz_alignment
 
-        k_comp.fields [1]['posx'] = str(int(self.name_pos.x))
-        k_comp.fields [1]['posy'] = str(self.name_pos.y)
+        name_field = SweetField("Value", comp.name)
+        name_field.pos.x = int(self.name_pos.x)
+        name_field.pos.y = int(self.name_pos.y)
+        name_field.effects.h_justify = self.name_style.horiz_alignment
 
-        k_comp.fields [2]['posx'] = str(int(self.footprint_pos.x))
-        k_comp.fields [2]['posy'] = str(self.footprint_pos.y)
-
-        k_comp.fields [0]['htext_justify' ] = ha_right
-        k_comp.fields [1]['htext_justify' ] = ha_right
-
-        # if field is positioned on the right, justify text on left
-        if comp.settings.label_horiz_align == ha_right:
-            k_comp.fields [1]['htext_justify' ] = ha_left
+        footprint_field = SweetField ("Footprint", comp.default_footprint)
+        footprint_field.pos.x = int(self.footprint_pos.x)
+        footprint_field.pos.y = int(self.footprint_pos.y)
+        footprint_field.effects.h_justify = ha_left
+        footprint_field.effects.visible = False
 
         field_pos = Point()
         field_pos.x = self.footprint_pos.x
@@ -607,48 +620,58 @@ class GenerateSweetLib(GenerateKicad):
                 
             field_id = 0
 
-            self.write_field ("Reference", comp.ref, field_id, k_comp.fields[0]) 
+            self.write_field (ref_field, field_id) 
             field_id += 1
 
-            self.write_field ("Value", name, field_id, k_comp.fields[1]) 
+            name_field.value = name
+            self.write_field (name_field, field_id) 
             field_id += 1
 
             if comp.default_footprint:
-                self.write_field ("Footprint", comp.default_footprint, field_id, k_comp.fields[2]) 
+                self.write_field (footprint_field, field_id) 
                 field_id += 1
-                field_pos.y = field_pos.y - 100
-                k_comp.fields [2]['posy'] = str(field_pos.y)
+                footprint_field.pos.y -= 100
 
             sgdoc = comp.doc_fields[name]
 
             if sgdoc.datasheet:
-                self.write_field ("Datasheet", sgdoc.datasheet, field_id, k_comp.fields[2]) 
+                footprint_field.name = "Datasheet"
+                footprint_field.value = sgdoc.datasheet
+                self.write_field (footprint_field, field_id) 
                 field_id += 1
-                field_pos.y = field_pos.y - 100
-                k_comp.fields [2]['posy'] = str(field_pos.y)
+                footprint_field.pos.y -= 100
 
             if not is_alias and flat_unit and len(comp.units) > 1:
-                self.write_field ("ki_locked", "", field_id, k_comp.fields[2]) 
+                footprint_field.name = "ki_locked"
+                footprint_field.value = ""
+                self.write_field (footprint_field, field_id) 
                 field_id += 1
 
             if sgdoc.keywords:
-                self.write_field ("ki_keywords", sgdoc.keywords, field_id, k_comp.fields[2]) 
+                footprint_field.name = "ki_keywords"
+                footprint_field.value = sgdoc.keywords
+                self.write_field (footprint_field, field_id) 
                 field_id += 1
 
             if sgdoc.description:
-                self.write_field ("ki_description", sgdoc.description, field_id, k_comp.fields[2]) 
+                footprint_field.name = "ki_description"
+                footprint_field.value = sgdoc.description
+                self.write_field (footprint_field, field_id) 
                 field_id += 1
 
             #if not is_alias:
-            if k_comp.fplist:
-                self.write_field ("ki_fp_filters", ' '.join(k_comp.fplist), field_id, k_comp.fields[2]) 
+            if comp.fplist:
+                footprint_field.name = "ki_fp_filters"
+                footprint_field.value = ' '.join(comp.fplist)
+                self.write_field (footprint_field, field_id) 
                 field_id += 1
+
+            #todo: user fields
 
                 #self.outfile.write ('    (alternates\n' )
                 #for unit_name in unit_list:
                 #    self.outfile.write ('      %s\n' % unit_name)
                 #self.outfile.write ('    )\n' )
-
             
             if not is_alias and flat_unit:
                 # generate units

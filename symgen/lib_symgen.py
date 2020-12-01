@@ -148,10 +148,10 @@ class SymGen:
         # some global settings
         self.opt_combine_power_for_single_units = True
         self.opt_power_unit_style = PowerStyle.BOX
-        #opt_power_unit_style = PowerStyle.LINES
+        #self.opt_power_unit_style = PowerStyle.LINES
 
         self.symbol_style = SymbolStyle.ANSI
-        #symbol_style = SymbolStyle.IEC
+        #self.symbol_style = SymbolStyle.IEC
 
         self.opt_pin_qualifiers = False
 
@@ -159,7 +159,7 @@ class SymGen:
 
         self.def_logic_combine = "multi"
 
-        self.output_format = "v6-sweet"
+        self.output_format = "v6"
 
 
 
@@ -758,8 +758,8 @@ class SymGen:
 
             if token == "PWR":
                 unit.unit_shape = "power"
-                # TODO: maybe not right place
-                unit.set_width(400)
+                # TODO: maybe not right place ?
+                unit.set_width(200)
             elif token == "NONE":
                 unit.unit_shape = "none"
             elif token == "AND":
@@ -873,11 +873,13 @@ class SymGen:
         if unit.unit_shape in ["box", "none", "and", "nand", "or", "nor", "xor", "xnor", "not", "buffer", "power"]:
 
             if unit.unit_shape in ["and", "nand", "or", "nor", "xor", "xnor", "not", "buffer"]:
-                #comp.pin_length = 150
 
-                comp.settings.label_style = ls_center
+                ###
+                #comp.settings.label_style = ls_center
+
                 if self.opt_power_unit_style == PowerStyle.LINES:
                     comp.settings.pin_names_inside = True
+
                 unit.fill = comp.settings.logic_fill
             else:
                 unit.fill = comp.settings.box_fill

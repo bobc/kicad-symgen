@@ -211,6 +211,7 @@ def copy_icon (comp, comp_icon, unit, pos, variant=1, src_unit=0, src_variant=1,
             poly.unit = unit
             poly.demorgan = variant
             poly.fill = get_fill (item['fill'], style)
+            poly.pensize = item['thickness']
             for pt in poly.points:
                 pt.x += pos.x    
                 pt.y += pos.y    

@@ -19,10 +19,6 @@ class StyleAttributes:
     pensize = 10
     fill = NoFill
 
-    offset = 0
-    show_pin_name = True
-    show_pin_number = True
-
     angle = "H"
     font_size = 50
     bold = False
@@ -31,6 +27,9 @@ class StyleAttributes:
     vert_alignment = "C"
     horiz_alignment = "C"
 
+    offset = 0
+    show_pin_name = True
+    show_pin_number = True
     sizenum = 50
     sizename = 50
     pin_length = 100
