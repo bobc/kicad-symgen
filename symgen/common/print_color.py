@@ -9,7 +9,7 @@ class PrintColor(object):
     """
     A class to print colorized text using ANSI escape sequences
     """
-    def __init__(self, tab_size=4, use_color=True, max_width=0, indentation=0):
+    def __init__(self, tab_size=4, use_color=True, max_width=0, indentation=0, buffered=False):
         self._color = {
             'regular':'\033[0m',
             'black':'\033[0;30m',
@@ -34,6 +34,8 @@ class PrintColor(object):
         self._use_color = use_color
         self._max_width = max_width
         self._indentation = indentation
+        self.buffer = []
+        self.buffered = buffered
 
         if platform.system() == 'Windows':
             try:
@@ -44,6 +46,9 @@ class PrintColor(object):
                 print('[Continuing using no color mode]\n')
                 self._use_color = False
 
+    def flush(self):
+        for l in self.buffer:
+            print(l)
 
     def _replace_tabs(self, text):
         if self._tab_size == 0:
@@ -96,10 +101,13 @@ class PrintColor(object):
                 # construct the final line
                 line = color + line + regular
 
-            try:
-                print(line)
-            except:
-                print("ERROR printing output")
+            if self.buffered:
+                self.buffer.append(line)
+            else:
+                try:
+                    print(line)
+                except:
+                    print("ERROR printing output")
 
     def regular(self, text, max_width=None, indentation=None):
         self._do_print(sys._getframe().f_code.co_name, text, max_width, indentation)

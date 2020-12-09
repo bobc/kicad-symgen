@@ -113,7 +113,10 @@ class BoundingBox(object):
         
     @property
     def center(self):
-        return {'x': self.xmin + self.width / 2, 'y': self.ymin + self.height/2 }
+        if self.xmin and self.width and self.ymin and self.height:
+            return {'x': self.xmin + self.width / 2, 'y': self.ymin + self.height/2 }
+        else:
+            return {'x': 0.0, 'y': 0.0}
             
 if __name__ == '__main__':
     bb1 = BoundingBox(-20,50,10,-20)
