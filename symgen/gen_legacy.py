@@ -3,17 +3,46 @@ import os
 from sym_comp import *
 from lib_symgen import *
 
+import kicad_sym
+import sweet
+
 def sort_num_str(pin):
     return pin.number
+
+def getComponentByName(lib, name):
+
+    if type(lib) == SchLib:
+        return lib.getComponentByName(name)
+    elif type(lib) == kicad_sym.KicadLibrary:
+        sym = [x for x in lib.symbols if x.name == name]
+        if sym:
+            return sym[0]
+    return None
+        
 
 class LibraryGenerator(object):
     """description of class"""
 
     def __init__(self):
-        pass
+        self.num_errors = 0
+        self.num_warnings = 0
 
     def GenerateLibrary(self, a_symbols):
         pass
+
+    def error (self, comp_name, msg):
+        if comp_name:
+            print("error: (%s) %s" % (comp_name, msg))
+        else:
+            print("error: %s" % (msg))
+        self.num_errors += 1
+
+    def warning (self, comp_name, msg):
+        if comp_name:
+            print("warning: (%s) %s" % (comp_name, msg))
+        else:
+            print("warning: %s" % (msg))
+        self.num_warnings += 1
 
 
 class GenerateKicad(LibraryGenerator):
@@ -78,16 +107,13 @@ class GenerateKicad(LibraryGenerator):
         
                     if orientation == 'D':
                         if pos.y  % 100 != 0:
-                            print("error: %s pin not on grid: %s %s" % (comp.name, params["name"], pos))
-                            self.num_errors += 1
+                            self.error (comp.name, "pin not on grid: %s %s" % (params["name"], pos))
                     elif orientation == 'U':
                         if pos.y % 100 != 0:
-                            print("error: pin not on grid: %s %s" % (params["name"], pos))
-                            self.num_errors += 1
+                            self.error (comp.name, "pin not on grid: %s %s" % (params["name"], pos))
                     elif orientation in ['L', "R"]:
                         if pos.x % 100 != 0:
-                            print("error: %s pin not on grid: %s %s" % (comp.name, params["name"], pos))
-                            self.num_errors += 1
+                            self.error (comp.name, "pin not on grid: %s %s" % (params["name"], pos))
         
     def create_gate (self, unit_shape, num_inputs, num_outputs, demorgan):
         if self.symbols.symbol_style == SymbolStyle.ANSI:
@@ -162,38 +188,58 @@ class GenerateKicad(LibraryGenerator):
         size = max(minsize, num_pins / 5 * 25 )
         return min(size, 200)
 
-    def get_template_pins (self, name):
+    def get_template_pins (self, template_comp):
         pins = []
 
         numeric_pins = True
 
-        comp = self.symbols.icon_lib.getComponentByName(name)
+        #comp = self.symbols.icon_lib.getComponentByName(name)
 
-        if comp:
-            for elem in comp.draw['pins']:
-                item = dict(elem)
-                pin = Pin()
-                pin.pos = Point (int(item['posx']), int (item['posy']))
-                pin.name = item['name']
-                pin.number = item['num']
-                pin.orientation = item['direction']
+        if template_comp:
 
-                pin.shape = item['pin_type']
-                pin.type = item['electrical_type']
+            if type(template_comp) == Component:
+                for elem in template_comp.draw['pins']:
+                    item = dict(elem)
+                    pin = Pin()
+                    pin.pos = Point (int(item['posx']), int (item['posy']))
+                    pin.name = item['name']
+                    pin.number = item['num']
+                    pin.orientation = item['direction']
 
-                pins.append (pin)
+                    pin.shape = item['pin_type']
+                    pin.type = item['electrical_type']
 
-                if not pin.number.isdigit():
-                    numeric_pins = False
+                    pins.append (pin)
 
-            if numeric_pins:
-                # sort by num
-                for passnum in range(len(pins)-1,0,-1):
-                    for i in range(passnum):
-                        if int(pins[i].number) > int(pins[i+1].number) :
-                            temp = pins[i]
-                            pins[i] = pins[i+1]
-                            pins[i+1] = temp
+                    if not pin.number.isdigit():
+                        numeric_pins = False
+
+
+            elif type(template_comp) == kicad_sym.KicadSymbol:
+                for p in template_comp.pins:
+                    pin = Pin()
+                    pin.pos = sym_utils_v6.point_to_mil(Point (p.posx, p.posy))
+                    pin.name = p.name
+                    pin.number = p.number
+                    pin.orientation = p.get_direction()
+
+                    pin.shape = sweet.convert_pin_shape_to_v5 (p.shape)
+                    pin.type = sweet.convert_elect_type_to_v5 (p.etype)
+
+                    pins.append (pin)
+
+                    if not pin.number.isdigit():
+                        numeric_pins = False
+
+
+        if pins and numeric_pins:
+            # sort by num
+            for passnum in range(len(pins)-1,0,-1):
+                for i in range(passnum):
+                    if int(pins[i].number) > int(pins[i+1].number) :
+                        temp = pins[i]
+                        pins[i] = pins[i+1]
+                        pins[i+1] = temp
 
         return pins
 
@@ -443,28 +489,33 @@ class GenerateKicad(LibraryGenerator):
         #
 
         if unit.template:
-            template_pins = self.get_template_pins (unit.template)
-            left_pins = self.find_pins (template_pins, "R")
-            right_pins = self.find_pins (template_pins, "L")
+            template_comp = getComponentByName(self.symbols.icon_lib, unit.template)
+            if template_comp:
+                template_pins = self.get_template_pins (template_comp)
+                left_pins = self.find_pins (template_pins, "R")
+                right_pins = self.find_pins (template_pins, "L")
 
-            l_pin = 0
-            r_pin = 0
+                l_pin = 0
+                r_pin = 0
 
-            ##
-            for pin in pins:
-                if pin.type !=" " :
-                    if pin.orientation == 'R':
-                        if l_pin < len(left_pins):
-                            pin.pos = left_pins[l_pin].pos
-                            l_pin += 1
-                        else:
-                            print("warning: pin %s not found in template %s" % (pin.number, unit.template))
-                    elif pin.orientation == 'L':
-                        if r_pin < len(right_pins):
-                            pin.pos = right_pins[r_pin].pos
-                            r_pin += 1
-                        else:
-                            print("warning: pin %s not found in template %s" % (pin.number, unit.template))
+                ##
+                for pin in pins:
+                    if pin.type !=" " :
+                        if pin.orientation == 'R':
+                            if l_pin < len(left_pins):
+                                pin.pos = left_pins[l_pin].pos
+                                l_pin += 1
+                            else:
+                                self.warning(comp.name, "pin %s not found in template %s" % (pin.number, unit.template))
+                        elif pin.orientation == 'L':
+                            if r_pin < len(right_pins):
+                                pin.pos = right_pins[r_pin].pos
+                                r_pin += 1
+                            else:
+                                self.warning(comp.name, "pin %s not found in template %s" % (pin.number, unit.template))
+
+            else:
+                self.error (comp.name, "template %s not in icon lib" % unit.template)
 
         # align pins (right)
         right_pins = self.find_pins (pins, "L")
@@ -538,7 +589,7 @@ class GenerateKicad(LibraryGenerator):
             if pin.type != " ":
                 comp.drawOrdered.append( pin.get_element() )
 
-    def draw_element (self, sgcomp, xunit, element, comp, unit, variant):
+    def draw_element (self, sgcomp, xunit, element, comp, unit_num, variant):
 
         fontsize = 50
 
@@ -626,9 +677,9 @@ class GenerateKicad(LibraryGenerator):
                     box_size.y += 50
                     top_margin += 25
 
-        if element.shape != "none":
-            # update the actual unit size (for label pos)
-            xunit.unit_rect.size.y = -self.cur_pos.y + box_size.y 
+        #if element.shape != "none":
+        # update the actual unit size (for label pos)
+        xunit.unit_rect.size.y = -self.cur_pos.y + box_size.y 
 
         #print "element %s %s unit_size %d  box_size %d" % (element.shape, "P" if xunit.is_power_unit else " ", 
         #                                                   xunit.unit_rect.size.y, box_size.y)
@@ -644,7 +695,7 @@ class GenerateKicad(LibraryGenerator):
             rect.p2.x = box_size.x/2
             rect.p2.y = self.cur_pos.y - box_size.y
 
-            rect.unit = unit
+            rect.unit = unit_num
             #todo: this allows 'open' power unit for demorgan variant
             #rect.demorgan = variant
             rect.demorgan = 1
@@ -654,7 +705,7 @@ class GenerateKicad(LibraryGenerator):
 
         elif element.shape == "control":
             poly = PolyLine ()
-            poly.unit = unit
+            poly.unit = unit_num
             poly.demorgan = variant
             poly.fill = xunit.fill
             poly.pensize = sgcomp.settings.box_pen
@@ -680,7 +731,7 @@ class GenerateKicad(LibraryGenerator):
                 align_horiz = AlignLeft
                 align_vert  = AlignBottom
 
-            draw_text (comp, unit, variant, pos, element.label, fontsize, align_horiz, align_vert)
+            draw_text (comp, unit_num, variant, pos, element.label, fontsize, align_horiz, align_vert)
 
 
 
@@ -719,7 +770,7 @@ class GenerateKicad(LibraryGenerator):
             else:
                 pass
 
-        self.draw_pins (xunit, element.pins, comp, unit, variant)
+        self.draw_pins (xunit, element.pins, comp, unit_num, variant)
 
         #
         for group in element.groups:
@@ -742,7 +793,7 @@ class GenerateKicad(LibraryGenerator):
             rect.p1.y = group_pos.y
             rect.p2.x = group_pos.x + group_size.x
             rect.p2.y = group_pos.y - group_size.y
-            rect.unit = unit
+            rect.unit = unit_num
             rect.demorgan = variant
             rect.fill = NoFill
             rect.pensize = 6
@@ -759,7 +810,7 @@ class GenerateKicad(LibraryGenerator):
                 type_text = ""
 
             if type_text:
-                draw_text (comp, unit, variant, pos, type_text, fontsize )
+                draw_text (comp, unit_num, variant, pos, type_text, fontsize )
                 offset = 50
             else:
                 offset = 10
@@ -771,7 +822,7 @@ class GenerateKicad(LibraryGenerator):
                     pos.x = box_size.x/2 - group_size.x + 25
 
                 pos.y = group_pos.y - group_size.y/2 - 25
-                draw_text (comp, unit, variant, pos, group.qualifiers, fontsize)
+                draw_text (comp, unit_num, variant, pos, group.qualifiers, fontsize)
             
             if group.label:
                 size = self.get_scaled_fontsize (fontsize, len(group.pins) ) 
@@ -780,7 +831,7 @@ class GenerateKicad(LibraryGenerator):
                 else:
                     pos.x = box_size.x/2 - group_size.x - offset - TextLength(group.label, size)
                 pos.y = group_pos.y - group_size.y/2 - 25
-                draw_text (comp, unit, variant, pos, group.label, size)
+                draw_text (comp, unit_num, variant, pos, group.label, size)
 
         # add icons
         if self.symbols.icon_lib and len(xunit.icons)>0:
@@ -792,7 +843,7 @@ class GenerateKicad(LibraryGenerator):
                 icons_y_extent = 0
 
             for icon_name in xunit.icons:
-                comp_icon = self.symbols.icon_lib.getComponentByName(icon_name)
+                comp_icon = getComponentByName(self.symbols.icon_lib, icon_name)
                 if comp_icon:
                     style = StyleAttributes()
                     # todo: not sure this is right way
@@ -801,18 +852,19 @@ class GenerateKicad(LibraryGenerator):
                     else:
                         style.fill = xunit.fill
                     style.pensize = sgcomp.settings.box_pen
-                    copy_icon (comp, comp_icon, unit, Point(0, y_pos -k * 150 + icons_y_extent/2), style=style)
+                    copy_icon_v5 (comp, comp_icon, unit_num, Point(0, y_pos -k * 150 + icons_y_extent/2), style=style)
                     k += 1
                 else:
-                    print("error: unknown icon %s " % icon_name)
-                    self.num_errors += 1
+                    self.error (comp.name, "icon %s not in icon lib" % icon_name)
 
         if self.symbols.icon_lib and xunit.template:
-            comp_icon = self.symbols.icon_lib.getComponentByName(xunit.template)
-            style = StyleAttributes()
-            style.fill = xunit.fill
+            comp_icon = getComponentByName(self.symbols.icon_lib, xunit.template)
             if comp_icon:
-                copy_icon (comp, comp_icon, unit, Point(0, 0), style=style)
+                style = StyleAttributes()
+                style.fill = xunit.fill
+                copy_icon_v5 (comp, comp_icon, unit_num, Point(0, 0), style=style)
+            #else:
+            #    self.error (comp.name, "template %s not in icon lib" % xunit.template)
 
         #
         #if self.label_style == "floating":
@@ -1008,8 +1060,7 @@ class GenerateKicad(LibraryGenerator):
             #    #continue
 
             if not num_outputs in [1,2]:
-                print("error: wrong number of output pins: expected 1-2 got %d" % (num_outputs))
-                self.num_errors += 1
+                self.error (comp.name, "wrong number of output pins: expected 1-2 got %d" % (num_outputs))
                 #continue
 
             ##
@@ -1074,23 +1125,22 @@ class GenerateKicad(LibraryGenerator):
                     unit.unit_rect.size.y = gatedef.height
 
                 if num_inputs > len(inputs_pos):
-                    print("error: too many input pins, expected %d got %d" % ( len(inputs_pos), num_inputs))
-                    self.num_errors += 1
-            
+                    self.error (comp.name, "too many input pins, expected %d got %d" % ( len(inputs_pos), num_inputs))
+                    continue
+
     #            if comp.name=="74LS136":
     #                print "oops"
 
                 if self.symbols.icon_lib and len(unit.icons)>0:
                     for icon_name in unit.icons:
-                        comp_icon = self.symbols.icon_lib.getComponentByName(icon_name)
+                        comp_icon = getComponentByName(self.symbols.icon_lib, icon_name)
                         if comp_icon:
                             style = StyleAttributes()
                             style.fill = unit.fill
                             style.pensize = sgcomp.settings.box_pen
-                            copy_icon (comp, comp_icon, self.unit_num, gatedef.get_center(), style=style)
+                            copy_icon_v5 (comp, comp_icon, self.unit_num, gatedef.get_center(), style=style)
                         else:
-                            print("error: unknown icon %s " % icon_name) 
-                            self.num_errors += 1
+                            self.error (comp.name, "icon %s not in icon lib" % icon_name)
 
                 j=0
                 input_pins = []
@@ -1139,8 +1189,9 @@ class GenerateKicad(LibraryGenerator):
                         else:
                             pin.shape = "I" if output_shape == " " else " "
 
-                        pin.pos.x = outputs_pos[j].x + sgcomp.settings.pin_length
-                        pin.pos.y = outputs_pos[j].y       
+                        if j < len(outputs_pos):
+                            pin.pos.x = outputs_pos[j].x + sgcomp.settings.pin_length
+                            pin.pos.y = outputs_pos[j].y       
                         j += 1
                         #pins.append (pin)
                         comp.drawOrdered.append( pin.get_element () )
@@ -1260,8 +1311,7 @@ class GenerateKicad(LibraryGenerator):
             found = False
             if sgcomp.default_footprint:
                 if not sgcomp.default_footprint.strip ('"') in self.symbols.footprints:
-                    print("error: (%s) footprint not found: %s" % (sgcomp.name, sgcomp.default_footprint))
-                    self.num_errors += 1
+                    self.error (sgcomp.name, "footprint not found: %s" % (sgcomp.default_footprint))
                 elif self.symbols.verbose:
                     print("found: %s" % sgcomp.default_footprint.strip ('"'))
 
@@ -1273,14 +1323,12 @@ class GenerateKicad(LibraryGenerator):
                     match = [m.group(0) for l in self.symbols.footprints for m in [regex.search(l)] if m]
 
                     if not match:
-                        print("error: (%s) no matches for filter: %s" % (sgcomp.name, filter))
-                        self.num_errors += 1
+                        self.error (sgcomp.name, "no matches for filter: %s" % (filter))
                     elif self.symbols.verbose:
                         print("found: %s" % match)
 
         if len(sgcomp.fplist) == 1 and not sgcomp.default_footprint:
-            print("error: (%s) footprint field should contain default footprint (%s)" % (comp.name, match if match and len(match)<=2 else sgcomp.fplist[0]))
-            self.num_errors += 1
+            self.error (comp.name, "footprint field should contain default footprint (%s)" % (match if match and len(match)<=2 else sgcomp.fplist[0]))
 
         #
         if sgcomp.user_fields:

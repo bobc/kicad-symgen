@@ -14,6 +14,22 @@ va_top = "T"
 va_center = "C"
 va_bottom = "B"
 
+class SymbolStyle (Enum):
+    # ANSI/MIL MIL-STD-806, now also IEEE Standard 91-1984 "distinctive shapes" 
+    ANSI = 1
+    # IEC 60617-12, now also IEEE Standard 91-1984
+    IEC = 2
+    # DIN 40700
+    DIN = 3
+    #
+    PHYSICAL = 4
+
+class PowerStyle (Enum):
+    # A box
+    BOX = 1
+    # No box
+    LINES = 2
+
 class StyleAttributes:
 
     pensize = 10
@@ -81,6 +97,9 @@ class SgSettings:
 
         self.label_horiz_align = ha_left
         self.label_vert_align = va_top
+
+        self.opt_alternate_names = False
+        self.alt_name_char = "/"
 
 
 class SgComponent (SgItem):

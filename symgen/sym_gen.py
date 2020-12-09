@@ -83,12 +83,17 @@ else:
 
 # --regen -lib C:\git_bobc\kicad-library\library\74xx.lib 
 # C:\gitlab\kicad-libraries\kicad-symbols_pre_v6\new
+
 # --inp MCU_Microchip_PIC18.txt --output v6-sweet
+# C:\git_bobc\kicad-symgen\symgen\data\74xx
 
 if "dump" in actions:
     # -d --lib C:\git_bobc\kicad-library\library\74xx.lib --ref ..\74xx\7400_logic_ref.txt
     # -d --lib C:\git_bobc\kicad-library\library\Logic_74xx.lib --ref ..\74xx\7400_logic_ref.txt
     # 
+    # -d --lib c:\gitlab_bobc\kicad-symbols\74xx.kicad_sym
+    # C:\github\kicad-symgen-symbols\74xx
+
     if not args.lib:
         ExitError("error: library name not supplied (need --lib)")
 
@@ -103,6 +108,7 @@ if "dump" in actions:
 if "gen" in actions:
     # --inp 74xx.txt
     # --inp mcu_stm32_stm32f0.txt --fp_dir c:\github\kicad-footprints
+    # --inp 74xgxx.txt --output v6
 
     if args.regen:
         file = os.path.basename (args.lib)

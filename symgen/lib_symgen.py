@@ -47,6 +47,8 @@ import re
 import shlex
 #from enum import Enum
 
+import kicad_sym
+
 from schlib import *
 from print_color import *
 
@@ -155,7 +157,7 @@ class SymGen:
 
         self.opt_pin_qualifiers = False
 
-        self.opt_alternate_names = True
+        #self.opt_alternate_names = True
 
         self.def_logic_combine = "multi"
 
@@ -502,8 +504,8 @@ class SymGen:
                 pin.shape = flags
 
                 #
-                if self.opt_alternate_names and '/' in pin.name:
-                    names = pin.name.split ('/')
+                if sgcomp.settings.opt_alternate_names and sgcomp.settings.alt_name_char in pin.name:
+                    names = pin.name.split (sgcomp.settings.alt_name_char)
                     pin.name = names[0]
                     for name in names[1:]:
                         pin.alternate_names.append (AlternatePin(name, pin.type, pin.shape))
@@ -607,7 +609,21 @@ class SymGen:
 
     def parse_directive(self, sgcomp):
 
-        if self.tokens[0] == "%lib":
+        if self.tokens[0] == "%alt_names":
+
+            if self.tokens[1].lower() == "off":
+                alternate_names = False
+            else:
+                alternate_names = True
+                alt_char = "/"
+
+            if self.in_component:
+                sgcomp.settings.opt_alternate_names = alternate_names
+                sgcomp.settings.alt_name_char = alt_char
+            else:
+                self.def_settings.opt_alternate_names = alternate_names
+
+        elif self.tokens[0] == "%lib":
             self.out_basename = self.tokens[1]
             if self.out_basename.endswith (".lib"):
                 self.out_basename = before (self.out_basename, ".lib")
@@ -691,12 +707,16 @@ class SymGen:
             if not self.in_component:
                 # filename = os.path.join ("data", self.tokens[1])
                 filename = os.path.abspath(os.path.join(self.out_path, self.tokens[1]))
-                self.icon_lib = SchLib(filename)
+
+                if after(filename, ".").lower() == "lib":
+                    self.icon_lib = SchLib(filename)
+                elif after(filename, ".").lower() == "kicad_sym":
+                    self.icon_lib = kicad_sym.KicadLibrary.from_file(filename)
 
         elif self.tokens[0] == "%style":
             tok = self.tokens[1].upper()
 
-            # ANSI|IEC fill single|multi
+            # ANSI|IEC|DIN <fill> single|multi
 
             if tok == "ANSI":
                 self.symbol_style = SymbolStyle.ANSI
@@ -712,7 +732,7 @@ class SymGen:
             if len(self.tokens) > 2:
                 fill = self.parse_fill (self.tokens[2])
                 if fill:
-                    self.def_settings.logic_fill = self.tokens[2]
+                    self.def_settings.logic_fill = fill
                 else:
                     print("error : unknown fill %s" % self.line)
                     self.num_errors += 1

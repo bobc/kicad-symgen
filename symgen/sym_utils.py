@@ -4,30 +4,19 @@ import os
 import hashlib
 import time
 import copy
+import math
 
 from schlib import *
 from sym_drawing import *
 from sym_comp import *
 
+import sweet
+import kicad_sym
+import sym_utils_v6
 
-class SymbolStyle (Enum):
-    # ANSI/MIL MIL-STD-806, now also IEEE Standard 91-1984 "distinctive shapes" 
-    ANSI = 1
-    # IEC 60617-12, now also IEEE Standard 91-1984
-    IEC = 2
-    # DIN 40700
-    DIN = 3
-    #
-    PHYSICAL = 4
-
-class PowerStyle (Enum):
-    # A box
-    BOX = 1
-    # No box
-    LINES = 2
                     
 
-
+#todo: v5
 def create_empty_lib (filename):
 
     basename = os.path.splitext (filename)[0]
@@ -93,6 +82,7 @@ def capitalise (s):
 def align_to_grid (val, grid_size):
     return int (val/grid_size) * grid_size
 
+#todo: v5
 def convert_to_string (elem):
     item=elem[1]
     keys_list = Component._DRAW_KEYS[elem[0]] # e.g 'A' -> keys of all properties of arc
@@ -107,6 +97,7 @@ def convert_to_string (elem):
     line = line.rstrip()
     return line
 
+#todo: v5
 def create_drawing_object (elem):
     key = elem[0]
     params = elem[1]
@@ -124,7 +115,7 @@ def create_drawing_object (elem):
 
     return drawing
 
-
+#todo: v5
 def get_bounds (comp, unit):
     bbs=[]
     for elem in comp.drawOrdered:
@@ -141,6 +132,7 @@ def get_bounds (comp, unit):
     else:
         return sum(bbs)
 
+#todo: v5
 def get_checksum (comp, unit, variant):
 
     data=''
@@ -178,64 +170,157 @@ def get_fill (fill, style):
         else:
             return fill
 
-def copy_icon (comp, comp_icon, unit, pos, variant=1, src_unit=0, src_variant=1, style = None):
+# copy graphic items from src_comp[src_unit,src_variant] to dest_comp[dest_unit,variant]
+#def copy_icon_v6 (dest_comp, src_comp, offset, dest_unit, variant=0, src_unit=0, src_variant=1, style = None):
+
+def copy_icon_v5 (dest_comp, src_comp, dest_unit, offset, variant=1, src_unit=0, src_variant=1, style = None):
     
     # TODO: source unit
     # pensize, fill?
 
-    for p in comp_icon.draw['arcs']:
-        # TODO apply offset pos
-        item = dict(p)
-        if item['convert'] == str(src_variant) or item['convert'] == '0':
-            item ['unit'] = str(unit)
-            item ['convert'] = str(variant)
-            item ['posy'] = str(int(item ['posy']) + pos.y)
-            item ['starty'] = str(int(item ['starty']) + pos.y)
-            item ['endy'] = str(int(item ['endy']) + pos.y)
-            item['fill'] = get_fill (item['fill'], style)
-            comp.drawOrdered.append (['A', item])
+    if type(src_comp) == Component:
+        for p in src_comp.draw['arcs']:
+            # TODO apply offset pos
+            item = dict(p)
+            if item['convert'] == str(src_variant) or item['convert'] == '0':
+                item ['unit'] = str(dest_unit)
+                item ['convert'] = str(variant)
+                item ['posy'] = str(int(item ['posy']) + offset.y)
+                item ['starty'] = str(int(item ['starty']) + offset.y)
+                item ['endy'] = str(int(item ['endy']) + offset.y)
+                item ['fill'] = get_fill (item['fill'], style)
+                dest_comp.drawOrdered.append (['A', item])
     
-    for p in comp_icon.draw['circles']:
-        item = copy.deepcopy(p)
-        if item['convert'] == str(src_variant) or item['convert'] == '0':
-            item ['unit'] = str(unit)
-            item ['convert'] = str(variant)
-            item ['posy'] = str(int(item ['posy']) + pos.y)
-            item['fill'] = get_fill (item['fill'], style)
-            comp.drawOrdered.append (['C', item])
+        for p in src_comp.draw['circles']:
+            item = copy.deepcopy(p)
+            if item['convert'] == str(src_variant) or item['convert'] == '0':
+                item ['unit'] = str(dest_unit)
+                item ['convert'] = str(variant)
+                item ['posy'] = str(int(item ['posy']) + offset.y)
+                item ['fill'] = get_fill (item['fill'], style)
+                dest_comp.drawOrdered.append (['C', item])
 
-    for p in comp_icon.draw['polylines']:
-        item = dict(p)
-        if item['convert'] == str(src_variant) or item['convert'] == '0':
-            poly = PolyLine (convert_to_string(['P',p]))
-            poly.unit = unit
-            poly.demorgan = variant
-            poly.fill = get_fill (item['fill'], style)
-            poly.pensize = item['thickness']
-            for pt in poly.points:
-                pt.x += pos.x    
-                pt.y += pos.y    
-            comp.drawOrdered.append (poly.get_element())
+        for p in src_comp.draw['polylines']:
+            item = dict(p)
+            if item['convert'] == str(src_variant) or item['convert'] == '0':
+                poly = PolyLine (convert_to_string(['P',p]))
+                poly.unit = dest_unit
+                poly.demorgan = variant
+                poly.fill = get_fill (item['fill'], style)
+                poly.pensize = item['thickness']
+                for pt in poly.points:
+                    pt.x += offset.x    
+                    pt.y += offset.y    
+                dest_comp.drawOrdered.append (poly.get_element())
 
-    for p in comp_icon.draw['rectangles']:
-        # TODO apply offset pos
-        item = dict(p)
-        if item['convert'] == str(src_variant) or item['convert'] == '0':
-            rect = Rect()
-            rect.unit = unit
-            rect.demorgan = variant
-            rect.fill = get_fill (item['fill'], style)
-            rect.p1 = Point(int(item['startx']), int(item['starty'])).Add(pos)
-            rect.p2 = Point(int(item['endx']), int(item['endy'])).Add(pos)
-            comp.drawOrdered.append (rect.get_element())
+        for p in src_comp.draw['rectangles']:
+            # TODO apply offset pos
+            item = dict(p)
+            if item['convert'] == str(src_variant) or item['convert'] == '0':
+                rect = Rect()
+                rect.unit = dest_unit
+                rect.demorgan = variant
+                rect.fill = get_fill (item['fill'], style)
+                rect.p1 = Point(int(item['startx']), int(item['starty'])).Add(offset)
+                rect.p2 = Point(int(item['endx']), int(item['endy'])).Add(offset)
+                dest_comp.drawOrdered.append (rect.get_element())
 
-    for p in comp_icon.draw['texts']:
-        item = copy.deepcopy(p)
-        if item['convert'] == str(src_variant) or item['convert'] == '0':
-            item ['unit'] = str(unit)
-            item ['convert'] = str(variant)
-            item ['posy'] = str(int(item ['posy']) + pos.y)
-            comp.drawOrdered.append (['T',item])
+        for p in src_comp.draw['texts']:
+            item = copy.deepcopy(p)
+            if item['convert'] == str(src_variant) or item['convert'] == '0':
+                item ['unit'] = str(dest_unit)
+                item ['convert'] = str(variant)
+                item ['posy'] = str(int(item ['posy']) + offset.y)
+                dest_comp.drawOrdered.append (['T',item])
+
+    elif type(src_comp) == kicad_sym.KicadSymbol:
+        for p in src_comp.arcs:
+            if p.demorgan == src_variant or p.demorgan==0:
+                item = {}
+                item ['unit'] = str(dest_unit)
+                item ['convert'] = str(variant)
+                item ['posx'] = str(kicad_sym.mm_to_mil(p.centerx))
+                item ['posy'] = str(kicad_sym.mm_to_mil(p.centery))
+                item ['radius'] = str (kicad_sym.mm_to_mil(p.length))
+                item ['start_angle'] = str(math.floor(p.angle_start * 10.0))
+                item ['end_angle'] = str(math.floor(p.angle_stop * 10.0))
+                item ['startx'] = str(kicad_sym.mm_to_mil(p.startx))
+                item ['starty'] = str(kicad_sym.mm_to_mil(p.starty))
+                item ['endx'] = str(kicad_sym.mm_to_mil(p.endx))
+                item ['endy'] = str(kicad_sym.mm_to_mil(p.endy))
+                item ['thickness'] = str(kicad_sym.mm_to_mil(p.stroke_width))
+                item ['fill'] = sweet.convert_fill_to_v5(p.fill_type)
+
+                item ['posy'] = str(int(item ['posy']) + offset.y)
+                item ['starty'] = str(int(item ['starty']) + offset.y)
+                item ['endy'] = str(int(item ['endy']) + offset.y)
+                item ['fill'] = get_fill (item['fill'], style)
+                dest_comp.drawOrdered.append (['A', item])
+    
+        for p in src_comp.circles:
+            if p.demorgan == src_variant or p.demorgan == 0:
+                item = {}
+                item ['unit'] = str(dest_unit)
+                item ['convert'] = str(variant)
+                item ['posx'] = str(kicad_sym.mm_to_mil(p.centerx))
+                item ['posy'] = str(kicad_sym.mm_to_mil(p.centery))
+                item ['radius'] = str (kicad_sym.mm_to_mil(p.radius))
+                item ['thickness'] = str(kicad_sym.mm_to_mil(p.stroke_width))
+                item ['fill'] = sweet.convert_fill_to_v5(p.fill_type)
+
+                item ['posy'] = str(int(item ['posy']) + offset.y)
+                item ['fill'] = get_fill (item['fill'], style)
+                dest_comp.drawOrdered.append (['C', item])
+
+        for p in src_comp.polylines:
+            if p.demorgan == src_variant or p.demorgan == 0:
+
+                poly = PolyLine ()
+                poly.unit = dest_unit
+                poly.demorgan = variant
+                poly.fill = sweet.convert_fill_to_v5(p.fill_type)
+                poly.fill = get_fill (poly.fill, style)
+                poly.pensize = kicad_sym.mm_to_mil(p.stroke_width)
+                for pt in p.points:
+                    mil_p = sym_utils_v6.point_to_mil (pt)
+                    poly.points.append (mil_p.Add (offset))
+
+                dest_comp.drawOrdered.append (poly.get_element())
+
+        for p in src_comp.rectangles:
+            # TODO apply offset
+            if p.demorgan == src_variant or p.demorgan == 0:
+                rect = Rect()
+                rect.unit = dest_unit
+                rect.demorgan = variant
+                rect.fill = sweet.convert_fill_to_v5(p.fill_type)
+                rect.fill = get_fill (rect.fill, style)
+                rect.pensize = kicad_sym.mm_to_mil(p.stroke_width)
+                rect.p1 = sym_utils_v6.point_to_mil(Point(p.startx, p.starty)).Add(offset)
+                rect.p2 = sym_utils_v6.point_to_mil(Point(p.endx, p.endy)).Add(offset)
+                dest_comp.drawOrdered.append (rect.get_element())
+
+        for p in src_comp.texts:
+            if p.demorgan == src_variant or p.demorgan == 0:
+                item = {}
+                item ['unit'] = str(dest_unit)
+                item ['convert'] = str(variant)
+                item ['posx'] = str(kicad_sym.mm_to_mil(p.posx))
+                item ['posy'] = str(kicad_sym.mm_to_mil(p.posy))
+                item ['direction'] = str(math.floor(p.rotation * 10.0))
+
+                item ['text_size'] = str(kicad_sym.mm_to_mil(p.effects.sizex))
+                item ['hjustify'] = "L" if p.effects.h_justify == "left" else "C"
+                item ['vjustify'] = "B" if p.effects.v_justify == "bottom" else "C"
+                item ['bold'] = "1" if p.effects.is_bold else "0"
+                item ['italic'] = "Italic" if p.effects.is_italic else "Normal"
+                item ['text_type'] = "1" if p.effects.is_hidden else "0"
+
+                item ['text'] = p.text
+
+                item ['posy'] = str(int(item ['posy']) + offset.y)
+                dest_comp.drawOrdered.append (['T',item])
+
 
 
 

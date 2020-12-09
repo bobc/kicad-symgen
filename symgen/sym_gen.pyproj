@@ -7,14 +7,13 @@
     <ProjectHome>
     </ProjectHome>
     <StartupFile>sym_gen.py</StartupFile>
-    <SearchPath>
-    </SearchPath>
-    <WorkingDirectory>C:\github\kicad-symgen-symbols\74xgxx</WorkingDirectory>
+    <SearchPath>v5_schlib;common</SearchPath>
+    <WorkingDirectory>C:\git_bobc\kicad-symgen\symgen\data\74xx</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>sym_gen</Name>
     <RootNamespace>opto_fix</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>--inp 74xgxx.txt --output v6</CommandLineArguments>
+    <CommandLineArguments>--inp 74xx.txt</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
     <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
@@ -28,6 +27,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="common\boundingbox.py" />
+    <Compile Include="common\kicad_sym.py" />
     <Compile Include="common\print_color.py" />
     <Compile Include="common\rulebase.py" />
     <Compile Include="common\sexpr.py" />
@@ -45,6 +45,9 @@
     <Compile Include="str_utils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="sweet.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="sym_comp.py">
       <SubType>Code</SubType>
     </Compile>
@@ -58,7 +61,8 @@
     <Compile Include="sym_iec.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="sym_utils.py">
+    <Compile Include="sym_utils.py" />
+    <Compile Include="sym_utils_v6.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="v5_schlib\schlib.py" />

@@ -6,7 +6,7 @@ from enum import Enum
 from schlib import *
 from str_utils import *
 
-
+#todo: v5
 NoFill = 'N'
 Foreground = 'F'
 Background = 'f'
@@ -68,6 +68,74 @@ def get_pin_type (_type, shape):
         flags += "X"
     if "I" in shape:
         flags = "~" + flags
+
+    result = flags + result
+
+    return result
+
+# convert kicad to symgen
+def get_pin_type_v6 (pin):
+
+    # _type : input, output, bidirectional, tri_state, passive, unspecified, power_in, power_out, open_collector, open_emitter, unconnected 
+    # shape : line, inverted, clock, inverted_clock, input_low, clock_low, output_low, edge_clock_high, non_logic
+
+    flags = ""
+    result = ""
+
+    if pin.etype == "power_in":
+        result = "PI"
+    elif pin.etype == "power_out":
+        result = "PO"
+    elif pin.etype ==  'input':
+        result = 'I'
+    elif pin.etype ==  'output':
+        result ='O'
+    elif pin.etype ==  'bidirectional':
+        result ='B'
+    elif pin.etype ==  'tri_state':
+        result ='T'
+    elif pin.etype ==  'passive':
+        result ='P'
+    elif pin.etype ==  'open_collector':
+        result ='C'
+    elif pin.etype ==  'open_emitter':
+        result ='E'
+    elif pin.etype ==  'unconnected':
+        result ='N'
+    elif pin.etype ==  'unspecified':
+        result ='U'
+
+    if pin.is_hidden :
+        flags = "N"
+    else:
+        flags = ""
+
+    if pin.shape == "line":
+        pass
+
+    elif pin.shape == "inverted":
+        flags = "~" + flags
+
+    elif pin.shape == "clock":
+        flags += "C"
+
+    elif pin.shape == "inverted_clock":
+        flags = "~" + flags + "C"
+
+    elif pin.shape == "input_low":
+        flags += "L"
+
+    elif pin.shape == "clock_low":
+        flags += "LC"
+
+    elif pin.shape == "output_low":
+        flags += "V"
+
+    elif  pin.shape == "falling_edge_clock":
+        flags += "F"
+
+    elif pin.shape == "non_logic":
+        flags += "X"
 
     result = flags + result
 
@@ -285,15 +353,15 @@ class Pin (DrawBase):
         # P Passive
         # C Open Collector
         # E Open Emitter
-        # N NC             (displayed with cross)
+        # N NoConnect aka unconnected            (displayed with cross)
         # U Unspecified
-        # W Power input
+        # W Power Input
         # w Power Output
         self.type = "I"
         
         # aka "Graphical style"
         # shape is ' ' or one or more of:
-        # " "     simple line (default)
+        # " "     line (default)         ---|
         # I       Inverted               --o|  
         # C       Clock                  ---|> 
         # F       Falling edge clock     ---|< 
@@ -301,7 +369,7 @@ class Pin (DrawBase):
         # V       Output, active low     --/| 
         # X       Non-logic              -->|< 
         # N       Invisible
-        # typical combinations:
+        # allowed combinations:
         # CI      Clock, inverted        --o|> 
         # CL      Clock, low             --\|> 
         self.shape = " "
@@ -403,10 +471,10 @@ class Pin (DrawBase):
 
 class Arc (DrawBase):
 
-    pos=Point()
     radius=0
     arcstart=0
     arcend=0
+    pos=Point()
     start=Point()
     end=Point()
 
@@ -544,7 +612,7 @@ class PolyLine (DrawBase):
 
     def get_values (self):
         values = []
-        values.append (str(self.point_count))
+        values.append (str(len(self.points)))
         values.append (str(self.unit))
         values.append (str(self.demorgan))
         values.append (str(self.pensize))
